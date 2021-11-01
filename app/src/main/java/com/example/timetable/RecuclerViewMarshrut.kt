@@ -3,11 +3,10 @@ package com.example.timetable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerAdapterTypesHelpAdmin: RecyclerView.Adapter<RecyclerAdapterTypesHelpAdmin.ViewHolder>()
+class RecyclerAdapterMarshrut: RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
     var dataset: MutableList<String> = mutableListOf("foreasd", "jj" ,"asdaksjdbaksd" , "asdhagsjdasdasd adds asdasdasdq")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
