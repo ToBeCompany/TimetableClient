@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/first_frg"
         android:name="com.example.timetable.MainFragment"
         android:layout_width="match_parent"
@@ -14,21 +14,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav">
 
-    </fragment>
+    </androidx.fragment.app.FragmentContainerView>
 
 
-    <fragment
-        android:id="@+id/map_frg"
-        android:name="com.example.timetable.FragmentMap"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-    </fragment>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
