@@ -32,7 +32,9 @@ class RecyclerAdapterTypesHelpAdmin: RecyclerView.Adapter<RecyclerAdapterTypesHe
         fun onBind(type: String)
         {
             type_text.text = type
+        deletetype_button.setOnClickListener(){
 
+        }
         }
     }
 
