@@ -38,4 +38,3 @@ class AdapterRecuclerMapView: RecyclerView.Adapter<AdapterRecuclerMapView.ViewHo
     }
 
 }
-
