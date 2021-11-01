@@ -1,6 +1,5 @@
 package com.example.timetable
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,9 @@ import com.example.timetable.data.BusData
 
 class RecyclerAdapterMarshrut(
 //       var click: ()->Unit
+       var click: (
+
+               )->Unit
 ): RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
     var dataset: MutableList<BusData> = mutableListOf()

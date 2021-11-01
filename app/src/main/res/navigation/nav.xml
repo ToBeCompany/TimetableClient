@@ -13,9 +13,7 @@
         <action
             android:id="@+id/action_mainFragment_to_fragmentMap"
             app:destination="@id/fragmentMap" />
-        <action
-            android:id="@+id/action_mainFragment_to_fragmentMap2"
-            app:destination="@id/fragmentMap" />
+
     </fragment>
     <fragment
         android:id="@+id/fragmentMap"

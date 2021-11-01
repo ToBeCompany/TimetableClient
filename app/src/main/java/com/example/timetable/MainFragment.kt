@@ -9,10 +9,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.timetable.data.BusData
-import com.example.timetable.data.BusStop
-import com.example.timetable.firebase.BusFireBase
-import com.google.firebase.firestore.GeoPoint
 
 
 class MainFragment : Fragment()
@@ -31,6 +27,13 @@ class MainFragment : Fragment()
         recyclerView?.layoutManager = LinearLayoutManager(context)
         getData()
 
+var adapter = RecyclerAdapterMarshrut{
+    findNavController().navigate(R.id.action_mainFragment_to_fragmentMap)
+}
+        var recyclerView = root.findViewById<RecyclerView>(R.id.recucler_View_Mainfrag)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        adapter.notifyDataSetChanged()
         return root
     }
 
