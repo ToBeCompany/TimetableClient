@@ -13,10 +13,10 @@ class FragmentMap: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var root = inflater.inflate(R.layout.fragment_main, container, false)
+        var root = inflater.inflate(R.layout.fragment_map, container, false)
 
         var adapter = AdapterRecuclerMapView()
-        var recyclerView = root.findViewById<RecyclerView>(R.id.recucler_View_First)
+        var recyclerView = root.findViewById<RecyclerView>(R.id.recyclerViewTimeTable)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter.notifyDataSetChanged()

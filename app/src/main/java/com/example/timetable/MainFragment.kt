@@ -22,7 +22,7 @@ class MainFragment : Fragment() {
 var adapter = RecyclerAdapterMarshrut{
     findNavController().navigate(R.id.action_mainFragment_to_fragmentMap)
 }
-        var recyclerView = root.findViewById<RecyclerView>(R.id.recucler_View_First)
+        var recyclerView = root.findViewById<RecyclerView>(R.id.recucler_View_Mainfrag)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter.notifyDataSetChanged()
