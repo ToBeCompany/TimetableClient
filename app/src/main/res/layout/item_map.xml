@@ -14,7 +14,7 @@
 
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textViewOst"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="остановка"
@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/imageview"
+            android:id="@+id/textViewTime"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="время"
