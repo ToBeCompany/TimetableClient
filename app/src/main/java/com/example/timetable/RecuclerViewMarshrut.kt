@@ -10,7 +10,9 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerAdapterMarshrut(
-       var click: ()->Unit
+       var click: (
+
+               )->Unit
 ): RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
     var dataset: MutableList<String> = mutableListOf("foreasd", "jj" ,"asdaksjdbaksd" , "asdhagsjdasdasd adds asdasdasdq")

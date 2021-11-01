@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class AdapterRecuclerMapView: RecyclerView.Adapter<AdapterRecuclerMapView.ViewHolder>()
 {
-    var dataset: MutableList<TypeMap> = mutableListOf(TypeMap("iurfg", "9:30"))
+    var dataset: MutableList<TypeMap> = mutableListOf(TypeMap("1-ый", "9:30"),TypeMap("2-ой", "10:30"))
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.item_map, parent, false)
