@@ -1,4 +1,7 @@
 package com.example.timetable.data
 
-class BusStop {
-}
+import com.google.firebase.firestore.GeoPoint
+
+data class BusStop(
+    var position: GeoPoint
+)

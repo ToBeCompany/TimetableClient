@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+/*
 
 class RecyclerAdapterTimeTable: RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
@@ -16,7 +17,7 @@ class RecyclerAdapterTimeTable: RecyclerView.Adapter<RecyclerAdapterMarshrut.Vie
         return ViewHolder(View)
     }
 
-    override fun onBindViewHolder(holder: RecyclerAdapterMarshrut.ViewHolder, position: Int)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
         holder.onBind(dataset[position])
     }
@@ -53,3 +54,4 @@ class MapRecyclerAdapter(private val names: List<String>) {
 
 
 }
+*/
