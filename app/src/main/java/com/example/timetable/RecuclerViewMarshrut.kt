@@ -3,10 +3,15 @@ package com.example.timetable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerAdapterMarshrut: RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
+class RecyclerAdapterMarshrut(
+       var click: ()->Unit
+): RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
     var dataset: MutableList<String> = mutableListOf("foreasd", "jj" ,"asdaksjdbaksd" , "asdhagsjdasdasd adds asdasdasdq")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -24,13 +29,21 @@ class RecyclerAdapterMarshrut: RecyclerView.Adapter<RecyclerAdapterMarshrut.View
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
+
         var context = itemView.context
         var type_text = itemView.findViewById<TextView>(R.id.textView)
-//        var deletetype_button = itemView.findViewById<Button>(R.id.delete_type_buton)
-
+        var next_button = itemView.findViewById<Button>(R.id.btnOf_Item)
         fun onBind(type: String)
         {
+
             type_text.text = type
+            next_button.setOnClickListener(){
+                click()
+                }
+
+            //                itemView.findNavController()
+//                        .navigate(R.id.action_mainFragment_to_fragmentMap)
+
         }
     }
 }
