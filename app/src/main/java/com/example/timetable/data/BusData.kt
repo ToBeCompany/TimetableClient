@@ -4,8 +4,8 @@ import com.google.firebase.firestore.GeoPoint
 
 data class BusData(
     var name: String,
-    var id: String,
+//    var uid: String,
     val route: MutableList<GeoPoint>,
     val busStops: MutableList<BusStop>,
 
-)
+    )

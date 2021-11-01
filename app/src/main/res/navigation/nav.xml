@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentMap"
-        android:name="com.example.timetable.FragmentMap"
+        android:name="com.example.timetable.map.FragmentMap"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map" >
         <action

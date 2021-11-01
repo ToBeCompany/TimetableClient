@@ -7,7 +7,7 @@ import com.example.timetable.data.BusData
 import com.google.firebase.firestore.FirebaseFirestore
 
 
-class BusFireBase(var c: Context)
+class BusFireBase()
 {
     private val collection = "buses"
     var ref = FirebaseFirestore.getInstance().collection(collection)
@@ -18,7 +18,6 @@ class BusFireBase(var c: Context)
             .document()
             .set(data)
             .addOnFailureListener { e ->
-                Toast.makeText(c, e.message, Toast.LENGTH_LONG).show()
                 Log.d("error", e.message.toString())
             }
     }

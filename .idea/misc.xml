@@ -4,17 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/layout/activity_main.xml" value="0.2210144927536232" />
-      </map>
-    </option>
-  </component>
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable/app/src/main/res/layout/activity_main.xml" value="0.2957427536231884" />
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable/app/src/main/res/layout/fragment_main.xml" value="0.2957427536231884" />
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable/app/src/main/res/layout/fragment_map.xml" value="0.2957427536231884" />
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable/app/src/main/res/layout/item_map.xml" value="0.2957427536231884" />
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable/app/src/main/res/layout/item_view_marshrut.xml" value="0.2957427536231884" />
+        <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/layout/fragment_main.xml" value="0.264" />
       </map>
     </option>
   </component>
