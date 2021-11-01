@@ -2,52 +2,35 @@ package com.example.timetable
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
+import android.util.Log
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+import android.widget.Toast
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
+class MainActivity : AppCompatActivity()
+{
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val db = Firebase.firestore
+
+        val user = hashMapOf(
+            "first" to "Ada",
+            "last" to "Lovelace",
+            "born" to 1815
+        )
+
+        db.collection("USer").add(user)
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(this, "success", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, e.message.toString(), Toast.LENGTH_LONG).show()
+                Log.d("Error", e.message.toString())
+
+            }
     }
-
-//    class RecyclerAdapterTypesHelpAdmin: RecyclerView.Adapter<RecyclerAdapterTypesHelpAdmin.ViewHolder>()
-//    {
-//        var dataset: MutableList<String> = mutableListOf()
-//        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
-//        {
-//            val View = LayoutInflater.from(parent.context).inflate(R.layout.type_help_item_admin, parent, false)
-//            return ViewHolder(View)
-//        }
-//
-//        override fun onBindViewHolder(holder: ViewHolder, position: Int)
-//        {
-//            holder.onBind(dataset[position])
-//        }
-//
-//        override fun getItemCount(): Int = dataset.size
-//
-//        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-//        {
-//            var context = itemView.context
-//            var type_text = itemView.findViewById<TextView>(R.id.type_text)
-//            var deletetype_button = itemView.findViewById<Button>(R.id.delete_type_buton)
-//
-//            fun onBind(type: String)
-//            {
-//                type_text.text = type
-//                deletetype_button.setOnClickListener {
-//
-//                }
-//            }
-//        }
-//    }
-
-
-
-
 }

@@ -1,37 +1,25 @@
 package com.example.timetable
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class FragmentMap : Fragment(){
-
+class FragmentMap: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-
     ): View? {
+        var root = inflater.inflate(R.layout.fragment_main, container, false)
 
-        var root =  inflater.inflate(R.layout.fragment_map, container, false)
-
-    val recyclerView: RecyclerView = root.findViewById(R.id.recyclerViewTimeTable)
-    recyclerView.layoutManager = LinearLayoutManager(context)
-
-
-
-
-
+        var adapter = AdapterRecuclerMapView()
+        var recyclerView = root.findViewById<RecyclerView>(R.id.recucler_View_First)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        adapter.notifyDataSetChanged()
         return root
     }
-
-
-
-
-
-
 }

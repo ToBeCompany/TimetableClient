@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "700450893534",
+    "project_id": "timetable-fd062",
+    "storage_bucket": "timetable-fd062.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700450893534:android:797f77eba897a5a529dc4f",
+        "android_client_info": {
+          "package_name": "com.example.timetable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700450893534-jl5pr4nt2cqkh6mrupro32eim9533ftr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.timetable",
+            "certificate_hash": "32251b114597e5f086fa7e7e57a71ae952011438"
+          }
+        },
+        {
+          "client_id": "700450893534-v0uaaviuhhrnkirvgp4qffb26pg78af0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfYA_OH11PdWDCSx5algrXB8RaogK9yw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700450893534-v0uaaviuhhrnkirvgp4qffb26pg78af0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

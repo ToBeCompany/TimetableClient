@@ -17,7 +17,7 @@ class MainFragment : Fragment() {
     ): View? {
         var root = inflater.inflate(R.layout.fragment_main, container, false)
 
-var adapter = RecyclerAdapterTypesHelpAdmin()
+var adapter = RecyclerAdapterMarshrut()
         var recyclerView = root.findViewById<RecyclerView>(R.id.recucler_View_First)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
