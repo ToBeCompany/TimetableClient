@@ -2,6 +2,7 @@ package com.example.timetable
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import com.example.timetable.data.BusData
 import com.example.timetable.data.BusStop
@@ -15,7 +16,6 @@ class MainActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
     }
 }
