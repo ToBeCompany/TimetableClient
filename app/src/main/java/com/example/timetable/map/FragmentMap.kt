@@ -23,7 +23,7 @@ class FragmentMap: Fragment()
         var root = inflater.inflate(R.layout.fragment_main, container, false)
 
 
-        recyclerView = root.findViewById(R.id.recucler_View_First)
+        recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
         recyclerView?.adapter = adapter
         recyclerView?.layoutManager = LinearLayoutManager(context)
 

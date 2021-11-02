@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.timetable.map.AdapterRecuclerMapView
 
 class FragmentMap: Fragment() {
     override fun onCreateView(
@@ -19,7 +20,6 @@ class FragmentMap: Fragment() {
         var recyclerView = root.findViewById<RecyclerView>(R.id.recyclerViewTimeTable)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter.notifyDataSetChanged()
         return root
     }
 }

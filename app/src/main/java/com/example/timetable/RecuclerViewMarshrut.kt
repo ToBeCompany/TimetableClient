@@ -1,5 +1,6 @@
 package com.example.timetable
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +11,8 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.data.BusData
 
-class RecyclerAdapterMarshrut(
-//       var click: ()->Unit
-       var click: (
-
-               )->Unit
-): RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
+class RecyclerAdapterMarshrut(var click: () -> Unit)
+    : RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
     var dataset: MutableList<BusData> = mutableListOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -43,9 +40,7 @@ class RecyclerAdapterMarshrut(
 
             nameBaseText.text = data.name
             next_button.setOnClickListener {
-//                click()
-                var bundle = Bundle()
-                nameBaseText.navigate(R.id.action_mainFragment_to_fragmentMap, bundle)
+                click()
             }
 
             //                itemView.findNavController()
