@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.map.AdapterRecuclerMapView
 
 class FragmentMap: Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_map, container, false)
 
         var adapter = AdapterRecuclerMapView()

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.data.BusData
 import com.example.timetable.data.BusStop
+import com.example.timetable.data.Repository
 import com.example.timetable.firebase.BusFireBase
 import com.google.firebase.firestore.GeoPoint
 
@@ -22,7 +23,7 @@ class MainFragment : Fragment()
 {
 
     private var db = BusFireBase()
-    private var adapter = RecyclerAdapterMarshrut{ findNavController().navigate(R.id.action_mainFragment_to_fragmentMap) }
+    private var adapter = RecyclerAdapterMarshrut{ findNavController().navigate(R.id.action_mainFragment_to_mapsFragment) }
     private var recyclerView: RecyclerView? = null
     private var parent: ConstraintLayout? = null
 
@@ -40,8 +41,6 @@ class MainFragment : Fragment()
         return root
     }
 
-
-
     private fun getData() // получение данных и загрузка в список
     {
         db.ref
@@ -50,16 +49,15 @@ class MainFragment : Fragment()
                 val data: MutableList<BusData> = mutableListOf()
                 for (doc in result)
                     data.add(
-                        BusData(
-                            name = doc.get("name").toString(),
-//                            uid = "0",
-                            route = doc.get("route") as MutableList<GeoPoint>,
-                            busStops = doc.get("busStops") as MutableList<BusStop>
-                        )
+                        doc.toObject(BusData::class.java)
                     )
+
                 // здесь уже данные успешно получены
                 parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
                 adapter.dataset = data
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                Repository.busData = data[0] // это для теста, при вызове карт передавайте данные (Repository/busdata)
+
                 adapter.notifyDataSetChanged()
             }
             .addOnFailureListener {
