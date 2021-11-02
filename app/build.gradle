@@ -9,6 +9,9 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
+        configurations.all {
+            resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
+        }
         resConfigs "en", "ru"
         applicationId "com.example.timetable"
         minSdkVersion 19
@@ -44,6 +47,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+
+    implementation 'com.google.android.material:material:1.1.0'
 
 
     implementation 'com.google.firebase:firebase-firestore-ktx:24.0.0'

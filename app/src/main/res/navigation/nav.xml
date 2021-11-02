@@ -22,6 +22,7 @@
         android:id="@+id/fragmentMap"
         android:name="com.example.timetable.map.FragmentMap"
         android:label="fragment_map"
+        tools:layout="@layout/fragment_map" />
         tools:layout="@layout/fragment_map" >
         <action
             android:id="@+id/action_fragmentMap_to_mainFragment"

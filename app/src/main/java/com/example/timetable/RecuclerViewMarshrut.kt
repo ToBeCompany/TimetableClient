@@ -35,15 +35,21 @@ class RecyclerAdapterMarshrut(var click: () -> Unit)
         var context = itemView.context
 
         var nameBaseText = itemView.findViewById<TextView>(R.id.textView)
-        var next_button = itemView.findViewById<Button>(R.id.btnOf_Item)
+//        var next_button = itemView.findViewById<Button>(R.id.btnOf_Item)
+
 
         fun onBind(data: BusData)
         {
 
             nameBaseText.text = data.name
-            next_button.setOnClickListener {
+//            next_button.setOnClickListener {
+//                click()
+//            }
+            itemView.setOnClickListener {
                 click()
             }
+
+
 
             //                itemView.findNavController()
 //                        .navigate(R.id.action_mainFragment_to_fragmentMap)
