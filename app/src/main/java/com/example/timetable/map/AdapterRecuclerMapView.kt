@@ -9,8 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
 
-class AdapterRecuclerMapView(var clickItemMap: () -> Unit)
-    : RecyclerView.Adapter<AdapterRecuclerMapView.ViewHolder>()
+class AdapterRecuclerMapView : RecyclerView.Adapter<AdapterRecuclerMapView.ViewHolder>()
 {
     var dataset: MutableList<TypeMap> = mutableListOf(TypeMap("1-ый", "9:30"),TypeMap("2-ой", "10:30"))
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -31,15 +30,13 @@ class AdapterRecuclerMapView(var clickItemMap: () -> Unit)
         var context = itemView.context
         var type_text = itemView.findViewById<TextView>(R.id.textViewOst)
         var type_text_time = itemView.findViewById<TextView>(R.id.textViewTime)
-//        var button = itemView.findViewById<Button>(R.id.buttontest2)
+
 
         fun onBind(type: TypeMap)
         {
             type_text.text = type.typeOst
             type_text_time.text = type.typeTime
-//            button.setOnClickListener(){
-//                clickItemMap()
-//            }
+
 
         }
     }

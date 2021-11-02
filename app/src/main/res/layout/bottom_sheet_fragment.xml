@@ -5,14 +5,11 @@
     android:orientation="vertical">
 
 
-    <TextView
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="This is test"
-        android:textSize="30sp"
-        android:textColor="@color/black"/>
+ <androidx.recyclerview.widget.RecyclerView
+     android:id="@+id/ruculerView_bottom_Sheet"
+     android:layout_width="match_parent"
+
+     android:layout_height="match_parent"/>
 
 
 </LinearLayout>
