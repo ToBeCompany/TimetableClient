@@ -1,39 +1,40 @@
 package com.example.timetable.map
 
-import androidx.fragment.app.Fragment
-
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import com.example.timetable.R
+import com.example.timetable.bottom_fragment_file
 import com.example.timetable.data.Repository
 import com.google.android.gms.maps.CameraUpdateFactory
-
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.android.gms.maps.model.BitmapDescriptor
-
-import android.graphics.drawable.Drawable
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import com.example.timetable.R
 
 
 class MapsFragment : Fragment() {
 
     lateinit var googleMap: GoogleMap
+    private var bottomSheet = bottom_fragment_file()
 
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
         Start()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View?
     {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
 
@@ -58,26 +59,35 @@ class MapsFragment : Fragment() {
         val polylineOptions = PolylineOptions()
 
             val startPoint = LatLng(route!![0].latitude, route!![0].longitude)
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint,15f),1500, null)
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15f), 1500, null)
 
-        route.forEach { polylineOptions.add(LatLng( it.latitude,  it.longitude)) }
+        route.forEach { polylineOptions.add(LatLng(it.latitude, it.longitude)) }
         val polyline = googleMap.addPolyline(polylineOptions)
 
 //        var icon = BitmapDescriptorFactory.fromResource(R.drawable.bus_icon)
         val circleDrawable = resources.getDrawable(com.example.timetable.R.drawable.bus_icon)
         val markerIcon: BitmapDescriptor = getMarkerIconFromDrawable(circleDrawable)
+        var mMap = googleMap
 
         data?.busStops?.forEach {
             googleMap.addMarker(
                 MarkerOptions()
-                    .position(LatLng( it.position!!.latitude,  it.position!!.longitude))
+                    .position(LatLng(it.position!!.latitude, it.position!!.longitude))
                     .title(it.name)
                     .icon(markerIcon)
 
             )?.showInfoWindow()
         }
 
+
+
         Toast.makeText(context, data?.name, Toast.LENGTH_LONG).show()
+
+        mMap.setOnMarkerClickListener { marker ->
+            bottomSheet.show(requireFragmentManager(),"BottomSheetDialog")
+            true
+        }
+
     }
 
     private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor {

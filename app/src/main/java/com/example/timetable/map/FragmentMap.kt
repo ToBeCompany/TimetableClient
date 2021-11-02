@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+import com.google.common.io.LineReader
 import com.google.firebase.firestore.GeoPoint
 
 class FragmentMap: Fragment()
@@ -55,13 +59,15 @@ class FragmentMap: Fragment()
     {
         var root = inflater.inflate(R.layout.fragment_map, container, false)
         var button = root.findViewById<Button>(R.id.buttontest2)
-//
+        var bottomsheet_LinearLayout = root.findViewById<LinearLayout>(R.id.bottomsheet_LinearLayout)
+
 //        recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
 //        recyclerView?.adapter = adapter
 //        recyclerView?.layoutManager = LinearLayoutManager(context)
-        button.setOnClickListener(){
-            bottomSheet.show(requireFragmentManager(),"BottomSheetDialog")
-        }
+
+//        button.setOnClickListener(){
+//            bottomSheet.show(requireFragmentManager(),"BottomSheetDialog")
+//        }
         return root
     }
 
