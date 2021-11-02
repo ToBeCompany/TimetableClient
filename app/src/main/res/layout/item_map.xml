@@ -11,34 +11,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
         android:id="@+id/constrainOf_Item_map"
         android:padding="5dp">
 
 
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginStart="0dp"
-            android:src="@drawable/ic_baseline_directions_bus_24"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
             android:layout_marginTop="8dp"
+            android:src="@drawable/ic_baseline_directions_bus_24"
             app:layout_constraintBottom_toBottomOf="@+id/textViewOst"
             app:layout_constraintEnd_toStartOf="@+id/textViewOst"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textViewOst"
-            app:tint="@color/black" />
+            app:layout_constraintVertical_bias="1.0"
+            app:tint="@color/good_grey" />
 
         <TextView
             android:id="@+id/textViewOst"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="38dp"
             android:layout_marginLeft="25dp"
             android:text="station"
             android:textColor="@color/good_grey"
-            android:textSize="30sp"
+            android:textSize="25dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.239"
+            app:layout_constraintHorizontal_bias="0.259"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
@@ -46,15 +48,16 @@
         <TextView
             android:id="@+id/textViewTime"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="38dp"
             android:text="time"
             android:textColor="@color/good_grey"
-            android:textSize="30dp"
+            android:textSize="25dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.788"
+            app:layout_constraintHorizontal_bias="0.783"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.368" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
