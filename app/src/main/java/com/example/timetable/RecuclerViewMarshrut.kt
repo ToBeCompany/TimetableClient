@@ -36,8 +36,6 @@ class RecyclerAdapterMarshrut(var click: () -> Unit)
 //        var next_button = itemView.findViewById<Button>(R.id.btnOf_Item)
 
 
-
-
         fun onBind(data: BusData)
         {
 

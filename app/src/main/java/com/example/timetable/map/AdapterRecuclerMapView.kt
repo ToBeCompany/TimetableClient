@@ -31,15 +31,15 @@ class AdapterRecuclerMapView(var clickItemMap: () -> Unit)
         var context = itemView.context
         var type_text = itemView.findViewById<TextView>(R.id.textViewOst)
         var type_text_time = itemView.findViewById<TextView>(R.id.textViewTime)
-        var itemMap = itemView.findViewById<ConstraintLayout>(R.id.constrainOf_Item_map)
+//        var button = itemView.findViewById<Button>(R.id.buttontest2)
 
         fun onBind(type: TypeMap)
         {
             type_text.text = type.typeOst
             type_text_time.text = type.typeTime
-            itemMap.setOnClickListener(){
-                clickItemMap()
-            }
+//            button.setOnClickListener(){
+//                clickItemMap()
+//            }
 
         }
     }

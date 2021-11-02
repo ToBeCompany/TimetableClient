@@ -7,21 +7,32 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.timetable.map.AdapterRecuclerMapView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class bottom_fragment_file : BottomSheetDialogFragment(){
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        var root = inflater.inflate(R.layout.bottom_sheet_fragment,container,false)
 
+    private var adapter = AdapterRecuclerMapView{  bottom_fragment_file().show(requireFragmentManager(),"BottomSheetDialog")}
+    private var recyclerView: RecyclerView? = null
+
+
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+    {
+        var root = inflater.inflate(R.layout.fragment_map, container, false)
+        var button = root.findViewById<Button>(R.id.buttontest2)
+
+        recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
+        recyclerView?.adapter = adapter
+        recyclerView?.layoutManager = LinearLayoutManager(context)
 
         return root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

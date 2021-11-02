@@ -17,18 +17,21 @@ import com.google.firebase.firestore.GeoPoint
 
 class FragmentMap: Fragment()
 {
-    private var bottomSheet = bottom_fragment_file()
-    private var adapter = AdapterRecuclerMapView{  bottomSheet.show(requireFragmentManager(),"BottomSheetDialog")}
-    private var recyclerView: RecyclerView? = null
+
+//    private var bottomSheet = bottom_fragment_file()
+//    private var adapter = AdapterRecuclerMapView{  bottom_fragment_file().show(requireFragmentManager(),"BottomSheetDialog")}
+//    private var recyclerView: RecyclerView? = null
+
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
-        var root = inflater.inflate(R.layout.fragment_main, container, false)
-
-
-        recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
-        recyclerView?.adapter = adapter
-        recyclerView?.layoutManager = LinearLayoutManager(context)
+        var root = inflater.inflate(R.layout.fragment_map, container, false)
+        var button = root.findViewById<Button>(R.id.buttontest2)
+//
+//        recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
+//        recyclerView?.adapter = adapter
+//        recyclerView?.layoutManager = LinearLayoutManager(context)
 
         return root
     }

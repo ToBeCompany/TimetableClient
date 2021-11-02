@@ -19,7 +19,7 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginStart="0dp"
-            android:src="@drawable/ic_baseline_brightness_1_24"
+            android:src="@drawable/ic_baseline_directions_bus_24"
             android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewOst"
             app:layout_constraintEnd_toStartOf="@+id/textViewOst"
