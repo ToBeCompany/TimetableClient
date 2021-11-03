@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
@@ -23,7 +22,11 @@ class MainFragment : Fragment()
 {
 
     private var db = BusFireBase()
-    private var adapter = RecyclerAdapterMarshrut{ findNavController().navigate(R.id.action_mainFragment_to_mapsFragment) }
+    private var adapter = RecyclerAdapterMarshrut{ id ->
+        findNavController().navigate(
+            MainFragmentDirections.actionMainFragmentToMapsFragment(id)
+        )
+    }
     private var recyclerView: RecyclerView? = null
     private var parent: ConstraintLayout? = null
 
@@ -48,16 +51,12 @@ class MainFragment : Fragment()
             .addOnSuccessListener { result ->
                 val data: MutableList<BusData> = mutableListOf()
                 for (doc in result)
-                    data.add(
-                        doc.toObject(BusData::class.java)
-                    )
+                    data.add( doc.toObject(BusData::class.java) )
 
                 // здесь уже данные успешно получены
                 parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
-                adapter.dataset = data
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                Repository.busData = data[0] // это для теста, при вызове карт передавайте данные (Repository/busdata)
-
+                Repository.busesData = data
+                adapter.updateData()
                 adapter.notifyDataSetChanged()
             }
             .addOnFailureListener {

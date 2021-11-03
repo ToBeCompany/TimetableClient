@@ -1,5 +1,6 @@
 package com.example.timetable.data
 
-object Repository {
-    var busData: BusData? = null
+object Repository
+{
+    var busesData: MutableList<BusData> = mutableListOf()
 }

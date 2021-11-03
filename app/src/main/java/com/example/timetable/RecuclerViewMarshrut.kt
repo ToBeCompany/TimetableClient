@@ -1,31 +1,31 @@
 package com.example.timetable
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
-import androidx.fragment.app.FragmentManager
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.data.BusData
+import com.example.timetable.data.Repository
 
-class RecyclerAdapterMarshrut(var click: () -> Unit)
+class RecyclerAdapterMarshrut(var click: (id:Int) -> Unit)
     : RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
-    var dataset: MutableList<BusData> = mutableListOf()
+    var dataset: MutableList<BusData> = Repository.busesData
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut , parent, false) //тут item
+        val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut , parent, false) // тут item
         return ViewHolder(View)
+    }
+
+    fun updateData()
+    {
+        dataset = Repository.busesData
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
-        holder.onBind(dataset[position])
+        holder.onBind(dataset[position], position)
     }
 
     override fun getItemCount(): Int = dataset.size
@@ -38,22 +38,13 @@ class RecyclerAdapterMarshrut(var click: () -> Unit)
 //        var next_button = itemView.findViewById<Button>(R.id.btnOf_Item)
 
 
-        fun onBind(data: BusData)
+        fun onBind(data: BusData, position: Int)
         {
 
-            nameBaseText.text = data.name
-//            next_button.setOnClickListener {
-//                click()
-//            }
+            nameBaseText.text = data.name.toString()
             itemView.setOnClickListener {
-                click()
+                click(position)
             }
-
-
-
-            //                itemView.findNavController()
-//                        .navigate(R.id.action_mainFragment_to_fragmentMap)
-
         }
     }
 }

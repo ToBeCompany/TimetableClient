@@ -9,8 +9,6 @@
  <androidx.recyclerview.widget.RecyclerView
      android:id="@+id/ruculerView_bottom_Sheet"
      android:layout_width="match_parent"
-
      android:layout_height="match_parent"/>
-
 
 </LinearLayout>

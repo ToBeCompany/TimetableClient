@@ -5,59 +5,62 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8sp"
     android:layout_gravity="bottom">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="10dp"
         android:id="@+id/constrainOf_Item_map"
         android:padding="5dp">
 
-
         <ImageView
-            android:layout_width="37dp"
-            android:layout_height="37dp"
-            android:layout_marginTop="8dp"
+            android:id="@+id/imageView"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:src="@drawable/ic_baseline_directions_bus_24"
-            app:layout_constraintBottom_toBottomOf="@+id/textViewOst"
-            app:layout_constraintEnd_toStartOf="@+id/textViewOst"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textViewOst"
-            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/good_grey" />
 
         <TextView
             android:id="@+id/textViewOst"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:layout_marginLeft="25dp"
-            android:text="station"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="top"
             android:textColor="@color/good_grey"
-            android:textSize="25dp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.259"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textViewTime"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+            tools:text="station" />
 
         <TextView
             android:id="@+id/textViewTime"
             android:layout_width="wrap_content"
             android:layout_height="38dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
             android:text="time"
             android:textColor="@color/good_grey"
-            android:textSize="25dp"
+            android:textSize="24dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.783"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.368" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:background="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="1sp"/>
+
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

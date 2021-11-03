@@ -1,17 +1,18 @@
 package com.example.timetable.map
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
+import com.example.timetable.data.BusData
+import com.example.timetable.data.BusStop
 
-class AdapterRecuclerMapView : RecyclerView.Adapter<AdapterRecuclerMapView.ViewHolder>()
+class AdapterRecuclerMapView(var data: BusData, public var cur: Int) : RecyclerView.Adapter<AdapterRecuclerMapView.ViewHolder>()
 {
-    var dataset: MutableList<TypeMap> = mutableListOf(TypeMap("1-ый", "9:30"),TypeMap("2-ой", "10:30"))
+    var dataset: MutableList<BusStop>? = data.busStops
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.item_map, parent, false)
@@ -20,25 +21,29 @@ class AdapterRecuclerMapView : RecyclerView.Adapter<AdapterRecuclerMapView.ViewH
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
-        holder.onBind(dataset[position])
+        holder.onBind(dataset!![position], position)
     }
 
-    override fun getItemCount(): Int = dataset.size
+    override fun getItemCount(): Int = dataset!!.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         var context = itemView.context
-        var type_text = itemView.findViewById<TextView>(R.id.textViewOst)
-        var type_text_time = itemView.findViewById<TextView>(R.id.textViewTime)
+        var name_text = itemView.findViewById<TextView>(R.id.textViewOst)
+        var time_text = itemView.findViewById<TextView>(R.id.textViewTime)
 
-
-        fun onBind(type: TypeMap)
+        fun onBind(busStop: BusStop, position: Int)
         {
-            type_text.text = type.typeOst
-            type_text_time.text = type.typeTime
+            if (cur == position)
+            {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    itemView.setBackgroundColor(context.getColor(R.color.blue))
+                }
+            }
 
-
-        }
+            name_text.text = busStop.name
+                time_text.text = busStop.time
+            }
     }
 
 }
