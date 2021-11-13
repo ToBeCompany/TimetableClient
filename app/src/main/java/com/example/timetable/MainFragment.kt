@@ -34,6 +34,8 @@ class MainFragment : Fragment()
     {
         var root = inflater.inflate(R.layout.fragment_main, container, false)
 
+
+
         parent = root.findViewById(R.id.parentMainFragment)
         recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
 
@@ -62,7 +64,6 @@ class MainFragment : Fragment()
             .addOnFailureListener {
                 // всё плохо
                 Toast.makeText(context,it.message.toString() , Toast.LENGTH_LONG).show()
-
             }
     }
 }

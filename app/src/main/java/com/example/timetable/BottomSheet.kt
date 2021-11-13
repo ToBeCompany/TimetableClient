@@ -1,6 +1,7 @@
 package com.example.timetable
 
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,13 +9,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.data.BusStop
-import com.example.timetable.data.Repository
-import com.example.timetable.map.AdapterRecuclerMapView
+import com.example.timetable.map.AdapterRecyclerMapView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class BottomSheet(var index: Int, var curItem: Int) : BottomSheetDialogFragment()
+class BottomSheet(index: Int, busStops: MutableList<BusStop>) : BottomSheetDialogFragment()
 {
-    private var adapter = AdapterRecuclerMapView(Repository.busesData[index], curItem)
+    private var adapter = AdapterRecyclerMapView(index, busStops)
     private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -26,6 +26,11 @@ class BottomSheet(var index: Int, var curItem: Int) : BottomSheetDialogFragment(
         recyclerView?.layoutManager = LinearLayoutManager(context)
 
         return root
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        onDestroyView()
+        super.onCancel(dialog)
     }
 }
 

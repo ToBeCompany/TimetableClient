@@ -5,14 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.BusData
 import com.example.timetable.data.BusStop
 
-class AdapterRecuclerMapView(var data: BusData, public var cur: Int) : RecyclerView.Adapter<AdapterRecuclerMapView.ViewHolder>()
+class AdapterRecyclerMapView(var current: Int, var dataSet: MutableList<BusStop>): RecyclerView.Adapter<AdapterRecyclerMapView.ViewHolder>()
 {
-    var dataset: MutableList<BusStop>? = data.busStops
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.item_map, parent, false)
@@ -21,10 +20,10 @@ class AdapterRecuclerMapView(var data: BusData, public var cur: Int) : RecyclerV
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
-        holder.onBind(dataset!![position], position)
+        holder.onBind(dataSet[position])
     }
 
-    override fun getItemCount(): Int = dataset!!.size
+    override fun getItemCount(): Int = dataSet.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
@@ -32,13 +31,11 @@ class AdapterRecuclerMapView(var data: BusData, public var cur: Int) : RecyclerV
         var name_text = itemView.findViewById<TextView>(R.id.textViewOst)
         var time_text = itemView.findViewById<TextView>(R.id.textViewTime)
 
-        fun onBind(busStop: BusStop, position: Int)
+        fun onBind(busStop: BusStop)
         {
-            if (cur == position)
+            if (dataSet[current] == busStop)
             {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     itemView.setBackgroundColor(context.getColor(R.color.blue))
-                }
             }
 
             name_text.text = busStop.name
