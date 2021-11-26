@@ -5,28 +5,34 @@
     android:id="@+id/nav"
     app:startDestination="@id/mainFragment">
 
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.timetable.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
-            android:id="@+id/action_mainFragment_to_fragmentMap"
-            app:destination="@id/fragmentMap" />
+            android:id="@+id/action_mainFragment_to_routeFragment"
+            app:destination="@id/routeFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_mapsFragment"
+            android:id="@+id/action_mainFragment_to_driverFragment"
+            app:destination="@id/driverFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/routeFragment"
+        android:name="com.example.timetable.RouteFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_route" >
+        <action
+            android:id="@+id/action_routeFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
 
     </fragment>
-    <fragment
-        android:id="@+id/fragmentMap"
-        android:name="com.example.timetable.map.FragmentMap"
-        android:label="fragment_map"
-        tools:layout="@layout/fragment_map"
-       />
-        <action
-            android:id="@+id/action_fragmentMap_to_mainFragment"
-            app:destination="@id/mainFragment" />
+
+    <action
+        android:id="@+id/action_fragmentMap_to_routeFragment"
+        app:destination="@id/routeFragment" />
 
     <fragment
         android:id="@+id/mapsFragment"
@@ -37,4 +43,10 @@
             android:name="id"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/driverFragment"
+        android:name="com.example.timetable.driver.DriverFragment"
+        android:label="fragment_driver"
+        tools:layout="@layout/fragment_driver" />
 </navigation>

@@ -21,7 +21,7 @@ class BottomSheet(index: Int, busStops: MutableList<BusStop>) : BottomSheetDialo
     {
         var root = inflater.inflate(R.layout.bottom_sheet_fragment, container, false)
 
-        recyclerView = root.findViewById(R.id.ruculerView_bottom_Sheet)
+        recyclerView = root.findViewById(R.id.recylerView_bottom_Sheet)
         recyclerView?.adapter = adapter
         recyclerView?.layoutManager = LinearLayoutManager(context)
 
