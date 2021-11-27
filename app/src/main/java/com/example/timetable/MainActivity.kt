@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity()
 {
     override fun onCreate(savedInstanceState: Bundle?)
     {
+        setTheme(R.style.Theme_TimeTable)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
