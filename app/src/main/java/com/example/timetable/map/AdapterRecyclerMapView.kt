@@ -1,16 +1,14 @@
 package com.example.timetable.map
 
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.BusStop
+import com.example.timetable.data.Bus_Stop
 
-class AdapterRecyclerMapView(var current: Int, var dataSet: MutableList<BusStop>): RecyclerView.Adapter<AdapterRecyclerMapView.ViewHolder>()
+class AdapterRecyclerMapView(var current: Int, var dataSet: MutableList<Bus_Stop>): RecyclerView.Adapter<AdapterRecyclerMapView.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -31,7 +29,7 @@ class AdapterRecyclerMapView(var current: Int, var dataSet: MutableList<BusStop>
         var name_text = itemView.findViewById<TextView>(R.id.textViewOst)
         var time_text = itemView.findViewById<TextView>(R.id.textViewTime)
 
-        fun onBind(busStop: BusStop)
+        fun onBind(busStop: Bus_Stop)
         {
             if (dataSet[current] == busStop)
             {
