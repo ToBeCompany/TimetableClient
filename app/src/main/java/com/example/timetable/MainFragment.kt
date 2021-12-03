@@ -35,7 +35,7 @@ class MainFragment : Fragment()
         {
             rootView.findViewById<TextView>(R.id.mainFragmentText)?.text = "user not auth"
 
-            userPreference.authUserOnDevice(User(TypeUser.COMMON, "Andrei", "xcrypwui")) // for test
+            userPreference.authUserOnDevice(User(TypeUser.DRIVER, "Andrei", "xcrypwui")) // for test
             // отправить на экран аунтификации
         }
         else

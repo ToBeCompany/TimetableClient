@@ -72,8 +72,4 @@ class DriverForeGroundTracker : Service()
         service.createNotificationChannel(chan)
         return channelId
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 }
