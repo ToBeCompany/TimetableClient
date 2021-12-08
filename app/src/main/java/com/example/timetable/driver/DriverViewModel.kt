@@ -12,16 +12,31 @@ import androidx.lifecycle.ViewModel
 import com.example.timetable.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import android.os.Bundle
+import android.widget.Toast
+
+import androidx.annotation.NonNull
+import com.example.timetable.App
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 class DriverViewModel(application : Application): AndroidViewModel(application) {
     private val locationManager by lazy {
         application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
+    var ref = FirebaseFirestore.getInstance().collection("LOCATION").document("point")
 
     private val _tapRequestState: MutableStateFlow<Resource<Location>?> = MutableStateFlow(null)
     val tapRequestState: StateFlow<Resource<Location>?> = _tapRequestState
 
     private val listener = LocationListener { // тут данные меняются
+        Toast.makeText(App.globalContext, it.toString() +";;;", Toast.LENGTH_SHORT).show()
+
+        var map = hashMapOf(
+            "lat" to it.latitude,
+            "lon" to it.longitude
+        )
+        ref.set(map)
         _tapRequestState.value = Resource.Success(it)
 
     }
@@ -35,13 +50,12 @@ class DriverViewModel(application : Application): AndroidViewModel(application) 
 
             locationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
-                3_000,
-                0f,
+                5_000,
+                10f,
                 listener
             )
 
     }
-
     fun clearSearch() {
         _tapRequestState.value = null
         locationManager.removeUpdates(listener)

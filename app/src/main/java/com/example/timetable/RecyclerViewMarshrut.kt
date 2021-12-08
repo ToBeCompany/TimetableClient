@@ -14,7 +14,7 @@ class RecyclerAdapterMarshrut(var click: (id:Int) -> Unit)
     var dataset: MutableList<BusData> = Repository.busesData
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut , parent, false) // тут item
+        val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut, parent, false) // тут item
         return ViewHolder(View)
     }
 

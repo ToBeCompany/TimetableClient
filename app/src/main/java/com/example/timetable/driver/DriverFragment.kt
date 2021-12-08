@@ -22,6 +22,8 @@ import com.example.timetable.App
 import com.example.timetable.MainActivity
 import com.example.timetable.Resource
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -54,29 +56,15 @@ class DriverFragment : Fragment()
 //                }
             }
 
-        lifecycle.coroutineScope.launchWhenStarted { // для пользователя
-            viewModel.tapRequestState.collectLatest {
-                when (it) {
-                    is Resource.Error -> {
-                        Log.d("tag", "Error")
-                        Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
-                    }
-                    is Resource.Loading -> {
-                        Log.d("tag", "Loading")
-                       Toast.makeText(context, "Loading", Toast.LENGTH_LONG).show()
-                    }
-                    is Resource.Success -> {
-                        Log.d("tag", "Success")
-                        Toast.makeText(context, it.data?.latitude.toString() , Toast.LENGTH_LONG).show()
-                        Toast.makeText(context, it.data?.longitude.toString() , Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        }
 
         return root
     }
 
+    fun onProviderEnabled(provider: String) {}
+
+    fun onProviderDisabled(provider: String) {}
+
+    fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

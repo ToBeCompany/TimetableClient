@@ -24,5 +24,7 @@ class MainActivity : AppCompatActivity()
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
     }
-
+    fun setActionBarTitle(title: String?) {
+        supportActionBar!!.title = title
+    }
 }

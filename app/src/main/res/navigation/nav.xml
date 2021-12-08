@@ -9,7 +9,6 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.timetable.MainFragment"
-        android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
             android:id="@+id/action_mainFragment_to_routeFragment"
@@ -22,7 +21,7 @@
     <fragment
         android:id="@+id/routeFragment"
         android:name="com.example.timetable.RouteFragment"
-        android:label="fragment_main"
+        android:label="@string/routes"
         tools:layout="@layout/fragment_route" >
         <action
             android:id="@+id/action_routeFragment_to_mapsFragment"
@@ -37,7 +36,6 @@
     <fragment
         android:id="@+id/mapsFragment"
         android:name="com.example.timetable.map.MapsFragment"
-        android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" >
         <argument
             android:name="id"
@@ -47,6 +45,6 @@
     <fragment
         android:id="@+id/driverFragment"
         android:name="com.example.timetable.driver.DriverFragment"
-        android:label="fragment_driver"
+        android:label="GPS трэкер"
         tools:layout="@layout/fragment_driver" />
 </navigation>

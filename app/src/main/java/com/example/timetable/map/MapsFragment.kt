@@ -10,23 +10,36 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.navArgs
 import com.example.timetable.R
-import com.example.timetable.BottomSheet
+import com.example.timetable.BusStopsBottomSheet
+import com.example.timetable.MainActivity
+import com.example.timetable.Resource
 import com.example.timetable.data.BusData
 import com.example.timetable.data.Repository
+import com.example.timetable.database.WebSocketTracker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.flow.collectLatest
 
 
-class MapsFragment : Fragment() {
+class MapsFragment : Fragment()
+{
+    private var busMarker: Marker?  = null
+    private var tracker = WebSocketTracker()
 
+    private val viewModel: MapViewModel by viewModels()
     lateinit var googleMap: GoogleMap
+
     private val args : MapsFragmentArgs by navArgs()
+    var ref = FirebaseFirestore.getInstance().collection("LOCATION").document("point")
 
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
@@ -52,9 +65,11 @@ class MapsFragment : Fragment() {
     private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
 
+
         val data: BusData = Repository.busesData[args.id]
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
 
+        (activity as MainActivity?)!!.setActionBarTitle(data.name)
         moveCamera( toLatLng(data.route?.get(0)) ) // перемещаем камеру на первую остановку
 
         data.route?.forEach { polylineOptions.add( toLatLng(it) ) } // добавляем точки для линии
@@ -80,9 +95,55 @@ class MapsFragment : Fragment() {
         Toast.makeText(context, data.name, Toast.LENGTH_LONG).show()
 
         googleMap.setOnMarkerClickListener { marker -> // при нажатии на маркер
-            BottomSheet(marker.tag as Int, data.busStops)
+            if (marker.tag != null)
+            BusStopsBottomSheet(marker.tag as Int, data.busStops)
                 .show(requireFragmentManager(),"BottomSheetDialog")
             true
+        }
+        ref.addSnapshotListener { snapshot, e ->
+            Toast.makeText(context, snapshot?.data.toString() +"данные обновлены", Toast.LENGTH_SHORT).show()
+            val icon: BitmapDescriptor = getMarkerIconFromDrawable(
+                ResourcesCompat.getDrawable(resources, R.drawable.bus_24, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
+            )
+                if (busMarker == null)
+                busMarker = googleMap.addMarker(
+                    MarkerOptions()
+                        .position( LatLng(snapshot?.data?.get("lat").toString().toDouble(), snapshot?.data?.get("lon").toString().toDouble() ))
+                        .title("")
+                        .icon(icon)
+                )
+            else
+                busMarker!!.position = LatLng(snapshot?.data?.get("lat").toString().toDouble(), snapshot?.data?.get("lon").toString().toDouble() )
+        }
+
+    }
+
+    private fun startListeningTracker(id: String)
+    {
+
+
+        lifecycle.coroutineScope.launchWhenStarted {
+            viewModel.busLocation.collectLatest { busPosition ->
+                when (busPosition)
+                {
+                    is Resource.Error -> {
+                    }
+                    is Resource.Loading -> {
+                    }
+                    is Resource.Success -> {
+                        if (busMarker == null)
+                            busMarker = googleMap.addMarker(
+                                MarkerOptions()
+                                    .position( viewModel.busLocation.value?.data!! )
+                                    .title("")
+//                                    .icon(icon)
+                            )
+                        else
+                            busMarker?.position = viewModel.busLocation.value?.data!!
+                    }
+                    else -> {}
+                }
+            }
         }
 
     }

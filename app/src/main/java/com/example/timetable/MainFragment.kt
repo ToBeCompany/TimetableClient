@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.findNavController
 import com.example.timetable.data.n.TypeUser
@@ -33,9 +34,14 @@ class MainFragment : Fragment()
 
         if (userPreference.currentUser == null)
         {
+            rootView.findViewById<Button>(R.id.buttondriver).setOnClickListener {
+                userPreference.authUserOnDevice(User(TypeUser.DRIVER, "Andrei", "xcrypwui")) // for test
+                }
+            rootView.findViewById<Button>(R.id.buttoncommon).setOnClickListener {
+                userPreference.authUserOnDevice(User(TypeUser.COMMON, "Andrei", "xcrypwui")) // for test
+                }
             rootView.findViewById<TextView>(R.id.mainFragmentText)?.text = "user not auth"
 
-            userPreference.authUserOnDevice(User(TypeUser.DRIVER, "Andrei", "xcrypwui")) // for test
             // отправить на экран аунтификации
         }
         else

@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
 import com.example.timetable.data.Bus_Stop
 
-class AdapterRecyclerMapView(var current: Int, var dataSet: MutableList<Bus_Stop>): RecyclerView.Adapter<AdapterRecyclerMapView.ViewHolder>()
+class BusStopsRecycleAdapter(var current: Int, var dataSet: MutableList<Bus_Stop>)
+    : RecyclerView.Adapter<BusStopsRecycleAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -33,7 +34,7 @@ class AdapterRecyclerMapView(var current: Int, var dataSet: MutableList<Bus_Stop
         {
             if (dataSet[current] == busStop)
             {
-                    itemView.setBackgroundColor(context.getColor(R.color.blue))
+                itemView.setBackgroundColor(context.getColor(R.color.blue))
             }
 
             name_text.text = busStop.name
