@@ -30,15 +30,14 @@ import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.flow.collectLatest
 
 
-class MapsFragment : Fragment()
-{
-    private var busMarker: Marker?  = null
+class MapsFragment : Fragment() {
+    private var busMarker: Marker? = null
     private var tracker = WebSocketTracker()
 
     private val viewModel: MapViewModel by viewModels()
     lateinit var googleMap: GoogleMap
 
-    private val args : MapsFragmentArgs by navArgs()
+    private val args: MapsFragmentArgs by navArgs()
     var ref = FirebaseFirestore.getInstance().collection("LOCATION").document("point")
 
     private val callback = OnMapReadyCallback { google_map ->
@@ -50,8 +49,7 @@ class MapsFragment : Fragment()
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View?
-    {
+    ): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
         return root
     }
@@ -65,29 +63,40 @@ class MapsFragment : Fragment()
     private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
 
+        startListeningTracker("33") //---------------
 
         val data: BusData = Repository.busesData[args.id]
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
 
         (activity as MainActivity?)!!.setActionBarTitle(data.name)
-        moveCamera( toLatLng(data.route?.get(0)) ) // перемещаем камеру на первую остановку
+        moveCamera(toLatLng(data.route?.get(0))) // перемещаем камеру на первую остановку
 
-        data.route?.forEach { polylineOptions.add( toLatLng(it) ) } // добавляем точки для линии
+        data.route?.forEach { polylineOptions.add(toLatLng(it)) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
 
 
         val markerIcon: BitmapDescriptor = getMarkerIconFromDrawable(
-            ResourcesCompat.getDrawable(resources, R.drawable.bus_icon, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.bus_icon,
+                null
+            )!! // создаем и конвертируем Drawable к BitmapDescriptor
         )
 
         for (i in 0 until data.busStops!!.size) // добавляем маркеры на карту
         {
             var marker = googleMap.addMarker(
                 MarkerOptions()
-                    .position(LatLng(data.busStops[i].position!!.latitude, data.busStops[i].position!!.longitude))
+                    .position(
+                        LatLng(
+                            data.busStops[i].position!!.latitude,
+                            data.busStops[i].position!!.longitude
+                        )
+                    )
                     .title(data.busStops[i].name)
                     .icon(markerIcon)
-            )?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
+            )
+                ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
         }
 
 
@@ -96,66 +105,67 @@ class MapsFragment : Fragment()
 
         googleMap.setOnMarkerClickListener { marker -> // при нажатии на маркер
             if (marker.tag != null)
-            BusStopsBottomSheet(marker.tag as Int, data.busStops)
-                .show(requireFragmentManager(),"BottomSheetDialog")
+                BusStopsBottomSheet(marker.tag as Int, data.busStops)
+                    .show(requireFragmentManager(), "BottomSheetDialog")
             true
         }
         ref.addSnapshotListener { snapshot, e ->
-            Toast.makeText(context, snapshot?.data.toString() +"данные обновлены", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                snapshot?.data.toString() + "данные обновлены",
+                Toast.LENGTH_SHORT
+            ).show()
             val icon: BitmapDescriptor = getMarkerIconFromDrawable(
-                ResourcesCompat.getDrawable(resources, R.drawable.bus_24, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bus_24,
+                    null
+                )!! // создаем и конвертируем Drawable к BitmapDescriptor
             )
-                if (busMarker == null)
+            if (busMarker == null)
                 busMarker = googleMap.addMarker(
                     MarkerOptions()
-                        .position( LatLng(snapshot?.data?.get("lat").toString().toDouble(), snapshot?.data?.get("lon").toString().toDouble() ))
+                        .position(
+                            LatLng(
+                                snapshot?.data?.get("lat").toString().toDouble(),
+                                snapshot?.data?.get("lon").toString().toDouble()
+                            )
+                        )
                         .title("")
                         .icon(icon)
                 )
             else
-                busMarker!!.position = LatLng(snapshot?.data?.get("lat").toString().toDouble(), snapshot?.data?.get("lon").toString().toDouble() )
+                busMarker!!.position = LatLng(
+                    snapshot?.data?.get("lat").toString().toDouble(),
+                    snapshot?.data?.get("lon").toString().toDouble()
+                )
         }
 
     }
 
-    private fun startListeningTracker(id: String)
-    {
-
-
+    private fun startListeningTracker(id: String) {
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.busLocation.collectLatest { busPosition ->
-                when (busPosition)
-                {
-                    is Resource.Error -> {
-                    }
-                    is Resource.Loading -> {
-                    }
-                    is Resource.Success -> {
-                        if (busMarker == null)
-                            busMarker = googleMap.addMarker(
-                                MarkerOptions()
-                                    .position( viewModel.busLocation.value?.data!! )
-                                    .title("")
+                if (busMarker == null)
+                    busMarker = googleMap.addMarker(
+                        MarkerOptions()
+                            .position(busPosition)
+                            .title("")
 //                                    .icon(icon)
-                            )
-                        else
-                            busMarker?.position = viewModel.busLocation.value?.data!!
-                    }
-                    else -> {}
-                }
+                    )
+                else
+                    busMarker?.position = busPosition
             }
         }
 
     }
 
-    fun moveCamera(point: LatLng?)
-    {
+    fun moveCamera(point: LatLng?) {
         if (point != null)
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f), 1500, null)
     }
 
-    private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor
-    {
+    private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor {
         val canvas = Canvas()
         val bitmap = Bitmap.createBitmap(
             drawable.intrinsicWidth,

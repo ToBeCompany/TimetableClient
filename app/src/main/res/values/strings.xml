@@ -4,6 +4,8 @@
     <string name="on_tracker">Включить трекер</string>
     <string name="off_tracker">Выключить трекер</string>
     <string name="routes">маршруты</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

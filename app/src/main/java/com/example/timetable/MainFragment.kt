@@ -19,7 +19,8 @@ class MainFragment : Fragment()
 
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    {
         var root = inflater.inflate(R.layout.fragment_main, container, false)
         rootView = root
         return root
