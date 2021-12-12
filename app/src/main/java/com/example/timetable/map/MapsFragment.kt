@@ -13,10 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.navArgs
-import com.example.timetable.R
-import com.example.timetable.BusStopsBottomSheet
-import com.example.timetable.MainActivity
-import com.example.timetable.Resource
+import com.example.timetable.*
 import com.example.timetable.data.BusData
 import com.example.timetable.data.Repository
 import com.example.timetable.database.WebSocketTracker
@@ -27,6 +24,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -45,11 +44,7 @@ class MapsFragment : Fragment() {
         mapReady()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
         return root
     }
@@ -145,17 +140,25 @@ class MapsFragment : Fragment() {
 
     private fun startListeningTracker(id: String) {
         lifecycle.coroutineScope.launchWhenStarted {
-            viewModel.busLocation.collectLatest { busPosition ->
-                if (busMarker == null)
-                    busMarker = googleMap.addMarker(
-                        MarkerOptions()
-                            .position(busPosition)
-                            .title("")
-//                                    .icon(icon)
-                    )
-                else
-                    busMarker?.position = busPosition
+            viewModel.startWebSocket().collect {
+                Toast.makeText(App.globalContext, it, Toast.LENGTH_LONG).show()
+
             }
+
+//            viewModel.busLocation.collectLatest { busPosition ->
+//
+//
+//
+//                if (busMarker == null)
+//                    busMarker = googleMap.addMarker(
+//                        MarkerOptions()
+//                            .position(busPosition)
+//                            .title("")
+////                                    .icon(icon)
+//                    )
+//                else
+//                    busMarker?.position = busPosition
+//            }
         }
 
     }
