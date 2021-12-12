@@ -15,16 +15,19 @@ import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.util.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import java.security.Security
 
 class MapViewModel(application : Application): AndroidViewModel(application)
 {
     private val PORT = 8080
-    private val HOST = "fierce-woodland-54822.herokuapp.com/passanger/1"
-    private val PATH = "/passiger"
+    private val HOST = "fierce-woodland-54822.herokuapp.com"
+    private val PATH = "/passenger/1"
 
     val client = HttpClient(CIO) {
         install(WebSockets)
@@ -44,18 +47,30 @@ class MapViewModel(application : Application): AndroidViewModel(application)
 
 //    fun updateLocation(newData: LatLng) { busLocation.value = Resource.Success(newData) }
         //https://habr.com/ru/post/432310/
+fun providerKtorCLiemtik():HttpClient{
+    System.setProperty("io.ktor.random.secure.random.provider","DRBG")
+    Security.setProperty("securerandom.drgb.config","HMAC_DRBG,SHA-512,256,pr_and_reseed")
+    return HttpClient(CIO){
+        install(WebSockets)
 
+    }
+}
     fun startWebSocket() = flow<String> {
-            client.webSocket(urlString = HOST){
-                while (true) {
-                    when(val frame = incoming.receive()){
+            val a = providerKtorCLiemtik().webSocket(
+                method = HttpMethod.Get,
+                host = HOST,
+                path = PATH
+            ){
+
+                for(frame in incoming){
+                    when (frame){
                         is Frame.Text -> {
-                            Log.d("getDAta", frame.readText())
+
+//                            Log.d("getDAta", frame.readText())
 //                            val data : User= Json.decodeFromString<User>(frame.readText())
-//                            emit(frame.readText().toString())
+                            emit(frame.readText())
                                 //https://question-it.com/questions/2640377/kak-serializovat-web-socket-frametext-v-ktor-s-pomoschju-kotlinxserialization
                         }
-                        else -> TODO()
                     }
                 }
 //                    for (response in incoming)
@@ -71,6 +86,6 @@ class MapViewModel(application : Application): AndroidViewModel(application)
 //                    }
             }
 
-    }
+    }.flowOn(Dispatchers.IO)
 
 }
