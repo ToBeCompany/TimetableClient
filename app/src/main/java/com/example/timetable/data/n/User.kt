@@ -1,5 +1,8 @@
 package com.example.timetable.data.n
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class User(
     var userType: TypeUser?,
     var name: String?,

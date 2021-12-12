@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import kotlin.random.Random
 
 class App: Application() // переопределяем класс приложения
 {
@@ -12,6 +13,7 @@ class App: Application() // переопределяем класс прилож
         super.onCreate()
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) // запрещаю включать тёмную тему
+
 
         globalContext = applicationContext
     }
