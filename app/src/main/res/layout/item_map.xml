@@ -5,59 +5,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8sp"
+    android:backgroundTint="#C5CAE9"
     android:layout_gravity="bottom">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/constrainOf_Item_map"
-        android:padding="5dp">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constrainOf_Item_map"
+            android:layout_width="match_parent"
+            android:layout_height="42dp">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_baseline_directions_bus_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/good_grey" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_baseline_directions_bus_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="#3F51B5" />
 
-        <TextView
-            android:id="@+id/textViewOst"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:gravity="top"
-            android:textColor="@color/good_grey"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/textViewTime"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="station" />
+            <TextView
+                android:id="@+id/textViewOst"
+                android:layout_width="323dp"
+                android:layout_height="19dp"
+                android:layout_marginStart="8dp"
+                android:gravity="top"
+                android:textColor="#616161"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/textViewTime"
+                app:layout_constraintHorizontal_bias="0.016"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="station" />
 
-        <TextView
-            android:id="@+id/textViewTime"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:text="time"
-            android:textColor="@color/good_grey"
-            android:textSize="24dp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/textViewTime"
+                android:layout_width="40dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="304dp"
+                android:text="time"
+                android:textColor="#888888"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <View
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/baseline_brightness_1_black_24" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
         android:background="@color/black"
         android:layout_width="match_parent"
         android:layout_height="1sp"/>
