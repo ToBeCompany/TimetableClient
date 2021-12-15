@@ -6,10 +6,11 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.example.timetable.Resource
-import kotlinx.coroutines.flow.MutableStateFlow
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import com.example.timetable.App
 import com.example.timetable.data.n.GeoPosition
 import com.google.android.gms.maps.model.LatLng
@@ -18,11 +19,8 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.security.Security
 
 
@@ -31,16 +29,18 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
     private val locationManager by lazy {
         application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
-    val busLocation = flow<GeoPosition> {}
+    private val busLocation = MutableSharedFlow<GeoPosition>()
     private var id = "1"
     private val HOST = "fierce-woodland-54822.herokuapp.com"
     private val PATH = "/driver/$id"
 
     private val listener = LocationListener { // тут данные меняются
-        Toast.makeText(App.globalContext, it.toString(), Toast.LENGTH_SHORT).show()
         var position = GeoPosition(it.latitude, it.longitude)
+        Log.d("LocationListener", position.toString())
+        viewModelScope.launch {
+            busLocation.emit(position)
+        }
     }
-
     fun providerKtorCLient(): HttpClient
     {
         System.setProperty("io.ktor.random.secure.random.provider","DRBG")
@@ -53,16 +53,14 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
     @SuppressLint("MissingPermission")
     suspend fun startSearch()
     {
-        startWebSocket()
-        val lastPositionNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
             locationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
-                5_000,
-                10f,
+                1_000,
+                1f,
                 listener
             )
 
+//        startWebSocket()
     }
 
     suspend fun startWebSocket()
@@ -74,17 +72,12 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         )
         {
 
-
-            coroutineScope {
-                while (true)
-                {
-                    delay(3_000)
-                    send(Frame.Text("it.toString()"))
+            busLocation.collect {
+                Log.d("pushLocation", it.toString())
+                withContext(Dispatchers.IO) {
+                    send(Frame.Text(it.toString()))
                 }
             }
-//            busLocation.collect {
-//                send(Frame.Text(it.toString()))
-//            }
         }
     }
 

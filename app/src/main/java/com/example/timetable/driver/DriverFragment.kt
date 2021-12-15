@@ -39,10 +39,12 @@ class DriverFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         var root = inflater.inflate(R.layout.fragment_driver, container, false)
-
-        root.findViewById<ToggleButton>(R.id.toggleTracker_fragmentDriver)
-            .setOnCheckedChangeListener { view, isChecked ->
-                checkLocationPermissions()
+        lifecycle.coroutineScope.launchWhenStarted {
+            viewModel.startSearch()
+        }
+//        root.findViewById<ToggleButton>(R.id.toggleTracker_fragmentDriver)
+//            .setOnCheckedChangeListener { view, isChecked ->
+//                checkLocationPermissions()
 //                if (isChecked)
 //                {
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -55,17 +57,12 @@ class DriverFragment : Fragment()
 //                {
 //
 //                }
-            }
+//            }
 
 
         return root
     }
 
-    fun onProviderEnabled(provider: String) {}
-
-    fun onProviderDisabled(provider: String) {}
-
-    fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

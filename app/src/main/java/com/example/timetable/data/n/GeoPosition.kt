@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-class GeoPosition(var latitude: Double, var longitude: Double)
+data class GeoPosition(var latitude: Double, var longitude: Double)
 {
     fun ToLatLng() = LatLng(latitude, longitude)
 }

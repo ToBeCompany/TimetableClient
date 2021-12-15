@@ -2,6 +2,7 @@ package com.example.timetable.map
 
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.example.timetable.data.BusData
 import com.google.android.gms.maps.model.LatLng
@@ -54,10 +55,10 @@ class MapViewModel(application : Application): AndroidViewModel(application)
                 for(frame in incoming){
                     when (frame){
                         is Frame.Text -> {
-
-//                            Log.d("getDAta", frame.readText())
 //                            val data : User= Json.decodeFromString<User>(frame.readText())
-                            emit(frame.readText())
+                            var data = frame.readText()
+                            emit(data)
+                            Log.d("newData", data)
                                 //https://question-it.com/questions/2640377/kak-serializovat-web-socket-frametext-v-ktor-s-pomoschju-kotlinxserialization
                         }
                     }
