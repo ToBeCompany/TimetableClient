@@ -18,8 +18,8 @@ import java.security.Security
 
 class MapViewModel(application : Application): AndroidViewModel(application)
 {
-    private val HOST = "fierce-woodland-54822.herokuapp.com"
     private var id = "1"
+    private val HOST = "fierce-woodland-54822.herokuapp.com"
     private val PATH = "/passenger/$id"
 
     var busData: BusData? = null

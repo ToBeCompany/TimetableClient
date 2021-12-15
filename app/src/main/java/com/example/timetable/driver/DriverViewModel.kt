@@ -18,6 +18,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -32,13 +33,12 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
     }
     val busLocation = flow<GeoPosition> {}
     private var id = "1"
-    private val HOST = "127.0.0.1"
+    private val HOST = "fierce-woodland-54822.herokuapp.com"
     private val PATH = "/driver/$id"
 
     private val listener = LocationListener { // тут данные меняются
         Toast.makeText(App.globalContext, it.toString(), Toast.LENGTH_SHORT).show()
         var position = GeoPosition(it.latitude, it.longitude)
-
     }
 
     fun providerKtorCLient(): HttpClient
@@ -50,11 +50,10 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         }
     }
 
-
     @SuppressLint("MissingPermission")
-    fun startSearch()
+    suspend fun startSearch()
     {
-
+        startWebSocket()
         val lastPositionNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
 
             locationManager.requestLocationUpdates(
@@ -65,9 +64,6 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
             )
 
     }
-    fun clearSearch() {
-        locationManager.removeUpdates(listener)
-    }
 
     suspend fun startWebSocket()
     {
@@ -75,12 +71,24 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
             method = HttpMethod.Get,
             host = HOST,
             path = PATH
-        ) {
-            busLocation.collect {
-                send(Frame.Text(it.toString()))
-            }
-            delay(3_000)
-        }
+        )
+        {
 
+
+            coroutineScope {
+                while (true)
+                {
+                    delay(3_000)
+                    send(Frame.Text("it.toString()"))
+                }
+            }
+//            busLocation.collect {
+//                send(Frame.Text(it.toString()))
+//            }
+        }
+    }
+
+    fun clearSearch() {
+        locationManager.removeUpdates(listener)
     }
 }

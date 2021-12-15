@@ -31,13 +31,11 @@ import kotlinx.coroutines.flow.collectLatest
 
 class MapsFragment : Fragment() {
     private var busMarker: Marker? = null
-    private var tracker = WebSocketTracker()
 
     private val viewModel: MapViewModel by viewModels()
     lateinit var googleMap: GoogleMap
 
     private val args: MapsFragmentArgs by navArgs()
-    var ref = FirebaseFirestore.getInstance().collection("LOCATION").document("point")
 
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
@@ -58,7 +56,7 @@ class MapsFragment : Fragment() {
     private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
 
-        startListeningTracker("33") //---------------
+        startListeningTracker("1") //---------------
 
         val data: BusData = Repository.busesData[args.id]
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
@@ -104,36 +102,15 @@ class MapsFragment : Fragment() {
                     .show(requireFragmentManager(), "BottomSheetDialog")
             true
         }
-        ref.addSnapshotListener { snapshot, e ->
-            Toast.makeText(context, snapshot?.data.toString() + "данные обновлены", Toast.LENGTH_SHORT).show()
-            val icon: BitmapDescriptor = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(resources,
-                R.drawable.bus_24, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
-            )
-            if (busMarker == null)
-                busMarker = googleMap.addMarker(
-                    MarkerOptions()
-                        .position(
-                            LatLng(
-                                snapshot?.data?.get("lat").toString().toDouble(),
-                                snapshot?.data?.get("lon").toString().toDouble()
-                            )
-                        )
-                        .title("")
-                        .icon(icon)
-                )
-            else
-                busMarker!!.position = LatLng(
-                    snapshot?.data?.get("lat").toString().toDouble(),
-                    snapshot?.data?.get("lon").toString().toDouble()
-                )
-        }
+
 
     }
 
-    private fun startListeningTracker(id: String) {
+    private fun startListeningTracker(id: String)
+    {
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket().collect {
-                Toast.makeText(App.globalContext, it, Toast.LENGTH_LONG).show()
+                Toast.makeText(App.globalContext, it + "  данные обновлены", Toast.LENGTH_LONG).show()
 
             }
 

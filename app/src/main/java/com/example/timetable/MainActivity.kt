@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.collect
 class MainActivity : AppCompatActivity()
 {
     private lateinit var navController: NavController
-    private val m : MapViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -24,11 +23,6 @@ class MainActivity : AppCompatActivity()
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         NavigationUI.setupActionBarWithNavController(this, navController)
-        lifecycleScope.launchWhenCreated {
-            m.startWebSocket().collect {
-                Log.d("sdefge", it)
-            }
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

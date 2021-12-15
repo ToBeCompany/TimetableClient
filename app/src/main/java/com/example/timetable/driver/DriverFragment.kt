@@ -24,6 +24,7 @@ import com.example.timetable.Resource
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -103,7 +104,9 @@ class DriverFragment : Fragment()
                     PERMISSION_CODE
                 )
             } else {
-                viewModel.startSearch()
+                lifecycle.coroutineScope.launchWhenStarted {
+                    viewModel.startSearch()
+                }
             } else {
             Snackbar.make(requireView(), "getString(R.string.gps_off)", Snackbar.LENGTH_LONG).show()
         }
