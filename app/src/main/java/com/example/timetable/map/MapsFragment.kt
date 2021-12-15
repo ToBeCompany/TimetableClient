@@ -105,17 +105,9 @@ class MapsFragment : Fragment() {
             true
         }
         ref.addSnapshotListener { snapshot, e ->
-            Toast.makeText(
-                context,
-                snapshot?.data.toString() + "данные обновлены",
-                Toast.LENGTH_SHORT
-            ).show()
-            val icon: BitmapDescriptor = getMarkerIconFromDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.bus_24,
-                    null
-                )!! // создаем и конвертируем Drawable к BitmapDescriptor
+            Toast.makeText(context, snapshot?.data.toString() + "данные обновлены", Toast.LENGTH_SHORT).show()
+            val icon: BitmapDescriptor = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(resources,
+                R.drawable.bus_24, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
             )
             if (busMarker == null)
                 busMarker = googleMap.addMarker(

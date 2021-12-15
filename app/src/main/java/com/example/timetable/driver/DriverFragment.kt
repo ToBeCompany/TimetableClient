@@ -105,8 +105,7 @@ class DriverFragment : Fragment()
             } else {
                 viewModel.startSearch()
             } else {
-            Snackbar.make(requireView(), "getString(R.string.gps_off)", Snackbar.LENGTH_LONG)
-                .show()
+            Snackbar.make(requireView(), "getString(R.string.gps_off)", Snackbar.LENGTH_LONG).show()
         }
     }
 
