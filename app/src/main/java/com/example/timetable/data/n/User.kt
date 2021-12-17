@@ -15,5 +15,4 @@ class User(
         const val TAG_NAME: String = "TAG_NAME"
         const val TAG_USERTYPE: String = "TAG_USERTYPE"
     }
-
 }

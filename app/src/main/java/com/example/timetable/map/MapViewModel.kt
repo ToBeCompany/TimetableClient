@@ -5,6 +5,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.example.timetable.data.BusData
+import com.example.timetable.data.n.GeoPosition
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -15,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.security.Security
 
 class MapViewModel(application : Application): AndroidViewModel(application)
@@ -44,7 +47,7 @@ class MapViewModel(application : Application): AndroidViewModel(application)
             install(WebSockets)
         }
     }
-    fun startWebSocket() = flow<String> {
+    fun startWebSocket() = flow<GeoPosition> {
             val client = providerKtorCLient().webSocket(
                 method = HttpMethod.Get,
                 host = HOST,
@@ -52,13 +55,14 @@ class MapViewModel(application : Application): AndroidViewModel(application)
             )
             {
 
+                Log.d("START", "STARTWEBSOCKET")
                 for(frame in incoming){
                     when (frame){
                         is Frame.Text -> {
 //                            val data : User= Json.decodeFromString<User>(frame.readText())
-                            var data = frame.readText()
+                            var data = Json.decodeFromString<GeoPosition>(frame.readText())
                             emit(data)
-                            Log.d("newData", data)
+                            Log.d("newData", data.latitude.toString())
                                 //https://question-it.com/questions/2640377/kak-serializovat-web-socket-frametext-v-ktor-s-pomoschju-kotlinxserialization
                         }
                     }

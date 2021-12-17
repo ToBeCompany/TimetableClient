@@ -16,6 +16,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.timetable.*
 import com.example.timetable.data.BusData
 import com.example.timetable.data.Repository
+import com.example.timetable.data.n.GeoPosition
 import com.example.timetable.database.WebSocketTracker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -110,25 +111,21 @@ class MapsFragment : Fragment() {
     {
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket().collect {
-                Toast.makeText(App.globalContext, it + "  данные обновлены", Toast.LENGTH_LONG).show()
-
+                val busPosition = it.toLatLng()
+//                Toast.makeText(App.globalContext, it + "  данные обновлены", Toast.LENGTH_LONG).show()
+                if (busMarker == null)
+                    busMarker = googleMap.addMarker(
+                        MarkerOptions()
+                            .position(busPosition)
+                            .title("")
+//                                    .icon(icon)
+                    )
+                else
+                    busMarker?.position = busPosition
             }
-
-//            viewModel.busLocation.collectLatest { busPosition ->
-//
-//
-//
-//                if (busMarker == null)
-//                    busMarker = googleMap.addMarker(
-//                        MarkerOptions()
-//                            .position(busPosition)
-//                            .title("")
-////                                    .icon(icon)
-//                    )
-//                else
-//                    busMarker?.position = busPosition
-//            }
         }
+
+
 
     }
 

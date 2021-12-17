@@ -1,7 +1,6 @@
 package com.example.timetable
 
 import android.content.Context
-import android.util.Log
 import androidx.preference.PreferenceManager
 import com.example.timetable.data.n.User
 import com.example.timetable.data.n.type_user_creater

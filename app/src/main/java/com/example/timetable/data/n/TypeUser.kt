@@ -1,11 +1,14 @@
 package com.example.timetable.data.n
 
-enum class TypeUser { DRIVER, COMMON, ADMIN}
+import kotlinx.serialization.Serializable
 
-fun type_user_creater(s : String?) = when(s) // конвертирует из string в enum class
+@Serializable
+enum class TypeUser { DRIVER, WORKER, ADMIN}
+
+fun type_user_creater(s : String?): TypeUser = when(s) // конвертирует из string в enum class
 {
     "DRIVER" -> TypeUser.DRIVER
-    "COMMON" -> TypeUser.COMMON
+    "COMMON" -> TypeUser.WORKER
     "ADMIN" -> TypeUser.ADMIN
-    else -> TypeUser.COMMON
+    else -> TypeUser.WORKER
 }
