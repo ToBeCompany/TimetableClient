@@ -10,14 +10,15 @@
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
-        app:cardCornerRadius="4sp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="7dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/marshrut"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#326DCF"
             android:orientation="horizontal">
 
             <TextView
@@ -28,7 +29,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="4dp"
-                android:textColor="@color/dark_gray"
+                android:textColor="#212121"
                 android:textSize="18sp"
                 android:textStyle="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +58,7 @@
         android:layout_marginTop="2dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@color/white_gray"
+        android:background="#C5CAE9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />

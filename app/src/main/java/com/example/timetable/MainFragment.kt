@@ -39,7 +39,7 @@ class MainFragment : Fragment()
                 userPreference.authUserOnDevice(User(TypeUser.DRIVER, "Andrei", "xcrypwui")) // for test
                 }
             rootView.findViewById<Button>(R.id.buttoncommon).setOnClickListener {
-                userPreference.authUserOnDevice(User(TypeUser.COMMON, "Andrei", "xcrypwui")) // for test
+                userPreference.authUserOnDevice(User(TypeUser.WORKER, "Andrei", "xcrypwui")) // for test
                 }
             rootView.findViewById<TextView>(R.id.mainFragmentText)?.text = "user not auth"
 
@@ -52,7 +52,7 @@ class MainFragment : Fragment()
                 TypeUser.DRIVER -> {
                     navController.navigate(MainFragmentDirections.actionMainFragmentToDriverFragment())
                 }
-                TypeUser.COMMON -> {
+                TypeUser.WORKER -> {
                     navController.navigate(MainFragmentDirections.actionMainFragmentToRouteFragment())
                 }
                 TypeUser.ADMIN -> {}
