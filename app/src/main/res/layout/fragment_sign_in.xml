@@ -33,7 +33,7 @@
         android:layout_width="230dp"
         android:layout_height="155dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/rotor_icon"
+        android:src="@drawable/rotor"
         app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
