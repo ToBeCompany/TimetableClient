@@ -1,4 +1,4 @@
-package com.example.timetable.data.n
+package com.example.timetable.data
 
 
 class Flight( // маршрут

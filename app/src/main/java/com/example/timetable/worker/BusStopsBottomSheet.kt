@@ -1,4 +1,4 @@
-package com.example.timetable
+package com.example.timetable.worker
 
 
 import android.content.DialogInterface
@@ -8,11 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.timetable.data.Bus_Stop
+import com.example.timetable.R
+import com.example.timetable.data.BusStop
 import com.example.timetable.map.BusStopsRecycleAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class BusStopsBottomSheet(index: Int, busStops: MutableList<Bus_Stop>) : BottomSheetDialogFragment()
+class BusStopsBottomSheet(index: Int, busStops: MutableList<BusStop>) : BottomSheetDialogFragment()
 {
     private var adapter = BusStopsRecycleAdapter(index, busStops)
     private var recyclerView: RecyclerView? = null

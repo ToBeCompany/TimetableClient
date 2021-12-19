@@ -4,8 +4,7 @@ package com.example.timetable.map
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import com.example.timetable.data.BusData
-import com.example.timetable.data.n.GeoPosition
+import com.example.timetable.data.GeoPosition
 import com.google.android.gms.maps.model.LatLng
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -25,17 +24,6 @@ class MapViewModel(application : Application): AndroidViewModel(application)
     private var id = "1"
     private val HOST = "fierce-woodland-54822.herokuapp.com"
     private val PATH = "/passenger/$id"
-
-    var busData: BusData? = null
-    val busLocation: Flow<LatLng> = flow {
-        for (i in 0..200) {
-            emit(LatLng(
-                i.toDouble()/5,
-                50.0
-            ))
-            kotlinx.coroutines.delay(300)
-        }
-    }
 
 //    fun updateLocation(newData: LatLng) { busLocation.value = Resource.Success(newData) }
         //https://habr.com/ru/post/432310/

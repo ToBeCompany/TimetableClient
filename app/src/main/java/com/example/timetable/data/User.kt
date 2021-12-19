@@ -1,4 +1,4 @@
-package com.example.timetable.data.n
+package com.example.timetable.data
 
 import kotlinx.serialization.Serializable
 

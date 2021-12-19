@@ -1,4 +1,4 @@
-package com.example.timetable.data.auth
+package com.example.timetable.auth
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.findNavController
-import com.example.timetable.data.n.TypeUser
-import com.example.timetable.data.n.User
+import com.example.timetable.data.TypeUser
+import com.example.timetable.data.User
 
 
 class MainFragment : Fragment()
