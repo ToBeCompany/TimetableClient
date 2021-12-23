@@ -11,8 +11,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import com.example.timetable.R
 import com.example.timetable.UserPreference
-import com.example.timetable.data.n.TypeUser
-import com.example.timetable.data.n.User
+import com.example.timetable.data.TypeUser
+import com.example.timetable.data.User
+import com.example.timetable.data.auth.SignInViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class SignInFragment : Fragment()

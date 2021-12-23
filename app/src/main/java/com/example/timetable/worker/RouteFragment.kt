@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
+import com.example.timetable.RouteFragmentDirections
 import com.example.timetable.Storage
 import com.example.timetable.data.Flight
 import kotlinx.coroutines.launch

@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
-import com.example.timetable.data.n.TypeUser
+import com.example.timetable.data.TypeUser
 
 
 class MainFragment : Fragment()

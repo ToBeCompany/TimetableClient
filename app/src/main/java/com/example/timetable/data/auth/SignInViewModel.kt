@@ -3,7 +3,7 @@ package com.example.timetable.data.auth
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.timetable.data.n.User
+import com.example.timetable.data.User
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.json.*
