@@ -1,22 +1,8 @@
 package com.example.timetable.database
 
-import android.location.Location
-import android.util.Log
 import com.example.timetable.Resource
-import com.example.timetable.data.n.Bus
 import com.google.android.gms.maps.model.LatLng
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.get
-import io.ktor.client.features.websocket.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class WebSocketTracker
 {

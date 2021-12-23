@@ -1,7 +1,6 @@
-package com.example.timetable.data.n
+package com.example.timetable.data
 
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.serialization.Serializable
 
 data class Bus(
     var name: String,

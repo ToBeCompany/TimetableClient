@@ -2,8 +2,8 @@ package com.example.timetable
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.example.timetable.data.n.User
-import com.example.timetable.data.n.type_user_creater
+import com.example.timetable.data.User
+import com.example.timetable.data.type_user_creater
 
 class UserPreference(var context: Context)
 {

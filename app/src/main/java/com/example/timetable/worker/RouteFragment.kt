@@ -1,24 +1,26 @@
-package com.example.timetable
+package com.example.timetable.worker
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.timetable.data.BusData
-import com.example.timetable.data.Repository
-import com.example.timetable.firebase.BusFireBase
+import com.example.timetable.R
+import com.example.timetable.Storage
+import com.example.timetable.data.Flight
+import kotlinx.coroutines.launch
 
 
 class RouteFragment : Fragment()
 {
+    private val viewModel: RouteViewModel by viewModels()
 
-    private var db = BusFireBase()
     private var adapter = RecyclerAdapterMarshrut{ id ->
         findNavController().navigate(
             RouteFragmentDirections.actionRouteFragmentToMapsFragment(id)
@@ -45,22 +47,18 @@ class RouteFragment : Fragment()
 
     private fun getData() // получение данных и загрузка в список
     {
-        db.ref
-            .get()
-            .addOnSuccessListener { result ->
-                val data: MutableList<BusData> = mutableListOf()
-                for (doc in result)
-                    data.add( doc.toObject(BusData::class.java) )
+        viewModel.viewModelScope.launch {
+            var flights: List<Flight> = viewModel.getFlight()
+            if (flights.isNotEmpty()) {
+                if (adapter.dataset.isEmpty())
+                    parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
 
-                // здесь уже данные успешно получены
-                parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
-                Repository.busesData = data
+                Storage.flights = flights.toMutableList()
                 adapter.updateData()
-                adapter.notifyDataSetChanged()
+
+            } else {
+                // маршрутов нет ( 0 )
             }
-            .addOnFailureListener {
-                // всё плохо
-                Toast.makeText(context,it.message.toString() , Toast.LENGTH_LONG).show()
-            }
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.timetable.map
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +8,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.Bus_Stop
+import com.example.timetable.data.BusStop
 
-class BusStopsRecycleAdapter(var current: Int, var dataSet: MutableList<Bus_Stop>)
+
+class BusStopsRecycleAdapter(var current: Int, var dataSet: MutableList<BusStop>)
     : RecyclerView.Adapter<BusStopsRecycleAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -38,7 +37,7 @@ class BusStopsRecycleAdapter(var current: Int, var dataSet: MutableList<Bus_Stop
         var time_text = itemView.findViewById<TextView>(R.id.textViewTime)
 
 
-        fun onBind(busStop: Bus_Stop)
+        fun onBind(busStop: BusStop)
         {
             if (dataSet[current] == busStop)
             {

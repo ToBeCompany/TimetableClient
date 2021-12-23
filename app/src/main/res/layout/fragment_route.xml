@@ -6,8 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#C5CAE9"
-    tools:context=".RouteFragment">
+    android:background="#FFFFFF"
+    tools:context=".worker.RouteFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recucler_View_Mainfrag"

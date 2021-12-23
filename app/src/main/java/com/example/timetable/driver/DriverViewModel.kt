@@ -8,7 +8,7 @@ import android.location.LocationManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.timetable.data.n.GeoPosition
+import com.example.timetable.data.GeoPosition
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.websocket.*
