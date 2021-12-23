@@ -24,7 +24,7 @@
     <fragment
         android:id="@+id/routeFragment"
         android:name="com.example.timetable.RouteFragment"
-        android:label="@string/routes"
+        android:label="@string/route_fragment_toolbar"
         tools:layout="@layout/fragment_route" >
         <action
             android:id="@+id/action_routeFragment_to_mapsFragment"
@@ -48,11 +48,11 @@
     <fragment
         android:id="@+id/driverFragment"
         android:name="com.example.timetable.driver.DriverFragment"
-        android:label="GPS трэкер"
+        android:label="@string/driver_fragment_toolbar"
         tools:layout="@layout/fragment_driver" />
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.example.timetable.data.auth.SignInFragment"
-        android:label="fragment_sign_in"
+        android:label="@string/signin_fragment_toolbar"
         tools:layout="@layout/fragment_sign_in" />
 </navigation>

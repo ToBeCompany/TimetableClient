@@ -5,11 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.navigation.findNavController
 import com.example.timetable.data.n.TypeUser
-import com.example.timetable.data.n.User
 
 
 class MainFragment : Fragment()
@@ -27,22 +24,19 @@ class MainFragment : Fragment()
     }
 
 
-    override fun onActivityCreated(savedInstanceState: Bundle?)
-    {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        checkUserAndNavigate()
+    }
+
+    private fun checkUserAndNavigate()
+    {
         val navController = rootView.findNavController()
 
         if (userPreference.currentUser == null)
         {
-            rootView.findViewById<Button>(R.id.buttondriver).setOnClickListener {
-                userPreference.authUserOnDevice(User(TypeUser.DRIVER, "Andrei", "xcrypwui")) // for test
-                }
-            rootView.findViewById<Button>(R.id.buttoncommon).setOnClickListener {
-                userPreference.authUserOnDevice(User(TypeUser.WORKER, "Andrei", "xcrypwui")) // for test
-                }
-            rootView.findViewById<TextView>(R.id.mainFragmentText)?.text = "user not auth"
-
+            navController.navigate(MainFragmentDirections.actionMainFragmentToSignInFragment())
             // отправить на экран аунтификации
         }
         else

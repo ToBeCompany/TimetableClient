@@ -2,6 +2,7 @@ package com.example.timetable.data.n
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 enum class TypeUser { DRIVER, WORKER, ADMIN}
 

@@ -37,7 +37,7 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
             LocationManager.GPS_PROVIDER,
             5000, 10f,
             listener
-        ) // здесь можно указать другие более подходящие вам параметры
+        )
         viewModelScope.launch {
             startWebSocket()
         }
