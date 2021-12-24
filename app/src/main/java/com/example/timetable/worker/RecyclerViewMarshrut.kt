@@ -7,13 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
 import com.example.timetable.Storage
-import com.example.timetable.data.Flight
+import com.example.timetable.data.response.FlightsNameResponse
 
 
-class RecyclerAdapterMarshrut(var click: (id:Int) -> Unit)
+class RecyclerAdapterMarshrut(var click: (id:String) -> Unit)
     : RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
-    var dataset: MutableList<Flight> = Storage.flights
+    var dataset: MutableList<FlightsNameResponse> = Storage.flightsNames
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut, parent, false) // тут item
@@ -22,7 +22,7 @@ class RecyclerAdapterMarshrut(var click: (id:Int) -> Unit)
 
     fun updateData()
     {
-        dataset = Storage.flights
+        dataset = Storage.flightsNames
         notifyDataSetChanged()
     }
 
@@ -42,9 +42,9 @@ class RecyclerAdapterMarshrut(var click: (id:Int) -> Unit)
         fun onBind(position: Int)
         {
 
-            nameBaseText.text = dataset[position].route.name
+            nameBaseText.text = dataset[position].name
             itemView.setOnClickListener {
-                click(position)
+                click(dataset[position].id!!)
             }
         }
     }

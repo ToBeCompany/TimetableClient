@@ -4,15 +4,16 @@ package com.example.timetable.map
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import com.example.timetable.data.Flight
 import com.example.timetable.data.GeoPosition
-import com.google.android.gms.maps.model.LatLng
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
 import io.ktor.client.features.websocket.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.decodeFromString
@@ -23,7 +24,12 @@ class MapViewModel(application : Application): AndroidViewModel(application)
 {
     private var id = "1"
     private val HOST = "fierce-woodland-54822.herokuapp.com"
-    private val PATH = "/passenger/$id"
+    private val websocketPath = "/passenger/$id"
+    private val flightPath = "/flight/"
+
+    val flightClient = HttpClient(CIO) {
+        install(JsonFeature)
+    }
 
 //    fun updateLocation(newData: LatLng) { busLocation.value = Resource.Success(newData) }
         //https://habr.com/ru/post/432310/
@@ -39,7 +45,7 @@ class MapViewModel(application : Application): AndroidViewModel(application)
             val client = providerKtorCLient().webSocket(
                 method = HttpMethod.Get,
                 host = HOST,
-                path = PATH
+                path = websocketPath
             )
             {
 
@@ -70,4 +76,5 @@ class MapViewModel(application : Application): AndroidViewModel(application)
 
     }.flowOn(Dispatchers.IO)
 
+    suspend fun getFlight(id: String): Flight = flightClient.get(HOST + flightPath)
 }

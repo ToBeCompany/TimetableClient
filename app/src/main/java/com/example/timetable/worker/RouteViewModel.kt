@@ -2,7 +2,7 @@ package com.example.timetable.worker
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.timetable.data.Flight
+import com.example.timetable.data.response.FlightsNameResponse
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -17,6 +17,6 @@ class RouteViewModel(application : Application): AndroidViewModel(application)
     }
 
 
-    suspend fun getFlight(): List<Flight> = client.get(url)
+    suspend fun getFlight(): List<FlightsNameResponse> = client.get(url)
 
 }

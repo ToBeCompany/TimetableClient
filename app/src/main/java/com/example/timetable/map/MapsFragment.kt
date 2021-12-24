@@ -34,9 +34,14 @@ class MapsFragment : Fragment() {
 
     lateinit var googleMap: GoogleMap
 
+    lateinit var flight: Flight
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
-        mapReady()
+
+        lifecycle.coroutineScope.launchWhenStarted {
+            flight = viewModel.getFlight(args.id)
+            mapReady()
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -53,9 +58,10 @@ class MapsFragment : Fragment() {
     private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
 
+
+
         startListeningTracker("1" /*Storage.flights[args.id].bus.id*/) //---------------
 
-        val flight: Flight =  Storage.flights[args.id]
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
 
         (activity as MainActivity?)!!.setActionBarTitle(flight.name)

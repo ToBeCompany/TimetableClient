@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/routeFragment"
-        android:name="com.example.timetable.RouteFragment"
+        android:name="com.example.timetable.worker.RouteFragment"
         android:label="@string/route_fragment_toolbar"
         tools:layout="@layout/fragment_route" >
         <action
@@ -42,7 +42,7 @@
         tools:layout="@layout/fragment_maps" >
         <argument
             android:name="id"
-            app:argType="integer" />
+            app:argType="string" />
     </fragment>
 
     <fragment
@@ -52,7 +52,7 @@
         tools:layout="@layout/fragment_driver" />
     <fragment
         android:id="@+id/signInFragment"
-        android:name="com.example.timetable.data.auth.SignInFragment"
+        android:name="com.example.timetable.auth.SignInFragment"
         android:label="@string/signin_fragment_toolbar"
         tools:layout="@layout/fragment_sign_in" />
 </navigation>

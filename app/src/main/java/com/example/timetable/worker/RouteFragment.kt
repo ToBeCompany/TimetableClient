@@ -12,9 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.RouteFragmentDirections
 import com.example.timetable.Storage
-import com.example.timetable.data.Flight
+import com.example.timetable.data.response.FlightsNameResponse
 import kotlinx.coroutines.launch
 
 
@@ -49,12 +48,12 @@ class RouteFragment : Fragment()
     private fun getData() // получение данных и загрузка в список
     {
         viewModel.viewModelScope.launch {
-            var flights: List<Flight> = viewModel.getFlight()
+            var flights: List<FlightsNameResponse> = viewModel.getFlight()
             if (flights.isNotEmpty()) {
                 if (adapter.dataset.isEmpty())
                     parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
 
-                Storage.flights = flights.toMutableList()
+                Storage.flightsNames = flights.toMutableList()
                 adapter.updateData()
 
             } else {

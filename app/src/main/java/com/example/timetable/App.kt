@@ -2,9 +2,8 @@ package com.example.timetable
 
 import android.app.Application
 import android.content.Context
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import kotlin.random.Random
+
 
 class App: Application() // переопределяем класс приложения
 {
