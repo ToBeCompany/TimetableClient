@@ -4,18 +4,17 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.navArgs
 import com.example.timetable.*
-import com.example.timetable.data.Flight
-import com.example.timetable.data.GeoPosition
+import com.example.timetable.data.Route
 import com.example.timetable.worker.BusStopsBottomSheet
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,7 +24,8 @@ import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.flow.collect
 
 
-class MapsFragment : Fragment() {
+class MapsFragment : Fragment()
+{
     private var busMarker: Marker? = null
 
     private val args: MapsFragmentArgs by navArgs()
@@ -34,13 +34,21 @@ class MapsFragment : Fragment() {
 
     lateinit var googleMap: GoogleMap
 
-    lateinit var flight: Flight
+    lateinit var flight/*: Flight*/: Route
+
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
 
         lifecycle.coroutineScope.launchWhenStarted {
-            flight = viewModel.getFlight(args.id)
-            mapReady()
+            viewModel.getFlight(args.id).also {
+                if (it != null)
+                {
+                    flight = it
+                    mapReady()
+                    Log.d("response_server", "data (flight) Ready")
+                } else
+                    Log.d("response_server", "data (flight) is null")
+            }
         }
     }
 
@@ -57,17 +65,17 @@ class MapsFragment : Fragment() {
 
     private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
+        val route = flight/*.route*/
 
-
-
-        startListeningTracker("1" /*Storage.flights[args.id].bus.id*/) //---------------
+        if (!route.id.isNullOrEmpty())
+            startListeningTracker(route.id!!) // включаю вебсокет
 
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
 
-        (activity as MainActivity?)!!.setActionBarTitle(flight.name)
-        moveCamera( flight.route.points[0] )// перемещаем камеру на первую остановку
+        (activity as MainActivity?)!!.setActionBarTitle(route.name)
+        moveCamera(route.points?.get(0)?.toLatLng())// перемещаем камеру на первую остановку
 
-        flight.route?.points?.forEach { polylineOptions.add(it) } // добавляем точки для линии
+        route.points!!.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
 
 
@@ -79,30 +87,29 @@ class MapsFragment : Fragment() {
             )!! // создаем и конвертируем Drawable к BitmapDescriptor
         )
 
-        val busStops = flight.route.busStops
-        for (i in 0 until busStops.size) // добавляем маркеры на карту
+        val busStops = route.busStops
+        if (busStops != null)
         {
-            var marker = googleMap.addMarker(
-                MarkerOptions()
-                    .position(
-                        LatLng(
-                            busStops[i].position.latitude,
-                            busStops[i].position.longitude
+            for (i in busStops.indices) // добавляем маркеры на карту
+            {
+                var marker = googleMap.addMarker(
+                    MarkerOptions()
+                        .position(
+                            LatLng(
+                                busStops[i].position!!.latitude,
+                                busStops[i].position!!.longitude
+                            )
                         )
-                    )
-                    .title(busStops[i].name)
-                    .icon(markerIcon)
-            )
-                ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
+                        .title(busStops[i].name)
+                        .icon(markerIcon)
+                )
+                    ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
+            }
         }
-
-
-
-        Toast.makeText(context, flight.name, Toast.LENGTH_LONG).show()
 
         googleMap.setOnMarkerClickListener { marker -> // при нажатии на маркер
             if (marker.tag != null)
-                BusStopsBottomSheet(marker.tag as Int, busStops)
+                BusStopsBottomSheet(marker.tag as Int, busStops!!)
                     .show(requireFragmentManager(), "BottomSheetDialog")
             true
         }
@@ -114,8 +121,8 @@ class MapsFragment : Fragment() {
     {
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket().collect {
+
                 val busPosition = it.toLatLng()
-//                Toast.makeText(App.globalContext, it + "  данные обновлены", Toast.LENGTH_LONG).show()
                 if (busMarker == null)
                     busMarker = googleMap.addMarker(
                         MarkerOptions()
@@ -132,7 +139,7 @@ class MapsFragment : Fragment() {
 
     }
 
-    fun moveCamera(point: LatLng?) {
+    private fun moveCamera(point: LatLng?) {
         if (point != null)
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f), 1500, null)
     }
@@ -149,6 +156,4 @@ class MapsFragment : Fragment() {
         drawable.draw(canvas)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
-
-    private fun toLatLng(point: GeoPosition) = LatLng(point.latitude, point.longitude)
 }

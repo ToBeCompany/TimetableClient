@@ -18,4 +18,9 @@
         <!-- загрузочный экран -->
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
+
+    <style name="Theme.TimeTable.ProgressBar">
+        <!-- загрузочный экран -->
+        <item name="colorAccent">@color/blue_800</item>
+    </style>
 </resources>

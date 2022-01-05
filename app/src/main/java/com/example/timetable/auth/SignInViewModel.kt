@@ -1,24 +1,33 @@
 package com.example.timetable.auth
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.timetable.data.User
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import kotlinx.coroutines.launch
+
 
 class SignInViewModel(application : Application): AndroidViewModel(application)
 {
-    private val url = "fierce-woodland-54822.herokuapp.com/signin/"
-    val client = HttpClient(CIO) {
-        install(JsonFeature)
+    private val url = "https://fierce-woodland-54822.herokuapp.com/sign/"
+    val client = HttpClient(Android) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer()
+//                    acceptContentTypes += ContentType("text", "plain")
+        }
     }
 
-    suspend fun authUserOnServer(id: String): User =
-        client.get(url + id)
+    suspend fun getUser(id: String): User? =
+        try {
+            client.get(url + id)
+        }
+        catch (error: Exception) {
+            Log.d("ErrorServer", error.message.toString())
+            null
+        }
 
 }

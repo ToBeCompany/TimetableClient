@@ -1,10 +1,13 @@
 package com.example.timetable.data
 
-import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class BusStop(
-    var name: String,
-    var id: String,
-    var position: LatLng,
+
+@Serializable
+data class BusStop( // остановка
+    @SerialName("name") var name: String? = null,
+    var id: String? = null,
+    @SerialName("geopos") var position: GeoPosition? = null,
     var time: String? = null
 )

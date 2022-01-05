@@ -13,7 +13,7 @@ import com.example.timetable.data.BusStop
 import com.example.timetable.map.BusStopsRecycleAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class BusStopsBottomSheet(index: Int, busStops: MutableList<BusStop>) : BottomSheetDialogFragment()
+class BusStopsBottomSheet(index: Int, busStops: List<BusStop>) : BottomSheetDialogFragment()
 {
     private var adapter = BusStopsRecycleAdapter(index, busStops)
     private var recyclerView: RecyclerView? = null

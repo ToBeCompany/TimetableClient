@@ -5,8 +5,8 @@ import com.example.timetable.data.response.FlightsNameResponse
 
 object Storage
 {
-    var flights: MutableList<Flight> = mutableListOf()
+    var flights: List<Flight> = listOf()
 
-    var flightsNames: MutableList<FlightsNameResponse> = mutableListOf()
+    var flightsNames: List<FlightsNameResponse> = listOf()
 
 }

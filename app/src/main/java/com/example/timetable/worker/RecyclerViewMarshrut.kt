@@ -13,7 +13,7 @@ import com.example.timetable.data.response.FlightsNameResponse
 class RecyclerAdapterMarshrut(var click: (id:String) -> Unit)
     : RecyclerView.Adapter<RecyclerAdapterMarshrut.ViewHolder>()
 {
-    var dataset: MutableList<FlightsNameResponse> = Storage.flightsNames
+    var dataset: List<FlightsNameResponse> = Storage.flightsNames
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut, parent, false) // тут item
@@ -37,7 +37,7 @@ class RecyclerAdapterMarshrut(var click: (id:String) -> Unit)
     {
         var context = itemView.context
 
-        var nameBaseText = itemView.findViewById<TextView>(R.id.textView)
+        var nameBaseText = itemView.findViewById<TextView>(R.id.name_flight_text)
 
         fun onBind(position: Int)
         {

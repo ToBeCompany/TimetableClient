@@ -1,6 +1,7 @@
 package com.example.timetable.auth
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +10,11 @@ import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
+import androidx.navigation.findNavController
 import com.example.timetable.R
 import com.example.timetable.UserPreference
 import com.example.timetable.data.User
+import com.google.android.material.snackbar.Snackbar
 
 
 class SignInFragment : Fragment()
@@ -23,15 +26,24 @@ class SignInFragment : Fragment()
     {
         var root = inflater.inflate(R.layout.fragment_sign_in, container, false)
 
+
+
         root.findViewById<EditText>(R.id.codetext_signInFragment)
-            .addTextChangedListener { code ->
-                if (!code.isNullOrEmpty())
+            .addTextChangedListener { inputText ->
+                if (!inputText.isNullOrEmpty())
                 {
+
                     lifecycle.coroutineScope.launchWhenStarted {
-                        val response: User = viewModel.authUserOnServer(code.toString())
-                        if (response.isNotEmpy())
+
+                        val response: User? = viewModel.getUser(inputText.toString())
+                        Log.d("response", response.toString())
+
+                        if (response != null && response.isNotEmpy())
                         {
                             userPreference.authUserOnDevice(response)
+                            Snackbar.make(requireView(), getString(R.string.auth_success), Snackbar.LENGTH_LONG).show()
+                            root.findNavController().popBackStack()
+
                         }
                     }
 

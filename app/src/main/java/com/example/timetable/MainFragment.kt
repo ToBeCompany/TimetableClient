@@ -37,6 +37,7 @@ class MainFragment : Fragment()
         if (userPreference.currentUser == null)
         {
             navController.navigate(MainFragmentDirections.actionMainFragmentToSignInFragment())
+
             // отправить на экран аунтификации
         }
         else

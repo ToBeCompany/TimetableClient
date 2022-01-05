@@ -1,10 +1,15 @@
 package com.example.timetable.data
 
-import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class Route(
-    var name: String,
-    var id: String,
-    var points: MutableList<LatLng>,
-    var busStops: MutableList<BusStop>
+
+@Serializable
+data class Route( // маршрут
+    @SerialName("idm_Foreign") var name: String? = null,
+    var id: String? = null,
+    @SerialName("lineMarshtriectori") var points: List<GeoPosition>? = null,
+    @SerialName("idOst") var busStops: List<BusStop>? = null
 )
+{
+}

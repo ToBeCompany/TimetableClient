@@ -1,7 +1,10 @@
 package com.example.timetable.data
 
+import kotlinx.serialization.Serializable
 
-class Flight( // маршрут
+
+@Serializable
+class Flight( // рейс
     var name: String,
     var id: String,
     var bus: Bus,

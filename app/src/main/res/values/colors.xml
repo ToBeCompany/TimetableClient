@@ -15,5 +15,6 @@
     <color name="good_purple">#9932cc</color>
     <color name="liloviy">#ff00ff</color>
     <color name="dark_blue">#315085</color>
+    <color name="blue_800">#0277BD</color>
     <color name="grey_new">#4A4A4A</color>
 </resources>

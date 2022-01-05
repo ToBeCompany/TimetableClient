@@ -9,7 +9,7 @@
     <!-- Лого приложения -->
     <item
         android:gravity="center">
-        <bitmap android:src="@drawable/rotor"/>
+        <bitmap android:src="@drawable/rotor_icon"/>
 
     </item>
 

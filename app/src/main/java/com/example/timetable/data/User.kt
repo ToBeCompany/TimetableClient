@@ -1,14 +1,52 @@
 package com.example.timetable.data
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-class User(
-    var userType: TypeUser?,
-    var name: String?,
-    var id: String?
+data class User( // пользователь
+    @SerialName("User_type") var userType: TypeUser? = TypeUser.WORKER,
+    var name: String? = "",
+    var id: String? = ""
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
     fun isNotEmpy() = !(userType == null ||
                         name == null ||

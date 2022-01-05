@@ -13,7 +13,7 @@ import com.example.timetable.R
 import com.example.timetable.data.BusStop
 
 
-class BusStopsRecycleAdapter(var current: Int, var dataSet: MutableList<BusStop>)
+class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStop>)
     : RecyclerView.Adapter<BusStopsRecycleAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -48,7 +48,7 @@ class BusStopsRecycleAdapter(var current: Int, var dataSet: MutableList<BusStop>
 
 
             name_text.text = busStop.name
-                time_text.text = busStop.time
+//                time_text.text = busStop.time
             }
     }
 

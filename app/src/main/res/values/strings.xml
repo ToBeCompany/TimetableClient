@@ -14,5 +14,7 @@
     <string name="routes">маршруты</string>
     <string name="sigining_code">введите код аунтификации</string>
 
+    <string name="auth_success">Вы успешно вошли в систему</string>
+
 
 </resources>

@@ -48,12 +48,13 @@ class RouteFragment : Fragment()
     private fun getData() // получение данных и загрузка в список
     {
         viewModel.viewModelScope.launch {
-            var flights: List<FlightsNameResponse> = viewModel.getFlight()
-            if (flights.isNotEmpty()) {
+            var flights: List<FlightsNameResponse>? = viewModel.getFlight()
+            if (flights != null && flights.isNotEmpty())
+            {
                 if (adapter.dataset.isEmpty())
                     parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
 
-                Storage.flightsNames = flights.toMutableList()
+                Storage.flightsNames = flights
                 adapter.updateData()
 
             } else {
