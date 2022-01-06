@@ -96,11 +96,11 @@ class MapsFragment : Fragment()
                     MarkerOptions()
                         .position(
                             LatLng(
-                                busStops[i].position!!.latitude,
-                                busStops[i].position!!.longitude
+                                busStops[i].busStop?.position!!.latitude,
+                                busStops[i].busStop?.position!!.longitude
                             )
                         )
-                        .title(busStops[i].name)
+                        .title(busStops[i].busStop?.name)
                         .icon(markerIcon)
                 )
                     ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)

@@ -10,10 +10,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.BusStop
+import com.example.timetable.data.BusStopTime
 
 
-class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStop>)
+class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStopTime>)
     : RecyclerView.Adapter<BusStopsRecycleAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -37,9 +37,9 @@ class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStop>)
         var time_text = itemView.findViewById<TextView>(R.id.textViewTime)
 
 
-        fun onBind(busStop: BusStop)
+        fun onBind(busStopTime: BusStopTime)
         {
-            if (dataSet[current] == busStop)
+            if (dataSet[current] == busStopTime)
             {
                 itemView.findViewById<TextView>(R.id.textViewOst).setTextColor(context.resources.getColor(R.color.black))
                 itemView.findViewById<TextView>(R.id.textViewTime).setTextColor(context.resources.getColor(R.color.grey_new))
@@ -47,9 +47,10 @@ class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStop>)
             }
 
 
-            name_text.text = busStop.name
-//                time_text.text = busStop.time
-            }
+            name_text.text = busStopTime.busStop?.name.toString()
+            time_text.text = busStopTime.time.toString()
+
+        }
     }
 
 }

@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class BusStop( // остановка
-    @SerialName("name") var name: String? = null,
+class BusStopTime(
     var id: String? = null,
-    @SerialName("geopos") var position: GeoPosition? = null,
+    @SerialName("busStop") var busStop: BusStop? = null,
+    @SerialName("geopos") var time: String? = null
 )
