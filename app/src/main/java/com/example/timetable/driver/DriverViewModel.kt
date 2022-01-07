@@ -9,9 +9,14 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.timetable.data.GeoPosition
+import com.example.timetable.data.response.FlightsNameResponse
 import io.ktor.client.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.*
@@ -23,15 +28,22 @@ import java.security.Security
 
 class DriverViewModel(application : Application): AndroidViewModel(application)
 {
-
     private val busLocation = MutableSharedFlow<GeoPosition>()
     private var id = "1"
     private val HOST = "fierce-woodland-54822.herokuapp.com"
     private val PATH = "/driver/$id"
 
+    val clientRoutes = HttpClient(Android) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer()
+//                    acceptContentTypes += ContentType("text", "plain")
+        }
+    }
+
     @SuppressLint("MissingPermission")
     fun startSearch(context: Context) // это нужно запустить в самом начале работы программы
     {
+        Log.d("LocationListener", "start listening")
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
@@ -43,13 +55,21 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         }
     }
 
+    fun stopSearch(context: Context)
+    {
+        Log.d("LocationListener", "stop listening")
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager.removeUpdates(listener)
+    }
+
+
     private var listener = LocationListener {
         val position = GeoPosition(it.latitude, it.longitude)
         viewModelScope.launch {
             busLocation.emit(position)
         }
     }
-    suspend fun startWebSocket()
+    private suspend fun startWebSocket()
     {
         val client = providerKtorCLient().webSocket(
             method = HttpMethod.Get,
@@ -71,7 +91,16 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         }
     }
 
-    fun providerKtorCLient(): HttpClient
+    suspend fun getFlight(): List<FlightsNameResponse>? =
+        try {
+            clientRoutes.get("https://$HOST/namesMarsh")
+        }
+        catch (error: Exception) {
+            Log.d("ErrorServer", error.message.toString())
+            null
+        }
+
+    private fun providerKtorCLient(): HttpClient
     {
         System.setProperty("io.ktor.random.secure.random.provider","DRBG")
         Security.setProperty("securerandom.drgb.config","HMAC_DRBG,SHA-512,256,pr_and_reseed")

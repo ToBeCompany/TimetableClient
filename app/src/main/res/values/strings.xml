@@ -7,6 +7,10 @@
 <!--    <string name="driver_fragment_toolbar">TimeTable</string>-->
 
 
+    <string name="turn_on_gps">Включите GPS</string>
+    <string name="permission_not_granted">Разрешения не выданы</string>
+
+    <string name="route_not_selected">Маршрут не выбран</string>
 
 
     <string name="on_tracker">Включить трекер</string>
