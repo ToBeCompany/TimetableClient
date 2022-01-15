@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.BusStopTime
+import com.example.timetable.data.BusStopWithTime
 
 
-class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStopTime>)
+class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStopWithTime>)
     : RecyclerView.Adapter<BusStopsRecycleAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -31,9 +31,9 @@ class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStopTime>)
         var name_text = itemView.findViewById<TextView>(R.id.busStopName_busstop_item)
         var time_text = itemView.findViewById<TextView>(R.id.time_busstop_item)
 
-        fun onBind(busStopTime: BusStopTime)
+        fun onBind(busStopWithTime: BusStopWithTime)
         {
-            if (dataSet[current] == busStopTime)
+            if (dataSet[current] == busStopWithTime)
             {
                 itemView.setBackgroundColor( context.resources.getColor(R.color.light_blue) )
 //                itemView.findViewById<TextView>(R.id.textViewOst).setTextColor(context.resources.getColor(R.color.black))
@@ -42,8 +42,8 @@ class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStopTime>)
             }
 
 
-            name_text.text = busStopTime.busStop?.name ?: ""
-            time_text.text = busStopTime.time ?: ""
+            name_text.text = busStopWithTime.busStop?.name ?: ""
+            time_text.text = busStopWithTime.time ?: ""
 
         }
     }

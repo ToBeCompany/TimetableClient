@@ -70,7 +70,7 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
 
 
     private var listener = LocationListener {
-        val position = GeoPosition(it.latitude, it.longitude)
+        val position = GeoPosition(latitude = it.latitude, longitude = it.longitude)
         viewModelScope.launch {
             busLocation.emit(position)
         }

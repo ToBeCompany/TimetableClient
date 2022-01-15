@@ -1,12 +1,21 @@
 package com.example.timetable.data
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
+@Entity(tableName = "BusStop")
 data class BusStop( // остановка
-    @SerialName("name") var name: String? = null,
-    var id: String? = null,
-    @SerialName("geopos") var position: GeoPosition? = null,
+        @PrimaryKey
+            var id: String = "",
+    @SerialName("name")
+        @ColumnInfo(name = "name")
+            var name: String = "",
+    @SerialName("geopos")
+        @ColumnInfo(name = "position")
+            var position: GeoPosition? = null,
 )

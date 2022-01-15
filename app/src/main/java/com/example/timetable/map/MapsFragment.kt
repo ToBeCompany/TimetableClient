@@ -22,7 +22,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import kotlinx.coroutines.flow.collect
 
 
 class MapsFragment : Fragment()
@@ -31,7 +30,12 @@ class MapsFragment : Fragment()
 
     private val args: MapsFragmentArgs by navArgs()
 
-    private val viewModel: MapViewModel by viewModels()
+    private val viewModel: MapViewModel by viewModels {
+        MapViewModelFactory(
+            (activity?.application as App).database
+                .routeDao()
+        )
+    }
 
     lateinit var googleMap: GoogleMap
 
@@ -59,7 +63,11 @@ class MapsFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
 
-//        findBusButton = root.findViewById(R.id.findBus_fragment_map)
+        findBusButton = root.findViewById(R.id.findBus_fragment_map)
+        findBusButton.setOnClickListener {
+            viewModel.addRoute(flight)
+            Log.d("database_room", "addNewRoute")
+        }
         return root
     }
 
@@ -74,13 +82,13 @@ class MapsFragment : Fragment()
         val route = flight/*.route*/
 
         if (!route.id.isNullOrEmpty())
-            startListeningTracker(route.id!!) // включаю вебсокет
+            startListeningTracker(route.id) // включаю вебсокет
 
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
 
-        moveCamera(route.points?.get(0)?.toLatLng())// перемещаем камеру на первую остановку
+        moveCamera(route.points[0].toLatLng())// перемещаем камеру на первую остановку
 
-        route.points!!.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
+        route.points.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
 
 
@@ -92,28 +100,25 @@ class MapsFragment : Fragment()
 //            )!! // создаем и конвертируем Drawable к BitmapDescriptor
 //        )
 
-        val busStops = route.busStops
-        if (busStops != null)
+        val busStops = route.busStopsWithTime
+        for (i in busStops.indices) // добавляем маркеры на карту
         {
-            for (i in busStops.indices) // добавляем маркеры на карту
-            {
-                var marker = googleMap.addMarker(
-                    MarkerOptions()
-                        .position(
-                            LatLng(
-                                busStops[i].busStop?.position!!.latitude,
-                                busStops[i].busStop?.position!!.longitude
-                            )
+            var marker = googleMap.addMarker(
+                MarkerOptions()
+                    .position(
+                        LatLng(
+                            busStops[i].busStop?.position!!.latitude,
+                            busStops[i].busStop?.position!!.longitude
                         )
-                        .title(busStops[i].busStop?.name)
-                )
-                    ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
-            }
+                    )
+                    .title(busStops[i].busStop?.name)
+            )
+                ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
         }
 
         googleMap.setOnMarkerClickListener { marker -> // при нажатии на маркер
             if (marker.tag != null)
-                BusStopsBottomSheet(marker.tag as Int, busStops!!)
+                BusStopsBottomSheet(marker.tag as Int, busStops)
                     .show(requireFragmentManager(), "BottomSheetDialog")
             true
         }
