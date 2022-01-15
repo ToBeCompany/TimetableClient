@@ -1,4 +1,4 @@
-package com.example.timetable.auth
+package com.example.timetable.driver
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +9,14 @@ import com.example.timetable.R
 import com.example.timetable.Storage
 import com.example.timetable.data.response.FlightsNameResponse
 
-class RecyclerAdapterFlightNames()
+class RecyclerAdapterFlightNames(var click: (curItem: FlightsNameResponse) -> Unit)
     : RecyclerView.Adapter<RecyclerAdapterFlightNames.ViewHolder>()
 {
     var dataset: List<FlightsNameResponse> = Storage.flightsNames
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapterFlightNames.ViewHolder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        val View = LayoutInflater.from(parent.context).inflate(R.layout.item_view_marshrut, parent, false) // тут item
+        val View = LayoutInflater.from(parent.context).inflate(R.layout.route_item, parent, false) // тут item
         return ViewHolder(View)
     }
 
@@ -31,11 +31,14 @@ class RecyclerAdapterFlightNames()
     {
         var context = itemView.context
 
-        var flightNameText = itemView.findViewById<TextView>(R.id.name_flight_text)
+        var flightNameText = itemView.findViewById<TextView>(R.id.nameRoute_route_item)
 
         fun onBind(position: Int)
         {
 
+            itemView.setOnClickListener {
+                click(dataset[position])
+            }
             flightNameText.text = dataset[position].name
         }
     }

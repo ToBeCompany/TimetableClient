@@ -8,8 +8,10 @@
 
     <!-- Лого приложения -->
     <item
+        android:width="173.6sp"
+        android:height="126.4sp"
         android:gravity="center">
-        <bitmap android:src="@drawable/rotor_icon"/>
+        <bitmap android:src="@drawable/rotor_text_logo"/>
 
     </item>
 

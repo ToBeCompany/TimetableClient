@@ -1,9 +1,9 @@
 package com.example.timetable.map
 
-
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import com.example.timetable.EndPoint
 import com.example.timetable.data.GeoPosition
 import com.example.timetable.data.Route
 import io.ktor.client.*
@@ -25,13 +25,8 @@ import java.security.Security
 
 class MapViewModel(application : Application): AndroidViewModel(application)
 {
-    private var id = "1"
-    private val HOST = "fierce-woodland-54822.herokuapp.com"
-    private val websocketPath = "/passenger/$id"
-    private val flightPath = "/flight/"
-
-    private var urlFlight = "https://$HOST/OneMarsh/"
-
+    private val HOST = EndPoint.host
+    private val urlFlight = EndPoint.protocol + HOST + EndPoint.routeById
 
     val flightClient = HttpClient(Android) {
         install(JsonFeature) {
@@ -48,15 +43,15 @@ class MapViewModel(application : Application): AndroidViewModel(application)
             install(WebSockets)
         }
     }
-    fun startWebSocket() = flow<GeoPosition> {
+    fun startWebSocket(routeId: String) = flow<GeoPosition> {
             val webSocketClient = providerKtorCLient().webSocket(
                 method = HttpMethod.Get,
                 host = HOST,
-                path = websocketPath
+                path = (EndPoint.webSocket_passenger + routeId)
             )
             {
 
-                Log.d("STARTWEBSOCKET", "websocket start client map")
+                Log.d("start_websocket", "websocket start client map routeId = $routeId")
                 for(frame in incoming)
                 {
                     if (frame is Frame.Text)
@@ -78,5 +73,4 @@ class MapViewModel(application : Application): AndroidViewModel(application)
             Log.d("ErrorServer", error.message.toString())
             null
         }
-
 }

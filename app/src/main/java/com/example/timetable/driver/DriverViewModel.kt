@@ -8,6 +8,7 @@ import android.location.LocationManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.timetable.EndPoint
 import com.example.timetable.data.GeoPosition
 import com.example.timetable.data.response.FlightsNameResponse
 import io.ktor.client.*
@@ -29,9 +30,8 @@ import java.security.Security
 class DriverViewModel(application : Application): AndroidViewModel(application)
 {
     private val busLocation = MutableSharedFlow<GeoPosition>()
-    private var id = "1"
-    private val HOST = "fierce-woodland-54822.herokuapp.com"
-    private val PATH = "/driver/$id"
+    private val HOST = EndPoint.host
+    private val urlFlightNames = EndPoint.protocol + HOST + EndPoint.routes_names_id
 
     val clientRoutes = HttpClient(Android) {
         install(JsonFeature) {
@@ -39,9 +39,10 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
 //                    acceptContentTypes += ContentType("text", "plain")
         }
     }
+    var webSocketSession: DefaultClientWebSocketSession? = null
 
     @SuppressLint("MissingPermission")
-    fun startSearch(context: Context) // это нужно запустить в самом начале работы программы
+    fun startSearch(context: Context, trackerId: String) // это нужно запустить в самом начале работы программы
     {
         Log.d("LocationListener", "start listening")
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -51,15 +52,20 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
             listener
         )
         viewModelScope.launch {
-            startWebSocket()
+            startWebSocket(trackerId)
         }
     }
 
     fun stopSearch(context: Context)
     {
         Log.d("LocationListener", "stop listening")
+
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.removeUpdates(listener)
+
+        viewModelScope.launch {
+            webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "driver turn off transponder "))
+        }
     }
 
 
@@ -69,17 +75,18 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
             busLocation.emit(position)
         }
     }
-    private suspend fun startWebSocket()
+    private suspend fun startWebSocket(trackerId: String)
     {
-        val client = providerKtorCLient().webSocket(
+        providerKtorCLient().webSocket(
             method = HttpMethod.Get,
             host = HOST,
-            path = PATH
+            path = EndPoint.webSocket_driver + trackerId
         )
         {
+            webSocketSession = this@webSocket
 
             busLocation.collect {
-                Log.d("newLocation(driver)", it.latitude.toString() + it.longitude.toString())
+                Log.d("newLocation(driver)", "${it.latitude.toString()} ${it.longitude.toString()}")
                 withContext(Dispatchers.IO) {
                     send(
                         Frame.Text(
@@ -93,7 +100,7 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
 
     suspend fun getFlight(): List<FlightsNameResponse>? =
         try {
-            clientRoutes.get("https://$HOST/namesMarsh")
+            clientRoutes.get(urlFlightNames)
         }
         catch (error: Exception) {
             Log.d("ErrorServer", error.message.toString())

@@ -1,6 +1,7 @@
 package com.example.timetable.worker
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +22,7 @@ class RouteFragment : Fragment()
 {
     private val viewModel: RouteViewModel by viewModels()
 
-    private var adapter = RecyclerAdapterMarshrut{ id ->
+    private var adapter = RecyclerAdapterRoute{ id ->
         findNavController().navigate(
             RouteFragmentDirections.actionRouteFragmentToMapsFragment(id)
         )
@@ -51,8 +52,9 @@ class RouteFragment : Fragment()
             var flights: List<FlightsNameResponse>? = viewModel.getFlight()
             if (flights != null && flights.isNotEmpty())
             {
-                if (adapter.dataset.isEmpty())
-                    parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
+
+                Log.d("getdataServer", flights.toString())
+                parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
 
                 Storage.flightsNames = flights
                 adapter.updateData()

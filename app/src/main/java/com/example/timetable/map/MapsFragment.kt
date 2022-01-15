@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -36,6 +37,8 @@ class MapsFragment : Fragment()
 
     lateinit var flight/*: Flight*/: Route
 
+    lateinit var findBusButton: Button
+
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
 
@@ -44,6 +47,7 @@ class MapsFragment : Fragment()
                 if (it != null)
                 {
                     flight = it
+                    (requireActivity() as MainActivity).setActionBarTitle(flight.name)
                     mapReady()
                     Log.d("response_server", "data (flight) Ready")
                 } else
@@ -54,12 +58,14 @@ class MapsFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
+
+//        findBusButton = root.findViewById(R.id.findBus_fragment_map)
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment_map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
     }
 
@@ -72,20 +78,19 @@ class MapsFragment : Fragment()
 
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
 
-        (activity as MainActivity?)!!.setActionBarTitle(route.name)
         moveCamera(route.points?.get(0)?.toLatLng())// перемещаем камеру на первую остановку
 
         route.points!!.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
 
 
-        val markerIcon: BitmapDescriptor = getMarkerIconFromDrawable(
-            ResourcesCompat.getDrawable(
-                resources,
-                R.drawable.bus_icon,
-                null
-            )!! // создаем и конвертируем Drawable к BitmapDescriptor
-        )
+//        val markerIcon: BitmapDescriptor = getMarkerIconFromDrawable(
+//            ResourcesCompat.getDrawable(
+//                resources,
+//                R.drawable.bus_stop_marker,
+//                null
+//            )!! // создаем и конвертируем Drawable к BitmapDescriptor
+//        )
 
         val busStops = route.busStops
         if (busStops != null)
@@ -101,7 +106,6 @@ class MapsFragment : Fragment()
                             )
                         )
                         .title(busStops[i].busStop?.name)
-                        .icon(markerIcon)
                 )
                     ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
             }
@@ -117,31 +121,37 @@ class MapsFragment : Fragment()
 
     }
 
-    private fun startListeningTracker(id: String)
+    private fun startListeningTracker(trackerId: String)
     {
-        lifecycle.coroutineScope.launchWhenStarted {
-            viewModel.startWebSocket().collect {
+        val busMarkerIcon: BitmapDescriptor = getMarkerIconFromDrawable(
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.bus_marker,
+                null
+            )!! // создаем и конвертируем Drawable к BitmapDescriptor
+        )
 
-                val busPosition = it.toLatLng()
-                if (busMarker == null)
-                    busMarker = googleMap.addMarker(
-                        MarkerOptions()
-                            .position(busPosition)
-                            .title("")
-//                                    .icon(icon)
-                    )
-                else
-                    busMarker?.position = busPosition
-            }
-        }
-
-
+//        lifecycle.coroutineScope.launchWhenStarted {
+//            viewModel.startWebSocket(trackerId).collect {
+//
+//                val busPosition = it.toLatLng()
+//                if (busMarker == null)
+//                    busMarker = googleMap.addMarker(
+//                        MarkerOptions()
+//                            .position(busPosition)
+//                            .title(flight.name)
+//                            .icon( busMarkerIcon )
+//                    )
+//                else
+//                    busMarker?.position = busPosition
+//            }
+//        }
 
     }
 
     private fun moveCamera(point: LatLng?) {
         if (point != null)
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f), 1500, null)
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 13.5f), 1500, null)
     }
 
     private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor {

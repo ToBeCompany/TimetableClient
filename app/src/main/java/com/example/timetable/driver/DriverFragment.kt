@@ -12,20 +12,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ListView
+import android.widget.TextView
 import com.example.timetable.R
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import com.example.timetable.Storage
 import com.example.timetable.data.response.FlightsNameResponse
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.timetable.auth.RecyclerAdapterFlightNames
 
 
 class DriverFragment : Fragment()
@@ -39,34 +36,57 @@ class DriverFragment : Fragment()
 
 
     private var isListiningPos = false
-    lateinit var trackerButton: Button
-    lateinit var parent: ConstraintLayout
 
-    private var adapter = RecyclerAdapterFlightNames()
-    private var recyclerView: RecyclerView? = null
+    private lateinit var trackerButton: Button
+    private lateinit var curRouteText: TextView
+    private lateinit var parent: ConstraintLayout
+    private lateinit var recyclerView: RecyclerView
+
+    private var adapter = RecyclerAdapterFlightNames (::selectRoute)
+
+    private var routeId: String? = null
+
+    fun selectRoute(selectedRoute: FlightsNameResponse)
+    {
+        if (selectedRoute.id != null && selectedRoute.name != null)
+        {
+            if (routeId != null)
+            {
+                viewModel.stopSearch(requireContext())
+                viewModel.startSearch(requireContext(), selectedRoute.id!!)
+            }
+            routeId = selectedRoute.id!!
+            curRouteText.text = selectedRoute.name!!
+            trackerButton.isEnabled = true
+
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         var root = inflater.inflate(R.layout.fragment_driver, container, false)
 
         trackerButton = root.findViewById(R.id.ButtonTracker_fragmentDriver)
-        recyclerView = root.findViewById(R.id.recyclerviewRoutes_fragmentDriver)
+        curRouteText = root.findViewById(R.id.selectedRoute_fragmentDriver)
         parent = root.findViewById(R.id.parent_fragmentDriver)
+        recyclerView = root.findViewById(R.id.recyclerviewRoutes_fragmentDriver)
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
 
         viewModel.viewModelScope.launch {
-            var response: List<FlightsNameResponse>? = viewModel.getFlight()
+            val response: List<FlightsNameResponse>? = viewModel.getFlight()
             if (response != null && response.isNotEmpty())
             {
                 Log.d("ResponseServer", "data (flight) Ready")
+
                 adapter.dataset = response
-                recyclerView?.adapter = adapter
-                recyclerView?.layoutManager = LinearLayoutManager(context)
+                adapter.notifyDataSetChanged()
 
                 parent.removeView(parent.findViewById(R.id.progress_fragmentDriver))
-
-//                trackerButton.isEnabled = true
-
-            } else {
+            }
+            else
+            {
                 Log.d("ResponseServer", "data (flight) is null")
                 // маршрутов нет ( 0 )
             }
@@ -107,7 +127,7 @@ class DriverFragment : Fragment()
                 else
                 {
                     trackerButton.text = getString(R.string.off_tracker)
-                    viewModel.startSearch(requireContext())
+                    viewModel.startSearch(requireContext(), routeId!!)
                 }
 
                 isListiningPos = !isListiningPos
