@@ -13,7 +13,7 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
 import com.example.timetable.R
 import com.example.timetable.UserPreference
-import com.example.timetable.data.User
+import com.example.timetable.data.metadata.User
 import com.google.android.material.snackbar.Snackbar
 
 

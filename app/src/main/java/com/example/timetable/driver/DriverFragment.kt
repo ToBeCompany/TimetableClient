@@ -17,7 +17,7 @@ import com.example.timetable.R
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import com.example.timetable.data.response.FlightsNameResponse
+import com.example.timetable.data.metadata.response.FlightsNameResponse
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import androidx.constraintlayout.widget.ConstraintLayout

@@ -1,4 +1,4 @@
-package com.example.timetable.data.response
+package com.example.timetable.data.metadata.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
