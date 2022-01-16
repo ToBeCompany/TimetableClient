@@ -1,22 +1,14 @@
 <resources>
     <string name="app_name">TimeTable</string>
-
-
     <string name="routes">маршруты</string>
-
-
-
     <!-- Toolbar -->
     <string name="driver_fragment_toolbar">GPS трэкер</string>
     <string name="signin_fragment_toolbar">Вход</string>
     <string name="route_fragment_toolbar">Маршруты</string>
-
-
     <!-- Snackbar & Toast -->
     <string name="auth_success">Вы успешно вошли в систему</string>
     <string name="turn_on_gps">Включите GPS</string>
     <string name="permission_not_granted">Разрешения не выданы</string>
-
 
     <!-- View -->
     <string name="sigining_code">введите код аутентификации</string>

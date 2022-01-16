@@ -26,8 +26,6 @@ class SignInFragment : Fragment()
     {
         var root = inflater.inflate(R.layout.fragment_sign_in, container, false)
 
-
-
         root.findViewById<EditText>(R.id.codetext_signInFragment)
             .addTextChangedListener { inputText ->
                 if (!inputText.isNullOrEmpty())

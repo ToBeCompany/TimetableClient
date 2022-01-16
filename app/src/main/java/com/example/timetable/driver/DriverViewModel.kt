@@ -27,11 +27,13 @@ import kotlinx.serialization.json.Json
 import java.security.Security
 
 
-class DriverViewModel(application : Application): AndroidViewModel(application)
-{
+class DriverViewModel(application: Application) : AndroidViewModel(application) {
     private val busLocation = MutableSharedFlow<GeoPosition>()
     private val HOST = EndPoint.host
     private val urlFlightNames = EndPoint.protocol + HOST + EndPoint.routes_names_id
+    private val _flightsName: MutableStateFlow<List<FlightsNameResponse>> =
+        MutableStateFlow(listOf())
+    val flightName = _flightsName.asStateFlow()
 
     val clientRoutes = HttpClient(Android) {
         install(JsonFeature) {
@@ -42,7 +44,10 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
     var webSocketSession: DefaultClientWebSocketSession? = null
 
     @SuppressLint("MissingPermission")
-    fun startSearch(context: Context, trackerId: String) // это нужно запустить в самом начале работы программы
+    fun startSearch(
+        context: Context,
+        trackerId: String
+    ) // это нужно запустить в самом начале работы программы
     {
         Log.d("LocationListener", "start listening")
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -56,18 +61,21 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         }
     }
 
-    fun stopSearch(context: Context)
-    {
+    fun stopSearch(context: Context) {
         Log.d("LocationListener", "stop listening")
 
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.removeUpdates(listener)
 
         viewModelScope.launch {
-            webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "driver turn off transponder "))
+            webSocketSession?.close(
+                CloseReason(
+                    CloseReason.Codes.NORMAL,
+                    "driver turn off transponder "
+                )
+            )
         }
     }
-
 
     private var listener = LocationListener {
         val position = GeoPosition(it.latitude, it.longitude)
@@ -75,8 +83,8 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
             busLocation.emit(position)
         }
     }
-    private suspend fun startWebSocket(trackerId: String)
-    {
+
+    private suspend fun startWebSocket(trackerId: String) {
         providerKtorCLient().webSocket(
             method = HttpMethod.Get,
             host = HOST,
@@ -98,19 +106,19 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         }
     }
 
-    suspend fun getFlight(): List<FlightsNameResponse>? =
-        try {
-            clientRoutes.get(urlFlightNames)
+    fun loadFlight() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _flightsName.value = clientRoutes.get(urlFlightNames)
+            } catch (error: Exception) {
+                Log.d("ErrorServer", error.message.toString())
+            }
         }
-        catch (error: Exception) {
-            Log.d("ErrorServer", error.message.toString())
-            null
-        }
+    }
 
-    private fun providerKtorCLient(): HttpClient
-    {
-        System.setProperty("io.ktor.random.secure.random.provider","DRBG")
-        Security.setProperty("securerandom.drgb.config","HMAC_DRBG,SHA-512,256,pr_and_reseed")
+    private fun providerKtorCLient(): HttpClient {
+        System.setProperty("io.ktor.random.secure.random.provider", "DRBG")
+        Security.setProperty("securerandom.drgb.config", "HMAC_DRBG,SHA-512,256,pr_and_reseed")
         return HttpClient(CIO) {
             install(WebSockets)
         }

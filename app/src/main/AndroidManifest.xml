@@ -2,12 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.timetable">
 
-<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<!--    <uses-permission android:name="android.permission.VIBRATE"/> &lt;!&ndash; ??? &ndash;&gt;-->
 
     <application
         android:name=".App"
@@ -17,7 +16,12 @@
         android:roundIcon="@drawable/app_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.TimeTable">
-
+        <service
+            android:name=".driver.service.DriverService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location"
+            />
         <service
             android:name=".driver.DriverForeGroundTracker"
             android:enabled="true"
