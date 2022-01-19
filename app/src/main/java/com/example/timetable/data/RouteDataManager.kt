@@ -1,8 +1,5 @@
 package com.example.timetable.data
 
-import com.example.timetable.App
-import com.example.timetable.data.metadata.Route
-import io.ktor.http.ContentDisposition.Companion.File
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

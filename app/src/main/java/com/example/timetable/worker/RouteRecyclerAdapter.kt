@@ -6,14 +6,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.metadata.Route
 import com.example.timetable.data.metadata.response.FlightsNameResponse
 
 
 class RecyclerAdapterRoute(var click: (id:String) -> Unit)
     : RecyclerView.Adapter<RecyclerAdapterRoute.ViewHolder>()
 {
-    var dataset: List<Route> = Storage.routes
+    var dataset: List<FlightsNameResponse> = Storage.flightsNames
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.route_item, parent, false) // тут item
@@ -22,7 +21,7 @@ class RecyclerAdapterRoute(var click: (id:String) -> Unit)
 
     fun updateData()
     {
-        dataset = Storage.routes
+        dataset = Storage.flightsNames
         notifyDataSetChanged()
     }
 
@@ -44,7 +43,7 @@ class RecyclerAdapterRoute(var click: (id:String) -> Unit)
 
             routeNameText.text = dataset[position].name
             itemView.setOnClickListener {
-                click(dataset[position].id)
+                click(dataset[position].id!!)
             }
         }
     }

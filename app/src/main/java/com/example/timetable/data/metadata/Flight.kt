@@ -1,5 +1,6 @@
 package com.example.timetable.data.metadata
 
+import com.example.timetable.data.Route
 import kotlinx.serialization.Serializable
 
 

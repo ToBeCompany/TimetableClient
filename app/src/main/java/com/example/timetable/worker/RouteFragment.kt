@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.metadata.Route
+import com.example.timetable.data.Route
 import com.example.timetable.data.metadata.response.FlightsNameResponse
 import kotlinx.coroutines.launch
 
@@ -49,23 +49,18 @@ class RouteFragment : Fragment()
     private fun getData() // получение данных и загрузка в список
     {
         viewModel.viewModelScope.launch {
-            if (Storage.routes.isNullOrEmpty())
+            var flights: List<FlightsNameResponse>? = viewModel.getFlight()
+            if (flights != null && flights.isNotEmpty())
             {
-                val flights: List<Route>? = viewModel.getRoutes()
-                if (!flights.isNullOrEmpty())
-                {
-                    Log.d("getData", flights.toString())
 
+                Log.d("getdataServer", flights.toString())
+                parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
 
-                    parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
-                    Storage.routes = flights
-                    adapter.updateData()
+                Storage.flightsNames = flights
+                adapter.updateData()
 
-                } else {
-                    Log.d("getData", "routes = 0")
-
-                    // маршрутов нет ( 0 )
-                }
+            } else {
+                // маршрутов нет ( 0 )
             }
         }
     }

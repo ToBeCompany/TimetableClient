@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.data.metadata.BusStopWithTime
+import com.example.timetable.data.BusStopWithTime
 
 
 class BusStopsRecycleAdapter(var current: Int, var dataSet: List<BusStopWithTime>)

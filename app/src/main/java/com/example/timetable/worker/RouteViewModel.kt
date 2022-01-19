@@ -4,8 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.example.timetable.EndPoint
+import com.example.timetable.data.Route
 import com.example.timetable.data.RouteDataManager
-import com.example.timetable.data.metadata.Route
 import com.example.timetable.data.metadata.response.FlightsNameResponse
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
