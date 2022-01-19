@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.timetable">
 
-<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,9 +21,11 @@
         android:theme="@style/Theme.TimeTable">
 
         <service
-            android:name=".driver.DriverForeGroundTracker"
+            android:name=".driver.service.DriverService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:foregroundServiceType="location"
+            />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

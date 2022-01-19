@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class Bus( // автобус
     var name: String,
     var id: String,
-    var position: GeoPosition? = null
+    var point: GeoPoint? = null
 )

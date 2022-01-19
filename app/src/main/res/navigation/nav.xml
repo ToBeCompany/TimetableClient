@@ -48,7 +48,7 @@
     <fragment
         android:id="@+id/driverFragment"
         android:name="com.example.timetable.driver.DriverFragment"
-        android:label="@string/driver_fragment_toolbar"
+        android:label="@string/gps_tracker"
         tools:layout="@layout/fragment_driver" />
     <fragment
         android:id="@+id/signInFragment"
