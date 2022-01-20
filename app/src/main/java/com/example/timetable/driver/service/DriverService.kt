@@ -112,7 +112,7 @@ class DriverService : Service()
             webSocketSession = this@webSocket
 
             busLocation.collect {
-                Log.d("newLocation(driver) $trackerId", "${it.latitude.toString()} ${it.longitude.toString()}")
+                Log.d("newLocationTracker id= $trackerId", "${it.latitude.toString()} ${it.longitude.toString()}")
                 withContext(Dispatchers.IO) {
                     send(
                         Frame.Text(

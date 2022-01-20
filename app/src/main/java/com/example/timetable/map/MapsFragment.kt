@@ -3,12 +3,14 @@ package com.example.timetable.map
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.flow.collect
 
 
+@RequiresApi(Build.VERSION_CODES.M)
 class MapsFragment : Fragment() {
     private var busMarker: Marker? = null
 
@@ -39,7 +42,7 @@ class MapsFragment : Fragment() {
 
     lateinit var googleMap: GoogleMap
 
-    lateinit var flight/*: Flight*/: Route
+    var flight/*: Flight*/: Route? = null
 
     lateinit var findBusButton: Button
 
@@ -50,7 +53,7 @@ class MapsFragment : Fragment() {
             viewModel.getFlight(args.id).also {
                 if (it != null) {
                     flight = it
-                    (requireActivity() as MainActivity).setActionBarTitle(flight.name)
+                    (requireActivity() as MainActivity).setActionBarTitle(flight?.name)
                     mapReady()
                     Log.d("response_server", "data (flight) Ready")
                 } else
@@ -59,18 +62,14 @@ class MapsFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
 
         findBusButton = root.findViewById(R.id.findBus_fragment_map)
         findBusButton.setOnClickListener {
             moveCamera(busMarker?.position)
 //            viewModel.addRoute(flight)
-            Log.d("database_room", "addNewRoute")
+            Log.d("findbusbtn", busMarker.toString())
         }
         return root
     }
@@ -82,16 +81,17 @@ class MapsFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
         val route = flight/*.route*/
 
-        if (!route.id.isNullOrEmpty())
-            startListeningTracker(route.id) // включаю вебсокет
+        if (!route?.id.isNullOrEmpty())
+            startListeningTracker(route!!.id) // включаю вебсокет
 
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
-
-        moveCamera(route.points[0].toLatLng())// перемещаем камеру на первую остановку
+        polylineOptions.color(requireContext().getColor(R.color.polyline))
+        moveCamera(route!!.points[0].toLatLng())// перемещаем камеру на первую остановку
 
         route.points.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
@@ -124,6 +124,7 @@ class MapsFragment : Fragment() {
 
     private fun startListeningTracker(trackerId: String)
     {
+        Log.d("startListeningTracker", "id = $trackerId")
         val busMarkerIcon: BitmapDescriptor = getMarkerIconFromDrawable(
             ResourcesCompat.getDrawable(
                 resources,
@@ -134,12 +135,15 @@ class MapsFragment : Fragment() {
 
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket(trackerId).collect {
+                Log.d("tracker new pos", it.toString())
+
+
                 val busPosition = it.toLatLng()
                 if (busMarker == null)
                     busMarker = googleMap.addMarker(
                         MarkerOptions()
                             .position(busPosition)
-                            .title(flight.name)
+                            .title(flight?.name)
                             .icon(busMarkerIcon)
                     )
                 else
@@ -151,6 +155,16 @@ class MapsFragment : Fragment() {
     private fun moveCamera(point: LatLng?) {
         if (point != null)
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 13.5f), 1500, null)
+    }
+
+    override fun onStop() {
+        viewModel.stopWebSocket()
+        super.onStop()
+    }
+
+    override fun onResume() {
+        if (flight != null && flight!!.id != null) startListeningTracker(flight!!.id)
+        super.onResume()
     }
 
     private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor {

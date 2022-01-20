@@ -32,6 +32,7 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
 {
     private val HOST = EndPoint.host
     private val urlFlight = EndPoint.protocol + HOST + EndPoint.routeById
+    var webSocketSession: DefaultClientWebSocketSession? = null
 
     val flightClient = HttpClient(Android) {
         install(JsonFeature) {
@@ -49,14 +50,14 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
         }
     }
     fun startWebSocket(routeId: String) = flow<GeoPoint> {
-            val webSocketClient = providerKtorCLient().webSocket(
+            providerKtorCLient().webSocket(
                 method = HttpMethod.Get,
                 host = HOST,
                 path = (EndPoint.webSocket_passenger + routeId)
             )
             {
-
-                Log.d("start_websocket", "websocket start client map routeId = $routeId")
+                webSocketSession = this@webSocket
+                Log.d("start_websocket", "start client map routeId = $routeId")
                 for(frame in incoming)
                 {
                     if (frame is Frame.Text)
@@ -79,7 +80,13 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
             null
         }
 
-
+    fun stopWebSocket()
+    {
+        viewModelScope.launch {
+            Log.d("closeWebSocket", "user close map fragment")
+            webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "user close map fragment"))
+        }
+    }
 
     fun addRoute(route: Route)
     {

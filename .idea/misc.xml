@@ -4,12 +4,16 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22916666666666666" />
+        <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/app_logo.xml" value="0.3828125" />
+        <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/baseline_brightness_1_24.xml" value="0.3675925925925926" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/baseline_square_24.xml" value="0.3828125" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/baseline_square_24_2.xml" value="0.3828125" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/bus_24.xml" value="0.3145833333333333" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/bus_icon.xml" value="0.3828125" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/bus_marker.xml" value="0.3828125" />
+        <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/circle_white.xml" value="0.3828125" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/ic_baseline_directions_bus_24.xml" value="0.3828125" />
+        <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/ic_baseline_remove_circle_24.xml" value="0.3828125" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/ic_twotone_access_time_24.xml" value="0.3828125" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/launch_screen.xml" value="0.6" />
         <entry key="..\:/Andrei/projects/Logistics/app/src/main/res/drawable/outline_gps_fixed.xml" value="0.3828125" />

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="purple_200">#FFBB86FC</color>
+    <color name="polyline">#4067A8</color>
     <color name="purple_500">#315085</color>
     <color name="blue">#90B5F4</color>
     <color name="purple_700">#283593</color>
