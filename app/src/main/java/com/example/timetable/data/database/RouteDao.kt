@@ -11,14 +11,6 @@ import com.example.timetable.data.RouteComplex
 @Dao
 interface RouteDao
 {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(item: RouteComplex)
-
-    @Update
-    suspend fun update(item: RouteComplex)
-
-    @Delete
-    suspend fun delete(item: RouteComplex)
 
 //    @Query("SELECT * from route WHERE id = :id")
 //    fun getRoute(id: String): Flow<RouteComplex>

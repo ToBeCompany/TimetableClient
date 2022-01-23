@@ -63,12 +63,7 @@ class MapsFragment : Fragment()
 
     private val args: MapsFragmentArgs by navArgs()
 
-    private val viewModel: MapViewModel by viewModels {
-        MapViewModelFactory(
-            (activity?.application as App).database
-                .routeDao()
-        )
-    }
+    private val viewModel: MapViewModel by viewModels()
 
     lateinit var googleMap: GoogleMap
 

@@ -33,7 +33,7 @@ import kotlinx.serialization.json.Json
 import java.security.Security
 
 
-class MapViewModel(application : Application, private val routeDao: RouteDao): AndroidViewModel(application)
+class MapViewModel(application : Application): AndroidViewModel(application)
 {
     private val HOST = EndPoint.host
     private val urlFlight = EndPoint.protocol + HOST + EndPoint.routeById
@@ -107,16 +107,4 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
 //            quantityInStock = itemCount.toInt()
 //        )
 //    }
-}
-
-class MapViewModelFactory(private val itemDao: RouteDao) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T
-    {
-        if (modelClass.isAssignableFrom(MapViewModel::class.java))
-        {
-            @Suppress("UNCHECKED_CAST")
-            return MapViewModel(Application(), itemDao) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }

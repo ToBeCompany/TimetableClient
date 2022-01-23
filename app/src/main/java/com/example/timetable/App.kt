@@ -9,8 +9,6 @@ import com.example.timetable.driver.service.NotificationDriver
 
 class App: Application() // переопределяем класс приложения
 {
-    val database: RouteRoomDatabase by lazy { RouteRoomDatabase.getDatabase(this) }
-
 
     override fun onCreate()
     {
