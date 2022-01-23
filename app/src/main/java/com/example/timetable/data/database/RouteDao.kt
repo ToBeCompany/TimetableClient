@@ -1,9 +1,11 @@
 package com.example.timetable.data.database
 
-import androidx.room.*
-import com.example.timetable.data.Route
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Update
+import androidx.room.Delete
 import com.example.timetable.data.RouteComplex
-import kotlinx.coroutines.flow.Flow
 
 
 @Dao

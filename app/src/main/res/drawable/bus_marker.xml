@@ -4,7 +4,7 @@
         android:drawable="@drawable/circle_white" />
     <item
         android:gravity="center"
-        android:drawable="@drawable/bus_icon"
+        android:drawable="@drawable/bus_icon_white"
         android:top="8dp"
         android:bottom="8dp"
         android:left="8dp"

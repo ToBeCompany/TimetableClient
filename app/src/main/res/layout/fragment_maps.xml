@@ -17,36 +17,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <android.widget.ImageButton
+        android:id="@+id/myLocationBtn_fragment_map7"
+        android:layout_width="56sp"
+        android:layout_height="56sp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/my_location_button"
+        app:layout_constraintBottom_toTopOf="@+id/findBus_fragment_map"
+        app:layout_constraintEnd_toEndOf="@+id/findBus_fragment_map" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="48sp"
-        android:orientation="horizontal"
+    <android.widget.ImageButton
+        android:id="@+id/findBus_fragment_map"
+        android:layout_width="56sp"
+        android:layout_height="56sp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="128dp"
+        android:background="@drawable/bus_in_gps_icon"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <View
-            android:layout_width="0sp"
-            android:layout_height="0sp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/findBus_fragment_map"
-            android:layout_width="0sp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="2sp"
-            android:text="@string/find_bus"
-            android:textSize="12sp" />
-
-        <View
-            android:layout_width="0sp"
-            android:layout_height="0sp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

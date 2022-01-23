@@ -1,6 +1,5 @@
 package com.example.timetable.worker
 
-import com.example.timetable.data.Route
 import com.example.timetable.data.metadata.response.FlightsNameResponse
 
 

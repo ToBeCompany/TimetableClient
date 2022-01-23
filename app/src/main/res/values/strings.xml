@@ -18,6 +18,7 @@
     <string name="permission_not_granted">Разрешения не выданы</string>
     <string name="tracker_launched">Трэкер включен</string>
     <string name="racker_shutdown">Трэкер выключен</string>
+    <string name="bus_not_connected">Нет данных о местоположении автобуса</string>
 
 
     <!-- View -->

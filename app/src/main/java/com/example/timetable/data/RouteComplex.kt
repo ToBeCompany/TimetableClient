@@ -13,12 +13,12 @@ data class RouteComplex( // маршрут
     @SerialName("id")
     @PrimaryKey
     var id: String,
-//    @SerialName("idm_Foreign")
-//    @ColumnInfo(name = "name")
-//    var name: String = "",
-//    @SerialName("lineMarshtriectori")
-//    @ColumnInfo(name = "pointList")
-//    var points: List<RoutePoint> = listOf(),
-//    @SerialName("idOst")
-//    var busStopsWithTime: List<BusStopWithTime> = listOf()
+    @SerialName("idm_Foreign")
+    @ColumnInfo(name = "name")
+    var name: String = "",
+    @SerialName("lineMarshtriectori")
+    @ColumnInfo(name = "pointList")
+    var points: List<RoutePoint> = listOf(),
+    @SerialName("idOst")
+    var busStopsWithTime: List<BusStopWithTime> = listOf()
 )

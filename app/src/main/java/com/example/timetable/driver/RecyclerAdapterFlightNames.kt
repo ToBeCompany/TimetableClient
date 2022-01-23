@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
-import com.example.timetable.worker.Storage
 import com.example.timetable.data.metadata.response.FlightsNameResponse
+
 
 class RecyclerAdapterFlightNames(var click: (curItem: FlightsNameResponse) -> Unit)
     : RecyclerView.Adapter<RecyclerAdapterFlightNames.ViewHolder>()

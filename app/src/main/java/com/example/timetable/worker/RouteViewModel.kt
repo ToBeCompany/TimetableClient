@@ -7,11 +7,11 @@ import com.example.timetable.EndPoint
 import com.example.timetable.data.Route
 import com.example.timetable.data.RouteDataManager
 import com.example.timetable.data.metadata.response.FlightsNameResponse
-import io.ktor.client.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.request.get
 
 
 class RouteViewModel(application : Application): AndroidViewModel(application)

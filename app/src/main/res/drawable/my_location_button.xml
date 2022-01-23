@@ -1,0 +1,13 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:gravity="fill"
+        android:drawable="@drawable/circle_light_grey"
+        android:width="48sp"
+        android:height="48sp"/>
+    <item
+        android:gravity="center"
+        android:drawable="@drawable/outline_gps_fixed"
+        android:width="24sp"
+        android:height="24sp"/>
+
+</layer-list>
