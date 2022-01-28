@@ -6,12 +6,20 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.example.timetable.EndPoint
 import com.example.timetable.R
 import com.example.timetable.data.GeoPoint
+import com.example.timetable.system.NetworkUtils
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
@@ -32,8 +40,10 @@ import kotlinx.serialization.json.Json
 import java.security.Security
 
 
-class DriverService : Service()
+class DriverService() : Service()
 {
+    var webSocketSession: DefaultClientWebSocketSession? = null
+
     private val busLocation = MutableSharedFlow<GeoPoint>()
     private val HOST = EndPoint.host
 
@@ -68,13 +78,35 @@ class DriverService : Service()
             getString(R.string.new_tracker) ->
             {
                 stopSearch()
+
                 startSearch(trackerId)
             }
         }
+
+        val networkCallback = object: ConnectivityManager.NetworkCallback()
+        {
+            // сеть доступна для использования
+            override fun onAvailable(network: Network) {
+                startSearch(trackerId)
+                Log.d("network", "is on")
+                super.onAvailable(network)
+            }
+
+            // соединение прервано
+            override fun onLost(network: Network) {
+                stopSearch()
+                Log.d("network", "is off")
+                super.onLost(network)
+            }
+        }
+
+        val connectivityManager = ContextCompat.getSystemService(applicationContext, ConnectivityManager::class.java)
+        connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+
         return super.onStartCommand(intent, flags, startId)
     }
 
-    var webSocketSession: DefaultClientWebSocketSession? = null
+
 
     @SuppressLint("MissingPermission")
     private fun startSearch(trackerId: String) // это нужно запустить в самом начале работы программы
@@ -140,4 +172,7 @@ class DriverService : Service()
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
+
+
+
 }

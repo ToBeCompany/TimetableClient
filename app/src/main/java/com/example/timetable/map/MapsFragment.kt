@@ -4,11 +4,10 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +18,7 @@ import android.widget.ImageButton
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -28,6 +28,7 @@ import com.example.timetable.App
 import com.example.timetable.MainActivity
 import com.example.timetable.R
 import com.example.timetable.data.Route
+import com.example.timetable.system.DrawableConvertor
 import com.example.timetable.worker.BusStopsBottomSheet
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -37,7 +38,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -47,9 +47,12 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 
+import com.example.timetable.system.ProgressManager
+
 
 class MapsFragment : Fragment()
 {
+    lateinit var progressManager: ProgressManager
     private val PERMISSION_CODE = 200
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -58,7 +61,7 @@ class MapsFragment : Fragment()
         LocationServices.getFusedLocationProviderClient(App.globalContext)
     }
     private var cancellationTokenSource = CancellationTokenSource()
-
+    private var isTracking = false
     private var busMarker: Marker? = null
 
     private val args: MapsFragmentArgs by navArgs()
@@ -72,21 +75,24 @@ class MapsFragment : Fragment()
 
     lateinit var googleMap: GoogleMap
 
-    var flight/*: Flight*/: Route? = null
+    var route/*: Flight*/: Route? = null
 
     lateinit var findBusButton: ImageButton
     lateinit var myLocationButton: ImageButton
 
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
-
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.getFlight(args.id).also {
-                if (it != null) {
-                    flight = it
-                    (requireActivity() as MainActivity).setActionBarTitle(flight?.name)
-                    mapReady()
+                if (it != null)
+                {
                     Log.d("response_server", "data (flight) Ready")
+
+                    route = it
+                    (requireActivity() as MainActivity).setActionBarTitle(route?.name)
+
+                    tpCamera(route?.points?.get(0)?.toLatLng())// перемещаем камеру на первую остановку
+                    dataReady()
                 } else
                     Log.d("response_server", "data (flight) is null")
             }
@@ -95,6 +101,9 @@ class MapsFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
+
+        progressManager = ProgressManager(root.findViewById(R.id.parentMapsFragment))
+        progressManager.start()
 
         findBusButton = root.findViewById(R.id.findBus_fragment_map)
         myLocationButton = root.findViewById(R.id.myLocationBtn_fragment_map7)
@@ -116,23 +125,22 @@ class MapsFragment : Fragment()
     }
 
     @SuppressLint("MissingPermission")
-    private fun mapReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
+    private fun dataReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
-        val route = flight/*.route*/
+        progressManager.finish()
 
         googleMap.uiSettings.isMyLocationButtonEnabled = false
 
         if (!route?.id.isNullOrEmpty())
-            startListeningTracker(route!!.id) // включаю вебсокет]
+            startListeningTracker(route!!.id) // включаю вебсокет
 
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
         polylineOptions.color(requireContext().getColor(R.color.polyline))
-        moveCamera(route!!.points[0].toLatLng())// перемещаем камеру на первую остановку
 
-        route.points.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
+        route?.points?.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
 
-        val busStops = route.busStopsWithTime
+        val busStops = route!!.busStopsWithTime
         for (i in busStops.indices) // добавляем маркеры на карту
         {
             var marker = googleMap.addMarker(
@@ -159,30 +167,47 @@ class MapsFragment : Fragment()
             checkLocationPermissions()
         }
 
+        val connectivityManager = getSystemService(requireContext(), ConnectivityManager::class.java)
+        connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+    }
 
+    val networkCallback = object: ConnectivityManager.NetworkCallback()
+    {
+        // сеть доступна для использования
+        override fun onAvailable(network: Network) {
+            startListeningTracker(route!!.id)
+            Log.d("network", "is on")
+            super.onAvailable(network)
+        }
+
+        // соединение прервано
+        override fun onLost(network: Network) {
+            stopListeningTracker()
+            Log.d("network", "is off")
+            super.onLost(network)
+        }
     }
 
     private fun startListeningTracker(trackerId: String)
     {
-        Log.d("startListeningTracker", "id = $trackerId")
-        val busMarkerIcon: BitmapDescriptor = getMarkerIconFromDrawable(
-            ResourcesCompat.getDrawable(
-                resources,
-                R.drawable.bus_marker,
-                null
-            )!! // создаем и конвертируем Drawable к BitmapDescriptor
+        Log.d("Tracker", "startListening, id = $trackerId")
+        if (isTracking) return
+        isTracking = true
+
+        val busMarkerIcon: BitmapDescriptor = DrawableConvertor().drawableToBitmapDescriptor(
+            ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
         )
 
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket(trackerId).collect {
-                Log.d("tracker new pos", it.toString())
+                Log.d("Tracker", "new pos ${ it.toString() }")
 
                 val busPosition = it.toLatLng()
                 if (busMarker == null)
                     busMarker = googleMap.addMarker(
                         MarkerOptions()
                             .position(busPosition)
-                            .title(flight?.name)
+                            .title(route?.name)
                             .icon(busMarkerIcon)
                     )
                 else
@@ -190,11 +215,19 @@ class MapsFragment : Fragment()
 
             }
         }
+
+    }
+
+    private fun stopListeningTracker()
+    {
+        Log.d("Tracker", "stopListening")
+        isTracking = false
+        viewModel.stopWebSocket()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
     {
-        if (requestCode == PERMISSION_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED })
+        if (requestCode == PERMISSION_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED } )
             checkLocationPermissions()
         else
             Snackbar.make(requireView(), getString(R.string.permission_not_granted), Snackbar.LENGTH_LONG).show()
@@ -240,27 +273,18 @@ class MapsFragment : Fragment()
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 13.5f), 1500, null)
     }
 
+    private fun tpCamera(point: LatLng?) {
+        if (point != null)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 13.5f))
+    }
+
     override fun onStop() {
-        viewModel.stopWebSocket()
+        stopListeningTracker()
         super.onStop()
     }
 
-    override fun onResume() {
-        if (flight != null) startListeningTracker(flight!!.id)
-        super.onResume()
-    }
-
-    private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor
-    {
-        val canvas = Canvas()
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-        canvas.setBitmap(bitmap)
-        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        drawable.draw(canvas)
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    override fun onPause() {
+        if (route != null) startListeningTracker(route!!.id)
+        super.onPause()
     }
 }

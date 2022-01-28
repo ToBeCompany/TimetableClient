@@ -7,7 +7,7 @@
 
 
     <!-- Toolbar -->
-    <string name="gps_tracker">GPS трэкер</string>
+    <string name="gps_tracker">GPS трекер</string>
     <string name="signin_fragment_toolbar">Вход</string>
     <string name="route_fragment_toolbar">Маршруты</string>
 
@@ -15,9 +15,10 @@
     <!-- Snackbar & Toast -->
     <string name="auth_success">Вы успешно вошли в систему</string>
     <string name="turn_on_gps">Включите GPS</string>
+    <string name="turn_on_internet">Включите интернет</string>
     <string name="permission_not_granted">Разрешения не выданы</string>
-    <string name="tracker_launched">Трэкер включен</string>
-    <string name="racker_shutdown">Трэкер выключен</string>
+    <string name="tracker_launched">Трекер включен</string>
+    <string name="racker_shutdown">Трекер выключен</string>
     <string name="bus_not_connected">Нет данных о местоположении автобуса</string>
 
 

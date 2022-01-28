@@ -1,38 +1,39 @@
 package com.example.timetable.driver
 
 import android.Manifest
+import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import com.example.timetable.R
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import com.example.timetable.data.metadata.response.FlightsNameResponse
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Intent
+import com.example.timetable.R
+import com.example.timetable.data.metadata.response.FlightsNameResponse
 import com.example.timetable.driver.service.DriverService
-
-import android.app.ActivityManager
+import com.example.timetable.system.ProgressManager
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 
 class DriverFragment : Fragment()
 {
     private val viewModel: DriverViewModel by viewModels()
     private val PERMISSION_CODE = 200
+    private lateinit var progressManager: ProgressManager
 
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -40,7 +41,6 @@ class DriverFragment : Fragment()
 
     private lateinit var trackerButton: Button
     private lateinit var curRouteText: TextView
-    private lateinit var parent: ConstraintLayout
     private lateinit var recyclerView: RecyclerView
 
     private var adapter = RecyclerAdapterFlightNames (::selectRoute)
@@ -83,9 +83,11 @@ class DriverFragment : Fragment()
         var root = inflater.inflate(R.layout.fragment_driver, container, false)
 
 
+        progressManager = ProgressManager(root.findViewById(R.id.parentDriverFragment))
+        progressManager.start()
+
         trackerButton = root.findViewById(R.id.ButtonTracker_fragmentDriver)
         curRouteText = root.findViewById(R.id.selectedRoute_fragmentDriver)
-        parent = root.findViewById(R.id.parent_fragmentDriver)
         recyclerView = root.findViewById(R.id.recyclerviewRoutes_fragmentDriver)
 
 
@@ -112,7 +114,7 @@ class DriverFragment : Fragment()
                 adapter.dataset = response
                 adapter.notifyDataSetChanged()
 
-                parent.removeView(parent.findViewById(R.id.progress_fragmentDriver))
+                progressManager.finish()
             }
             else
             {
@@ -122,8 +124,9 @@ class DriverFragment : Fragment()
         }
 
         trackerButton.setOnClickListener {
-            checkLocationPermissions()
+                checkLocationPermissions()
         }
+
 
         return root
     }
@@ -143,7 +146,7 @@ class DriverFragment : Fragment()
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             {
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
             } else

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
 import com.example.timetable.data.metadata.response.FlightsNameResponse
+import com.example.timetable.system.ProgressManager
 import kotlinx.coroutines.launch
 
 
@@ -21,21 +22,23 @@ class RouteFragment : Fragment()
 {
     private val viewModel: RouteViewModel by viewModels()
 
+    private lateinit var progressManager: ProgressManager
+
     private var adapter = RecyclerAdapterRoute{ id ->
         findNavController().navigate(
             RouteFragmentDirections.actionRouteFragmentToMapsFragment(id)
         )
     }
     private var recyclerView: RecyclerView? = null
-    private var parent: ConstraintLayout? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         var root = inflater.inflate(R.layout.fragment_route, container, false)
 
 
+        progressManager = ProgressManager(root.findViewById(R.id.parentMainFragment))
+        progressManager.start()
 
-        parent = root.findViewById(R.id.parentMainFragment)
         recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
 
         recyclerView?.adapter = adapter
@@ -51,9 +54,8 @@ class RouteFragment : Fragment()
             var flights: List<FlightsNameResponse>? = viewModel.getFlight()
             if (flights != null && flights.isNotEmpty())
             {
-
                 Log.d("getdataServer", flights.toString())
-                parent?.removeView(parent?.findViewById(R.id.progressMainFragment))
+                progressManager.finish()
 
                 Storage.flightsNames = flights
                 adapter.updateData()
