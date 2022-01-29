@@ -18,8 +18,9 @@
     <string name="turn_on_internet">Включите интернет</string>
     <string name="permission_not_granted">Разрешения не выданы</string>
     <string name="tracker_launched">Трекер включен</string>
-    <string name="racker_shutdown">Трекер выключен</string>
+    <string name="tracker_shutdown">Трекер выключен</string>
     <string name="bus_not_connected">Нет данных о местоположении автобуса</string>
+    <string name="choose_route">Выберите маршрут</string>
 
 
     <!-- View -->
@@ -28,6 +29,8 @@
     <string name="off_tracker">Выключить трекер</string>
     <string name="find_bus">найти автобус</string>
     <string name="route_not_selected">Маршрут не выбран</string>
+    <string name="tracking_route">Отслеживание по маршруту:</string>
+    <string name="tracking_off">Отслеживание выключено</string>
 
     <!--  intent  -->
     <string name="action">action</string>
@@ -35,6 +38,8 @@
     <string name="on_service">on_service</string>
     <string name="new_tracker">new_tracker</string>
     <string name="tracker_id">tracker_id</string>
+    <string name="which_tracker_id">which_tracker_id</string>
+    <string name="route">route</string>
 
     <!--  Notification  -->
     <string name="click_to_open_app">Нажмите чтобы открыть приложение</string>

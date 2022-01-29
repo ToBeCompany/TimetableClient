@@ -1,7 +1,7 @@
 package com.example.timetable.driver
 
 import android.Manifest
-import android.app.ActivityManager
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,125 +12,77 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.timetable.R
 import com.example.timetable.data.metadata.response.FlightsNameResponse
 import com.example.timetable.driver.service.DriverService
 import com.example.timetable.system.ProgressManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import com.example.timetable.system.isServiceRunning
+import android.app.PendingIntent
+import android.net.Uri
+import androidx.core.content.PackageManagerCompat
+import androidx.core.content.PackageManagerCompat.LOG_TAG
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 class DriverFragment : Fragment()
 {
     private val viewModel: DriverViewModel by viewModels()
     private val PERMISSION_CODE = 200
-    private lateinit var progressManager: ProgressManager
 
+    private lateinit var lastRoutePreference: LastRoutePreference
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
+    private lateinit var progressManager: ProgressManager
 
-    private lateinit var trackerButton: Button
+    private lateinit var trackerButton: ImageButton
     private lateinit var curRouteText: TextView
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var routeSpinner: Spinner
 
-    private var adapter = RecyclerAdapterFlightNames (::selectRoute)
-
-    private var selectedRouteId: String? = null
     private var isListiningPos = false
-
-    fun selectRoute(selectedRoute: FlightsNameResponse)
-    {
-        if (selectedRoute.id != null && selectedRoute.name != null)
-        {
-//            if (routeId != null && !isListiningPos)
-//            {
-//                requireContext().startService(
-//                    Intent(requireContext(), DriverService::class.java)
-//                        .putExtra(getString(R.string.action), getString(R.string.new_tracker))
-//                        .putExtra(getString(R.string.tracker_id), selectedRoute.id!!)
-//                )
-//            }
-            selectedRouteId = selectedRoute.id!!
-            curRouteText.text = selectedRoute.name!!
-            trackerButton.isEnabled = true
-            trackerButton.text = getString(R.string.on_tracker)
-            isListiningPos = false
-
-            if (isMyServiceRunning(DriverService::class.java))
-            {
-                requireContext().startService(
-                    Intent(requireContext(), DriverService::class.java)
-                        .putExtra(getString(R.string.action), getString(R.string.off_service))
-                )
-
-                Snackbar.make(requireView(), getString(R.string.racker_shutdown), Snackbar.LENGTH_LONG).show()
-            }
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         var root = inflater.inflate(R.layout.fragment_driver, container, false)
 
+        lastRoutePreference = LastRoutePreference(requireContext())
 
         progressManager = ProgressManager(root.findViewById(R.id.parentDriverFragment))
         progressManager.start()
 
         trackerButton = root.findViewById(R.id.ButtonTracker_fragmentDriver)
-        curRouteText = root.findViewById(R.id.selectedRoute_fragmentDriver)
-        recyclerView = root.findViewById(R.id.recyclerviewRoutes_fragmentDriver)
+        curRouteText = root.findViewById(R.id.routeTrackingText_DriverFragment)
+        routeSpinner = root.findViewById<Spinner>(R.id.routeList_DriverFragment)
 
+        getData()
 
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context)
-
-        if (isMyServiceRunning(DriverService::class.java))
+        if (isServiceRunning(DriverService::class.java, requireContext()))
         {
+            Log.d("service", "run")
+            getRouteFromService()
             isListiningPos = true
-            trackerButton.text = getString(R.string.off_tracker)
-        }
-        else
-        {
-            trackerButton.text = getString(R.string.on_tracker)
-            trackerButton.isEnabled = false
-        }
-
-        viewModel.viewModelScope.launch {
-            val response: List<FlightsNameResponse>? = viewModel.getFlight()
-            if (response != null && response.isNotEmpty())
-            {
-                Log.d("ResponseServer", "data (flight) Ready")
-
-                adapter.dataset = response
-                adapter.notifyDataSetChanged()
-
-                progressManager.finish()
-            }
-            else
-            {
-                Log.d("ResponseServer", "data (flight) is null")
-                // маршрутов нет ( 0 )
-            }
+            trackerButton.setBackgroundResource(R.drawable.stop_circle)
         }
 
         trackerButton.setOnClickListener {
+            if (routeSpinner.selectedItemPosition == 0) // выбрана подсказка "маршрут не выбран"
+                Snackbar.make(requireView(), getString(R.string.choose_route), Snackbar.LENGTH_LONG).show()
+            else
                 checkLocationPermissions()
         }
-
-
         return root
     }
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
     {
@@ -151,28 +103,8 @@ class DriverFragment : Fragment()
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
             } else
             {
-                if (isListiningPos)
-                {
-                    trackerButton.text = getString(R.string.on_tracker)
-                    Snackbar.make(requireView(), getString(R.string.racker_shutdown), Snackbar.LENGTH_LONG).show()
-
-                    requireContext().startService(
-                        Intent(requireContext(), DriverService::class.java)
-                            .putExtra(getString(R.string.action), getString(R.string.off_service))
-                    )
-                }
-                else
-                {
-                    trackerButton.text = getString(R.string.off_tracker)
-                    Snackbar.make(requireView(), getString(R.string.tracker_launched), Snackbar.LENGTH_LONG).show()
-
-                    requireContext().startService(
-                        Intent(requireContext(), DriverService::class.java)
-                            .putExtra(getString(R.string.action), getString(R.string.on_service))
-                            .putExtra(getString(R.string.tracker_id), selectedRouteId)
-                    )
-                }
-
+                if (isListiningPos) stopTracker()
+                else startTracker()
                 isListiningPos = !isListiningPos
             }
         else
@@ -181,17 +113,87 @@ class DriverFragment : Fragment()
         }
     }
 
-    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean
+    private fun getData()
     {
-        val manager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-        for (service in manager!!.getRunningServices(Int.MAX_VALUE))
-        {
-            if (serviceClass.name == service.service.className)
+        viewModel.viewModelScope.launch {
+            val routeNames: List<FlightsNameResponse>? = viewModel.getFlight()
+            if (routeNames != null && routeNames.isNotEmpty())
             {
-                return true
+                Log.d("ResponseServer", "data (flight) Ready")
+                progressManager.finish()
+
+                val hint = requireContext().getString(R.string.route_not_selected)
+                var spinnerSet = arrayOf<String>( hint )
+                spinnerSet += routeNames.map { it.name.toString() }
+
+                val adapter = RouteArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, spinnerSet, hint)
+                adapter.setDropDownViewResource(R.layout.route_spinner_dropdown_item)
+                routeSpinner.adapter = adapter
+                val lastRouteId = lastRoutePreference.getRouteId()
+                find@ for (i in routeNames.indices)
+                    if (routeNames[i].id == lastRouteId)
+                    {
+                        routeSpinner.setSelection(i)
+                        break@find
+                    }
+            }
+            else
+            {
+                Log.d("ResponseServer", "data (flight) is null")
+                // маршрутов нет ( 0 )
             }
         }
-        return false
     }
 
+    private fun getRouteFromService()
+    {
+        requireContext().startService(
+            Intent(requireContext(), DriverService::class.java)
+                .putExtra(getString(R.string.action), getString(R.string.which_tracker_id))
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        Log.d("service_result", "requestCode = $resultCode")
+
+        // Ловим сообщения об окончании задач
+        if (resultCode == 1)
+        {
+            val result: String? = data?.getStringExtra(getString(R.string.tracker_id))
+
+        }
+    }
+    private fun startTracker()
+    {
+        Log.d("Tracker", "start")
+        val route = viewModel.routesInf[routeSpinner.selectedItemPosition]
+        if (route.id != null && route.name != null)
+        {
+            trackerButton.setBackgroundResource(R.drawable.stop_circle)
+            curRouteText.text = "${requireContext().getString(R.string.tracking_route)} ${route.name}"
+            requireContext().startService(
+                Intent(requireContext(), DriverService::class.java)
+                    .putExtra(getString(R.string.route), Json.encodeToString(route))
+                    .putExtra(getString(R.string.action), getString(R.string.on_service))
+            )
+            lastRoutePreference.setRouteId(route.id!!)
+            Snackbar.make(requireView(), getString(R.string.tracker_launched), Snackbar.LENGTH_LONG).show()
+
+        }
+    }
+
+    private fun stopTracker()
+    {
+        Log.d("Tracker", "stop")
+        trackerButton.setBackgroundResource(R.drawable.play_circle)
+
+        curRouteText.text = requireContext().getString(R.string.tracking_off)
+        requireContext().startService(
+            Intent(requireContext(), DriverService::class.java)
+                .putExtra(getString(R.string.action), getString(R.string.off_service))
+        )
+        Snackbar.make(requireView(), getString(R.string.tracker_shutdown), Snackbar.LENGTH_LONG).show()
+    }
 }

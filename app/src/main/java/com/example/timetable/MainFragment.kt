@@ -14,15 +14,12 @@ class MainFragment : Fragment()
     val userPreference by lazy { UserPreference(requireContext()) }
     lateinit var rootView: View
 
-
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         var root = inflater.inflate(R.layout.fragment_main, container, false)
         rootView = root
         return root
     }
-
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -37,7 +34,6 @@ class MainFragment : Fragment()
         if (userPreference.currentUser == null)
         {
             navController.navigate(MainFragmentDirections.actionMainFragmentToSignInFragment())
-
             // отправить на экран аунтификации
         }
         else

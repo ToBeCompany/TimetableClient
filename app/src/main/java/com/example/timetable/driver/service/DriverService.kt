@@ -1,6 +1,7 @@
 package com.example.timetable.driver.service
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,18 +9,15 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.core.content.PackageManagerCompat
 import com.example.timetable.EndPoint
+import com.example.timetable.MainActivity
 import com.example.timetable.R
 import com.example.timetable.data.GeoPoint
-import com.example.timetable.system.NetworkUtils
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
@@ -38,19 +36,44 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.security.Security
+import androidx.core.content.PackageManagerCompat.LOG_TAG
+import androidx.annotation.WorkerThread
+import com.example.timetable.App
+import com.example.timetable.data.metadata.response.FlightsNameResponse
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.encodeToJsonElement
 
 
 class DriverService() : Service()
 {
-    var webSocketSession: DefaultClientWebSocketSession? = null
+    private var webSocketSession: DefaultClientWebSocketSession? = null
+    private var route: FlightsNameResponse? = null
 
     private val busLocation = MutableSharedFlow<GeoPoint>()
     private val HOST = EndPoint.host
+
 
     private var listener = LocationListener {
         val position = GeoPoint(latitude = it.latitude, longitude = it.longitude)
         MainScope().launch {
             busLocation.emit(position)
+        }
+    }
+
+    val networkCallback = object: ConnectivityManager.NetworkCallback()
+    {
+        // сеть доступна для использования
+        override fun onAvailable(network: Network) {
+            startSearch(route?.id.toString())
+            Log.d("network", "is on")
+            super.onAvailable(network)
+        }
+
+        // соединение прервано
+        override fun onLost(network: Network) {
+            stopSearch()
+            Log.d("network", "is off")
+            super.onLost(network)
         }
     }
 
@@ -63,12 +86,14 @@ class DriverService() : Service()
         startForeground(4, notification)
 
         val action: String = intent?.getStringExtra(getString(R.string.action)).toString()
-        val trackerId: String = intent?.getStringExtra(getString(R.string.tracker_id)).toString()
         when (action)
         {
             getString(R.string.on_service) ->
             {
-                startSearch(trackerId)
+                val _route: FlightsNameResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
+                Log.d("startServiceAndTracker", _route.toString())
+                startSearch(_route.id!!)
+                route = _route
             }
             getString(R.string.off_service) ->
             {
@@ -78,35 +103,26 @@ class DriverService() : Service()
             getString(R.string.new_tracker) ->
             {
                 stopSearch()
-
-                startSearch(trackerId)
+                val _route: FlightsNameResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
+                startSearch(_route.id!!)
+                route = _route
+            }
+            getString(R.string.which_tracker_id) ->
+            {
+                var _intent = Intent(baseContext, MainActivity::class.java).apply {
+                    putExtra(getString(R.string.tracker_id), Json.encodeToString(route))
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                baseContext.startActivity(_intent)
             }
         }
 
-        val networkCallback = object: ConnectivityManager.NetworkCallback()
-        {
-            // сеть доступна для использования
-            override fun onAvailable(network: Network) {
-                startSearch(trackerId)
-                Log.d("network", "is on")
-                super.onAvailable(network)
-            }
-
-            // соединение прервано
-            override fun onLost(network: Network) {
-                stopSearch()
-                Log.d("network", "is off")
-                super.onLost(network)
-            }
-        }
 
         val connectivityManager = ContextCompat.getSystemService(applicationContext, ConnectivityManager::class.java)
         connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
 
         return super.onStartCommand(intent, flags, startId)
     }
-
-
 
     @SuppressLint("MissingPermission")
     private fun startSearch(trackerId: String) // это нужно запустить в самом начале работы программы
@@ -172,7 +188,4 @@ class DriverService() : Service()
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
-
-
-
 }

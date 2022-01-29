@@ -15,6 +15,7 @@ class ProgressManager(var container: ConstraintLayout)
 
     fun start()
     {
+
         progressBar = ProgressBar(ContextThemeWrapper(container.context , R.style.Theme_TimeTable_ProgressBar))
 
         progressBar!!.id = View.generateViewId()
@@ -32,6 +33,7 @@ class ProgressManager(var container: ConstraintLayout)
 
     fun finish()
     {
+//        container.isEnabled = true
         container.removeView(progressBar)
     }
 }

@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import com.example.timetable.MainActivity
 import com.example.timetable.R
 
+
 object NotificationDriver
 {
     private val CHANNEL_ID: String = "TRACK_NOTIFICATION"
@@ -22,11 +23,18 @@ object NotificationDriver
                 PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
             }
 
+        val closeServes: PendingIntent =
+            Intent(context, DriverService::class.java).let { closeServesIntent ->
+                closeServesIntent.putExtra(context.getString(R.string.action), context.getString(R.string.off_service))
+                PendingIntent.getService(context, 0, closeServesIntent, PendingIntent.FLAG_IMMUTABLE)
+            }
+
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.outline_gps_fixed)
             .setContentTitle(context.getString(R.string.gps_tracker))
             .setContentText(context.getString(R.string.click_to_open_app))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .addAction(R.drawable.close, "Выключить трекер", closeServes)
             .setContentIntent(pendingIntent)
             .build()
     }
