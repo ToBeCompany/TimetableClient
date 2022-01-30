@@ -1,7 +1,6 @@
 package com.example.timetable.driver.service
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -13,11 +12,11 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.PackageManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.timetable.EndPoint
-import com.example.timetable.MainActivity
 import com.example.timetable.R
 import com.example.timetable.data.GeoPoint
+import com.example.timetable.data.metadata.response.FlightsNameResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
@@ -27,21 +26,16 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
+import java.security.Security
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.security.Security
-import androidx.core.content.PackageManagerCompat.LOG_TAG
-import androidx.annotation.WorkerThread
-import com.example.timetable.App
-import com.example.timetable.data.metadata.response.FlightsNameResponse
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.encodeToJsonElement
 
 
 class DriverService() : Service()
@@ -109,11 +103,11 @@ class DriverService() : Service()
             }
             getString(R.string.which_tracker_id) ->
             {
-                var _intent = Intent(baseContext, MainActivity::class.java).apply {
-                    putExtra(getString(R.string.tracker_id), Json.encodeToString(route))
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                baseContext.startActivity(_intent)
+                val _intent = Intent(getString(R.string.which_tracker_id))
+                _intent.putExtra(getString(R.string.tracker_id), Json.encodeToString(route))
+                LocalBroadcastManager
+                    .getInstance(applicationContext)
+                    .sendBroadcast(_intent)
             }
         }
 

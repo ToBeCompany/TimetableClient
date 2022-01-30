@@ -20,7 +20,8 @@
         android:spinnerMode="dialog"
         app:layout_constraintBottom_toTopOf="@+id/ButtonTracker_fragmentDriver"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:prompt="@string/routes"/>
 
     <ImageButton
         android:id="@+id/ButtonTracker_fragmentDriver"

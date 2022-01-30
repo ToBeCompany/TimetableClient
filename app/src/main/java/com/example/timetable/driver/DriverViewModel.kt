@@ -3,8 +3,9 @@ package com.example.timetable.driver
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.preference.PreferenceManager
+import com.example.timetable.App
 import com.example.timetable.EndPoint
+import com.example.timetable.R
 import com.example.timetable.data.metadata.response.FlightsNameResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -27,11 +28,12 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
         }
     }
 
-    suspend fun getFlight(): List<FlightsNameResponse>? =
+    suspend fun getFlight(): Array<FlightsNameResponse>? =
         try {
             val response: List<FlightsNameResponse> = clientRoutes.get(urlFlightNames)
-            routesInf = response.toTypedArray()
-            response
+            routesInf += FlightsNameResponse( App.globalContext.getString(R.string.route_not_selected), "" )
+            routesInf += response
+            routesInf
         }
         catch (error: Exception) {
             Log.d("ErrorServer", error.message.toString())

@@ -1,7 +1,6 @@
 package com.example.timetable.driver
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -27,12 +25,12 @@ import com.example.timetable.system.ProgressManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import com.example.timetable.system.isServiceRunning
-import android.app.PendingIntent
-import android.net.Uri
-import androidx.core.content.PackageManagerCompat
-import androidx.core.content.PackageManagerCompat.LOG_TAG
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.content.IntentFilter
+import android.content.BroadcastReceiver
+import kotlinx.serialization.decodeFromString
 
 
 class DriverFragment : Fragment()
@@ -52,9 +50,31 @@ class DriverFragment : Fragment()
 
     private var isListiningPos = false
 
+    var serviceReceiver: BroadcastReceiver = object : BroadcastReceiver()
+    {
+        override fun onReceive(context: Context, intent: Intent)
+        {
+            if (intent.hasExtra(getString(R.string.tracker_id)))
+            {
+                val jsonRoute = intent.getStringExtra(getString(R.string.tracker_id)).toString()
+                Log.d("receiver_driver", jsonRoute)
+
+                val route: FlightsNameResponse = Json.decodeFromString(jsonRoute)
+
+                isListiningPos = true
+                trackerButton.setBackgroundResource(R.drawable.stop_circle)
+                curRouteText.text = "${requireContext().getString(R.string.tracking_route)} ${route.name}"
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         var root = inflater.inflate(R.layout.fragment_driver, container, false)
+
+        LocalBroadcastManager
+            .getInstance(requireContext())
+            .registerReceiver(serviceReceiver, IntentFilter(getString(R.string.which_tracker_id)))
 
         lastRoutePreference = LastRoutePreference(requireContext())
 
@@ -65,14 +85,12 @@ class DriverFragment : Fragment()
         curRouteText = root.findViewById(R.id.routeTrackingText_DriverFragment)
         routeSpinner = root.findViewById<Spinner>(R.id.routeList_DriverFragment)
 
-        getData()
+        getDataFromServer()
 
         if (isServiceRunning(DriverService::class.java, requireContext()))
         {
-            Log.d("service", "run")
+            Log.d("service", "already run")
             getRouteFromService()
-            isListiningPos = true
-            trackerButton.setBackgroundResource(R.drawable.stop_circle)
         }
 
         trackerButton.setOnClickListener {
@@ -113,20 +131,19 @@ class DriverFragment : Fragment()
         }
     }
 
-    private fun getData()
+    private fun getDataFromServer()
     {
         viewModel.viewModelScope.launch {
-            val routeNames: List<FlightsNameResponse>? = viewModel.getFlight()
+            val routeNames: Array<FlightsNameResponse>? = viewModel.getFlight()
             if (routeNames != null && routeNames.isNotEmpty())
             {
                 Log.d("ResponseServer", "data (flight) Ready")
                 progressManager.finish()
 
-                val hint = requireContext().getString(R.string.route_not_selected)
-                var spinnerSet = arrayOf<String>( hint )
+                var spinnerSet = arrayOf<String>()
                 spinnerSet += routeNames.map { it.name.toString() }
 
-                val adapter = RouteArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, spinnerSet, hint)
+                val adapter = RouteArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, spinnerSet, getString(R.string.route_not_selected))
                 adapter.setDropDownViewResource(R.layout.route_spinner_dropdown_item)
                 routeSpinner.adapter = adapter
                 val lastRouteId = lastRoutePreference.getRouteId()
@@ -153,18 +170,6 @@ class DriverFragment : Fragment()
         )
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        Log.d("service_result", "requestCode = $resultCode")
-
-        // Ловим сообщения об окончании задач
-        if (resultCode == 1)
-        {
-            val result: String? = data?.getStringExtra(getString(R.string.tracker_id))
-
-        }
-    }
     private fun startTracker()
     {
         Log.d("Tracker", "start")
@@ -172,7 +177,7 @@ class DriverFragment : Fragment()
         if (route.id != null && route.name != null)
         {
             trackerButton.setBackgroundResource(R.drawable.stop_circle)
-            curRouteText.text = "${requireContext().getString(R.string.tracking_route)} ${route.name}"
+            curRouteText.text = "${requireContext().getString(R.string.tracking_route)} ${route.name} ${routeSpinner.selectedItemPosition}"
             requireContext().startService(
                 Intent(requireContext(), DriverService::class.java)
                     .putExtra(getString(R.string.route), Json.encodeToString(route))
@@ -190,10 +195,12 @@ class DriverFragment : Fragment()
         trackerButton.setBackgroundResource(R.drawable.play_circle)
 
         curRouteText.text = requireContext().getString(R.string.tracking_off)
-        requireContext().startService(
-            Intent(requireContext(), DriverService::class.java)
-                .putExtra(getString(R.string.action), getString(R.string.off_service))
-        )
+        requireContext().stopService(Intent(requireContext(), DriverService::class.java))
         Snackbar.make(requireView(), getString(R.string.tracker_shutdown), Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(serviceReceiver)
     }
 }
