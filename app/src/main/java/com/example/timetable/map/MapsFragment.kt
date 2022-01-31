@@ -102,7 +102,7 @@ class MapsFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var root = inflater.inflate(R.layout.fragment_maps, container, false)
 
-        progressManager = ProgressManager(root.findViewById(R.id.parentMapsFragment))
+        progressManager = ProgressManager(root.findViewById(R.id.parentMapsFragment), requireActivity())
         progressManager.start()
 
         findBusButton = root.findViewById(R.id.findBus_fragment_map)

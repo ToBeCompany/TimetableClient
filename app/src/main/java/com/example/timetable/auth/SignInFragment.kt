@@ -12,7 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
 import com.example.timetable.R
-import com.example.timetable.UserPreference
 import com.example.timetable.data.metadata.User
 import com.google.android.material.snackbar.Snackbar
 
@@ -26,13 +25,10 @@ class SignInFragment : Fragment()
     {
         var root = inflater.inflate(R.layout.fragment_sign_in, container, false)
 
-
-
         root.findViewById<EditText>(R.id.codetext_signInFragment)
             .addTextChangedListener { inputText ->
                 if (!inputText.isNullOrEmpty())
                 {
-
                     lifecycle.coroutineScope.launchWhenStarted {
 
                         val response: User? = viewModel.getUser(inputText.toString())
@@ -46,8 +42,6 @@ class SignInFragment : Fragment()
 
                         }
                     }
-
-
                 }
             }
         return root

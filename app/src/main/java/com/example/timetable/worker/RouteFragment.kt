@@ -36,7 +36,7 @@ class RouteFragment : Fragment()
         var root = inflater.inflate(R.layout.fragment_route, container, false)
 
 
-        progressManager = ProgressManager(root.findViewById(R.id.parentMainFragment))
+        progressManager = ProgressManager(root.findViewById(R.id.parentMainFragment), requireActivity())
         progressManager.start()
 
         recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)

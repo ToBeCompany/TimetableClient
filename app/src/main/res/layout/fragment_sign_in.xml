@@ -10,7 +10,8 @@
 
     <EditText
         android:id="@+id/codetext_signInFragment"
-        android:padding="8sp"
+        android:maxLength="50"
+        android:padding="10sp"
         android:layout_width="0sp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"

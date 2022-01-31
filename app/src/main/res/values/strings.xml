@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TimeTable</string>
 
@@ -5,11 +6,11 @@
     <string name="routes">маршруты</string>
 
 
-
     <!-- Toolbar -->
     <string name="gps_tracker">GPS трекер</string>
     <string name="signin_fragment_toolbar">Вход</string>
     <string name="route_fragment_toolbar">Маршруты</string>
+    <string name="not_found_user_fragment_toolbar">Ошибка входа</string>
 
 
     <!-- Snackbar & Toast -->
@@ -31,6 +32,13 @@
     <string name="route_not_selected">Маршрут не выбран</string>
     <string name="tracking_route">Отслеживание по маршруту:</string>
     <string name="tracking_off">Отслеживание выключено</string>
+    <string name="user_not_found">Аккаунт не найден</string>
+    <string name="user_not_found_reasons">
+        Возможные причины:
+        \n • Аккаунт был удалён или заблокирован
+        \n • Нет соединения с интернетом
+        \n • Возникли проблемы на сервере</string>
+    <string name="login_out">Очистить данные</string>
 
     <!--  intent  -->
     <string name="action">action</string>
@@ -43,5 +51,6 @@
 
     <!--  Notification  -->
     <string name="click_to_open_app">Нажмите чтобы открыть приложение</string>
+
 
 </resources>

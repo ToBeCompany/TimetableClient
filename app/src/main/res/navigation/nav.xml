@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_mainFragment_to_signInFragment"
             app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_notFoundUserFragment"
+            app:destination="@id/notFoundUserFragment" />
     </fragment>
 
     <fragment
@@ -55,4 +58,9 @@
         android:name="com.example.timetable.auth.SignInFragment"
         android:label="@string/signin_fragment_toolbar"
         tools:layout="@layout/fragment_sign_in" />
+    <fragment
+        android:id="@+id/notFoundUserFragment"
+        android:name="com.example.timetable.auth.NotFoundUserFragment"
+        android:label="@string/not_found_user_fragment_toolbar"
+        tools:layout="@layout/fragment_not_found_user" />
 </navigation>

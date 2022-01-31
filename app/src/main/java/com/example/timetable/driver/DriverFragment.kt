@@ -78,7 +78,7 @@ class DriverFragment : Fragment()
 
         lastRoutePreference = LastRoutePreference(requireContext())
 
-        progressManager = ProgressManager(root.findViewById(R.id.parentDriverFragment))
+        progressManager = ProgressManager(root.findViewById(R.id.parentDriverFragment), requireActivity())
         progressManager.start()
 
         trackerButton = root.findViewById(R.id.ButtonTracker_fragmentDriver)

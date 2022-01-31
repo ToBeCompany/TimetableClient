@@ -1,9 +1,10 @@
-package com.example.timetable
+package com.example.timetable.auth
 
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.example.timetable.data.metadata.User
 import com.example.timetable.data.metadata.type_user_creater
+
 
 class UserPreference(var context: Context)
 {
@@ -34,15 +35,15 @@ class UserPreference(var context: Context)
         }
     }
 
-    private fun checkAuth() = preference.getBoolean(TAG_AUTH, false)
+    private fun checkAuth(): Boolean = preference.getBoolean(TAG_AUTH, false)
 
     private fun getDataUser(): User
     {
         preference.apply {
             return User(
                 userType = type_user_creater(getString(User.TAG_USERTYPE, "")),
-                id = getString(User.TAG_ID, ""),
-                name = getString(User.TAG_NAME, "")
+                id = getString(User.TAG_ID, "").toString(),
+                name = getString(User.TAG_NAME, "").toString()
             )
         }
     }
@@ -52,6 +53,7 @@ class UserPreference(var context: Context)
         currentUser = null
         preference
             .edit()
+            .clear()
             .putBoolean(TAG_AUTH, false)
             .apply()
     }
