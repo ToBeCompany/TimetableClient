@@ -10,6 +10,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.example.timetable.R
 import com.example.timetable.data.metadata.User
@@ -29,8 +30,7 @@ class SignInFragment : Fragment()
             .addTextChangedListener { inputText ->
                 if (!inputText.isNullOrEmpty())
                 {
-                    lifecycle.coroutineScope.launchWhenStarted {
-
+                    lifecycleScope.launchWhenStarted {
                         val response: User? = viewModel.getUser(inputText.toString())
                         Log.d("response", response.toString())
 
@@ -39,7 +39,6 @@ class SignInFragment : Fragment()
                             userPreference.authUserOnDevice(response)
                             Snackbar.make(requireView(), getString(R.string.auth_success), Snackbar.LENGTH_LONG).show()
                             root.findNavController().popBackStack()
-
                         }
                     }
                 }

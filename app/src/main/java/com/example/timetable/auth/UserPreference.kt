@@ -55,6 +55,6 @@ class UserPreference(var context: Context)
             .edit()
             .clear()
             .putBoolean(TAG_AUTH, false)
-            .apply()
+            .commit()
     }
 }

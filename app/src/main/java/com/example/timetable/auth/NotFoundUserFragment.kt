@@ -24,6 +24,4 @@ class NotFoundUserFragment : Fragment()
             }
         return root
     }
-
-
 }

@@ -1,9 +1,10 @@
 package com.example.timetable.auth
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.example.timetable.data.metadata.User
+import com.example.timetable.worker.Storage
+import com.example.timetable.worker.Storage.BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.features.json.JsonFeature
@@ -11,23 +12,13 @@ import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.get
 
 
-class SignInViewModel(application : Application): AndroidViewModel(application)
-{
-    private val url = "https://fierce-woodland-54822.herokuapp.com/sign/"
-    val client = HttpClient(Android) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
-//                    acceptContentTypes += ContentType("text", "plain")
-        }
-    }
-
+class SignInViewModel: ViewModel() {
     suspend fun getUser(id: String): User? =
         try {
-            client.get(url + id)
+            Storage.client.get("$BASE_URL/sign/$id")
         }
         catch (error: Exception) {
             Log.d("ErrorServer", error.message.toString())
             null
         }
-
 }

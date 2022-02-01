@@ -10,6 +10,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import android.os.Bundle
+import android.util.Config
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
+import androidx.multidex.BuildConfig
 import androidx.navigation.fragment.navArgs
 import com.example.timetable.App
 import com.example.timetable.MainActivity
@@ -116,6 +118,7 @@ class MapsFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map_fragment_map) as SupportMapFragment?
+        if (BuildConfig.FLAVOR == "GOOGLE")
         mapFragment?.getMapAsync(callback)
     }
 

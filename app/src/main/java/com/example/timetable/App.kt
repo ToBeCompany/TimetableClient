@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.timetable.data.database.RouteRoomDatabase
 import com.example.timetable.driver.service.NotificationDriver
+import com.example.timetable.worker.Storage
 
 
 class App: Application() // переопределяем класс приложения
@@ -16,7 +17,7 @@ class App: Application() // переопределяем класс прилож
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) // запрещаю включать тёмную тему
         NotificationDriver.createNotificationChannel(this)
-
+        Storage.loadCache()
         globalContext = applicationContext
     }
 
