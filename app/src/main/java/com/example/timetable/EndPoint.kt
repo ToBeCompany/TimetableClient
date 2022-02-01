@@ -21,4 +21,7 @@ object EndPoint
 
     // получить все маршруты
     const val all_routes = "/allMarsh"
+
+    // маршруты которые не отслежтваются
+    const val not_tracking_routes = "/allMarsh"
 }
