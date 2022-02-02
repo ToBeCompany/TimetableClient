@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:700450893534:android:797f77eba897a5a529dc4f",
         "android_client_info": {
-          "package_name": "com.example.timetable"
+          "package_name": "com.dru128.timetable"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "700450893534-jl5pr4nt2cqkh6mrupro32eim9533ftr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.timetable",
+            "package_name": "com.dru128.timetable",
             "certificate_hash": "32251b114597e5f086fa7e7e57a71ae952011438"
           }
         },

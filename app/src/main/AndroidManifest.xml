@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.timetable">
+    package="dru128.timetable">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -14,16 +14,16 @@
     <!--    <uses-permission android:name="android.permission.VIBRATE"/> &lt;!&ndash; ??? &ndash;&gt;-->
 
     <application
-        android:name=".App"
+        android:name="com.dru128.timetable.App"
         android:allowBackup="true"
-        android:icon="@drawable/app_logo"
+        android:icon="@drawable/bus_icon_blue"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/app_logo"
+        android:roundIcon="@drawable/bus_icon_blue"
         android:supportsRtl="true"
         android:theme="@style/Theme.TimeTable">
 
         <service
-            android:name=".driver.service.DriverService"
+            android:name="com.dru128.timetable.driver.service.DriverService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location"
@@ -41,7 +41,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.dru128.timetable.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.TimeTable.Launcher">

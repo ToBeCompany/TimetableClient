@@ -16,7 +16,7 @@ android {
             resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
         }
         resConfigs "en", "ru"
-        applicationId "com.example.timetable"
+        applicationId "com.dru128.timetable"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1

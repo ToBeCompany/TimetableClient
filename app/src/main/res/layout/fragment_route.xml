@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".worker.RouteFragment">
+    tools:context="com.dru128.timetable.worker.RouteFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recucler_View_Mainfrag"
@@ -18,14 +18,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/route_item"/>
-
-<!--    <ProgressBar-->
-<!--        android:id="@+id/progressMainFragment"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:theme="@style/Theme.TimeTable.ProgressBar"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>

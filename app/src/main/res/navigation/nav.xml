@@ -8,11 +8,8 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.timetable.MainFragment"
+        android:name="com.dru128.timetable.MainFragment"
         tools:layout="@layout/fragment_main" >
-        <action
-            android:id="@+id/action_mainFragment_to_routeFragment"
-            app:destination="@id/routeFragment" />
         <action
             android:id="@+id/action_mainFragment_to_driverFragment"
             app:destination="@id/driverFragment" />
@@ -22,11 +19,14 @@
         <action
             android:id="@+id/action_mainFragment_to_notFoundUserFragment"
             app:destination="@id/notFoundUserFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_routeFragment"
+            app:destination="@id/routeFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/routeFragment"
-        android:name="com.example.timetable.worker.RouteFragment"
+        android:name="com.dru128.timetable.worker.RouteFragment"
         android:label="@string/route_fragment_toolbar"
         tools:layout="@layout/fragment_route" >
         <action
@@ -41,8 +41,8 @@
 
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.example.timetable.map.MapsFragment"
-        tools:layout="@layout/fragment_maps" >
+        android:name="com.dru128.timetable.map.MapsFragment"
+        tools:layout="@layout/fragment_maps">
         <argument
             android:name="id"
             app:argType="string" />
@@ -50,17 +50,17 @@
 
     <fragment
         android:id="@+id/driverFragment"
-        android:name="com.example.timetable.driver.DriverFragment"
+        android:name="com.dru128.timetable.driver.DriverFragment"
         android:label="@string/gps_tracker"
         tools:layout="@layout/fragment_driver" />
     <fragment
         android:id="@+id/signInFragment"
-        android:name="com.example.timetable.auth.SignInFragment"
+        android:name="com.dru128.timetable.auth.SignInFragment"
         android:label="@string/signin_fragment_toolbar"
         tools:layout="@layout/fragment_sign_in" />
     <fragment
         android:id="@+id/notFoundUserFragment"
-        android:name="com.example.timetable.auth.NotFoundUserFragment"
+        android:name="com.dru128.timetable.auth.NotFoundUserFragment"
         android:label="@string/not_found_user_fragment_toolbar"
         tools:layout="@layout/fragment_not_found_user" />
 </navigation>
