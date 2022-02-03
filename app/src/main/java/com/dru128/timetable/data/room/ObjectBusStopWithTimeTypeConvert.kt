@@ -1,15 +1,16 @@
-package com.dru128.timetable.data.database
+package com.dru128.timetable.data.room
 
 import androidx.room.TypeConverter
-import com.dru128.timetable.data.GeoPoint
+import com.dru128.timetable.data.metadata.BusStopWithTime
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class ObjectPointsTypeConvert
+
+class ObjectBusStopWithTimeTypeConvert
 {
     @TypeConverter
-    fun fromList(value: List<GeoPoint>): String?
+    fun fromList(value: List<BusStopWithTime>): String?
     {
         return if (!value.isNullOrEmpty())
             Json.encodeToString(value)
@@ -18,9 +19,9 @@ class ObjectPointsTypeConvert
     }
 
     @TypeConverter
-    fun toList(value: String?): List<GeoPoint>?
+    fun toList(value: String?): List<BusStopWithTime>?
     {
         if (value.isNullOrEmpty()) return null
-        return Json.decodeFromString(value) as List<GeoPoint>
+        return Json.decodeFromString(value) as List<BusStopWithTime>
     }
 }

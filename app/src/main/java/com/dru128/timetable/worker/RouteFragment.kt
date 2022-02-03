@@ -12,9 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.Storage
+import com.dru128.timetable.data.metadata.Route
 import dru128.timetable.R
-import com.dru128.timetable.data.metadata.response.FlightsNameResponse
-import com.dru128.timetable.system.ProgressManager
+import com.dru128.timetable.tools.ProgressManager
 import kotlinx.coroutines.launch
 
 
@@ -24,11 +24,10 @@ class RouteFragment : Fragment()
 
     private lateinit var progressManager: ProgressManager
 
-    private var adapter = RecyclerAdapterRoute{ id ->
-        findNavController().navigate(
-            RouteFragmentDirections.actionRouteFragmentToMapsFragment(id)
-        )
-    }
+    private var adapter = RouteRecyclerAdapter(
+        { id -> findNavController().navigate(RouteFragmentDirections.actionRouteFragmentToMapsFragment(id)) },
+        arrayOf()
+    )
     private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -51,18 +50,19 @@ class RouteFragment : Fragment()
     private fun getData() // получение данных и загрузка в список
     {
         viewModel.viewModelScope.launch {
-            var flights: List<FlightsNameResponse>? = viewModel.getFlight()
-            if (flights != null && flights.isNotEmpty())
+            val routes: Array<Route>? = viewModel.getRoutes()
+
+            if (routes != null && routes.isNotEmpty())
             {
-                Log.d("getdataServer", flights.toString())
                 progressManager.finish()
 
-                Storage.flightsNames = flights
+                Storage.routes = routes
                 adapter.updateData()
 
             } else {
                 // маршрутов нет ( 0 )
             }
+            Log.d("data ready", "routes = ${routes?.size}")
         }
     }
 

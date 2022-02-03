@@ -1,4 +1,4 @@
-package com.dru128.timetable
+package com.dru128.timetable.tools
 
 
 sealed class Resource<T>(

@@ -26,9 +26,11 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.navArgs
 import com.dru128.timetable.App
 import com.dru128.timetable.MainActivity
+import com.dru128.timetable.Storage
+import com.dru128.timetable.data.metadata.GeoPosition
 import dru128.timetable.R
-import com.dru128.timetable.data.Route
-import com.dru128.timetable.system.DrawableConvertor
+import com.dru128.timetable.data.metadata.Route
+import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.worker.BusStopsBottomSheet
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -46,7 +48,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
-import com.dru128.timetable.system.ProgressManager
+import com.dru128.timetable.tools.ProgressManager
 
 
 class MapsFragment : Fragment()
@@ -63,17 +65,11 @@ class MapsFragment : Fragment()
     private var isTracking = false
     private var busMarker: Marker? = null
 
-    private val args: MapsFragmentArgs by navArgs()
-
-    private val viewModel: MapViewModel by viewModels {
-        MapViewModelFactory(
-            (activity?.application as App).database
-                .routeDao()
-        )
-    }
+    private val viewModel: MapViewModel by viewModels()
 
     lateinit var googleMap: GoogleMap
 
+    private val args: MapsFragmentArgs by navArgs()
     var route/*: Flight*/: Route? = null
 
     lateinit var findBusButton: ImageButton
@@ -81,21 +77,17 @@ class MapsFragment : Fragment()
 
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
-        lifecycle.coroutineScope.launchWhenStarted {
-            viewModel.getFlight(args.id).also {
-                if (it != null)
-                {
-                    Log.d("response_server", "data (flight) Ready")
+        route = Storage.routes[args.id]
+        if (route != null)
+        {
+            Log.d("data", "(flight) is not null (SUCCESS)")
 
-                    route = it
-                    (requireActivity() as MainActivity).setActionBarTitle(route?.name)
+            (requireActivity() as MainActivity).setActionBarTitle(route?.name)
+            route?.positions?.get(0)?.let { tpCamera(geoPosToLatLng(it)) } // перемещаем камеру на первую остановку
+            dataReady()
+        } else
+            Log.d("data", "(flight) is null (FAIL)")
 
-                    tpCamera(route?.points?.get(0)?.toLatLng())// перемещаем камеру на первую остановку
-                    dataReady()
-                } else
-                    Log.d("response_server", "data (flight) is null")
-            }
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -136,7 +128,7 @@ class MapsFragment : Fragment()
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
         polylineOptions.color(ResourcesCompat.getColor(requireContext().resources, R.color.polyline, null))
 
-        route?.points?.forEach { polylineOptions.add(it.toLatLng()) } // добавляем точки для линии
+        route?.positions?.forEach { polylineOptions.add(geoPosToLatLng(it)) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
 
         val busStops = route!!.busStopsWithTime
@@ -146,8 +138,8 @@ class MapsFragment : Fragment()
                 MarkerOptions()
                     .position(
                         LatLng(
-                            busStops[i].busStop?.point!!.latitude,
-                            busStops[i].busStop?.point!!.longitude
+                            busStops[i].busStop?.position!!.latitude,
+                            busStops[i].busStop?.position!!.longitude
                         )
                     )
                     .title(busStops[i].busStop?.name)
@@ -201,7 +193,7 @@ class MapsFragment : Fragment()
             viewModel.startWebSocket(trackerId).collect {
                 Log.d("Tracker", "new pos ${ it.toString() }")
 
-                val busPosition = it.toLatLng()
+                val busPosition = geoPosToLatLng(it)
                 if (busMarker == null)
                     busMarker = googleMap.addMarker(
                         MarkerOptions()
@@ -295,4 +287,6 @@ class MapsFragment : Fragment()
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         super.onDestroy()
     }
+
+    private fun geoPosToLatLng(geoPosition: GeoPosition): LatLng = LatLng(geoPosition.latitude, geoPosition.longitude)
 }

@@ -3,42 +3,31 @@ package com.dru128.timetable.map
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Storage
-import com.dru128.timetable.data.GeoPoint
-import com.dru128.timetable.data.Route
-import com.dru128.timetable.data.database.RouteDao
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.features.websocket.WebSockets
-import io.ktor.client.features.websocket.webSocket
+import com.dru128.timetable.data.metadata.GeoPosition
+import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
-import io.ktor.client.request.get
+import io.ktor.client.features.websocket.webSocket
 import io.ktor.http.HttpMethod
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.readText
 import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.readText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.security.Security
 
 
-class MapViewModel(application : Application, private val routeDao: RouteDao): AndroidViewModel(application)
+class MapViewModel(application : Application): AndroidViewModel(application)
 {
     var webSocketSession: DefaultClientWebSocketSession? = null
 
-    fun startWebSocket(routeId: String) = flow<GeoPoint> {
+    fun startWebSocket(routeId: String) = flow<GeoPosition> {
             Storage.websocketClient().webSocket(
                 method = HttpMethod.Get,
                 host = EndPoint.host,
@@ -51,7 +40,7 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
                 {
                     if (frame is Frame.Text)
                     {
-                            val position = Json.decodeFromString<GeoPoint>(frame.readText())
+                            val position = Json.decodeFromString<GeoPosition>(frame.readText())
                             emit(position)
                             Log.d("websocket", "update position: " + position.latitude.toString())
                     }
@@ -59,15 +48,6 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
             }
 
     }.flowOn(Dispatchers.IO)
-
-    suspend fun getFlight(id: String): /*Flight*/Route? =
-        try {
-            Storage.client.get(EndPoint.routeById + id)
-        }
-        catch (error: Exception) {
-            Log.d("ErrorServer", error.message.toString())
-            null
-        }
 
     fun stopWebSocket()
     {
@@ -93,14 +73,14 @@ class MapViewModel(application : Application, private val routeDao: RouteDao): A
 //    }
 }
 
-class MapViewModelFactory(private val itemDao: RouteDao) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T
-    {
-        if (modelClass.isAssignableFrom(MapViewModel::class.java))
-        {
-            @Suppress("UNCHECKED_CAST")
-            return MapViewModel(Application(), itemDao) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+//class MapViewModelFactory(private val itemDao: RouteDao) : ViewModelProvider.Factory {
+//    override fun <T : ViewModel?> create(modelClass: Class<T>): T
+//    {
+//        if (modelClass.isAssignableFrom(MapViewModel::class.java))
+//        {
+//            @Suppress("UNCHECKED_CAST")
+//            return MapViewModel(Application(), itemDao) as T
+//        }
+//        throw IllegalArgumentException("Unknown ViewModel class")
+//    }
+//}

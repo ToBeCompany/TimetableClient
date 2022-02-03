@@ -1,10 +1,11 @@
-package com.dru128.timetable.data.database
+package com.dru128.timetable.data.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.dru128.timetable.data.RouteComplex
+import com.dru128.timetable.data.metadata.Route
+import com.dru128.timetable.data.room.entity.RouteComplex
 
 
 @Database(entities = [RouteComplex::class], version = 1, exportSchema = false)

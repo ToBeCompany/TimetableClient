@@ -16,18 +16,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Storage
 import dru128.timetable.R
-import com.dru128.timetable.data.GeoPoint
+import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.response.FlightsNameResponse
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
-import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
-import java.security.Security
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,10 +40,10 @@ class DriverService() : Service()
     private var webSocketSession: DefaultClientWebSocketSession? = null
     private var route: FlightsNameResponse? = null
 
-    private val busLocation = MutableSharedFlow<GeoPoint>()
+    private val busLocation = MutableSharedFlow<GeoPosition>()
 
     private var listener = LocationListener {
-        val position = GeoPoint(latitude = it.latitude, longitude = it.longitude)
+        val position = GeoPosition(latitude = it.latitude, longitude = it.longitude)
         MainScope().launch {
             busLocation.emit(position)
         }

@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.Storage
+import com.dru128.timetable.data.metadata.Route
 import dru128.timetable.R
-import com.dru128.timetable.data.metadata.response.FlightsNameResponse
 
 
-class RecyclerAdapterRoute(var click: (id:String) -> Unit)
-    : RecyclerView.Adapter<RecyclerAdapterRoute.ViewHolder>()
+class RouteRecyclerAdapter(var click: (id: Int) -> Unit, var dataSet: Array<Route> = arrayOf())
+    : RecyclerView.Adapter<RouteRecyclerAdapter.ViewHolder>()
 {
-    var dataset: List<FlightsNameResponse> = Storage.flightsNames
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val View = LayoutInflater.from(parent.context).inflate(R.layout.route_item, parent, false) // тут item
@@ -22,7 +22,7 @@ class RecyclerAdapterRoute(var click: (id:String) -> Unit)
 
     fun updateData()
     {
-        dataset = Storage.flightsNames
+        dataSet = Storage.routes
         notifyDataSetChanged()
     }
 
@@ -31,7 +31,7 @@ class RecyclerAdapterRoute(var click: (id:String) -> Unit)
         holder.onBind(position)
     }
 
-    override fun getItemCount(): Int = dataset.size
+    override fun getItemCount(): Int = dataSet.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
@@ -41,10 +41,9 @@ class RecyclerAdapterRoute(var click: (id:String) -> Unit)
 
         fun onBind(position: Int)
         {
-
-            routeNameText.text = dataset[position].name
+            routeNameText.text = dataSet[position].name
             itemView.setOnClickListener {
-                click(dataset[position].id!!)
+                click(position)
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.dru128.timetable.system
+package com.dru128.timetable.tools
 
 import android.app.ActivityManager
 import android.content.Context

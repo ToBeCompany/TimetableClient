@@ -1,4 +1,4 @@
-package com.dru128.timetable.data
+package com.dru128.timetable.data.room.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,13 +9,15 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-@Entity(tableName = "GeoPoint")
-data class BusStopPoint(
+@Entity(tableName = "RoutePoint")
+data class RoutePoint(
     @SerialName("id")
     @PrimaryKey(autoGenerate = true)
     var id: Int,
-    @ColumnInfo(name = "busstop_id")
-    var busStop_id: Int = 0,
+    @ColumnInfo(name = "route_id")
+    var route_id: String = "",
+    @ColumnInfo(name = "number")
+    var number: Int,
     @SerialName("lat")
     @ColumnInfo(name = "latitude")
     var latitude: Double = 0.0,

@@ -1,6 +1,6 @@
 package com.dru128.timetable
 
-import com.dru128.timetable.data.metadata.response.FlightsNameResponse
+import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.engine.cio.CIO
@@ -15,22 +15,21 @@ import java.security.Security
 
 object Storage
 {
-//   // var routes: List<Route> = listOf()
+    var routes: Array<Route> = arrayOf()
 
-    var flightsNames: List<FlightsNameResponse> = listOf()
+
 
     var client = HttpClient(Android) {
         install(JsonFeature) {
             serializer = KotlinxSerializer()
 //                    acceptContentTypes += ContentType("text", "plain")
         }
-        defaultRequest {
+        defaultRequest{
             url.takeFrom( URLBuilder ().takeFrom(EndPoint.protocol + EndPoint.host).apply {
                 encodedPath += url.encodedPath
             })
         }
     }
-
 
     fun websocketClient(): HttpClient
     {

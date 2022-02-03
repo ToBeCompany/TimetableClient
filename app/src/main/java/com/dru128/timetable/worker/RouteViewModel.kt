@@ -1,60 +1,55 @@
 package com.dru128.timetable.worker
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import com.dru128.timetable.App
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Storage
-import com.dru128.timetable.data.Route
-import com.dru128.timetable.data.RouteDataManager
-import com.dru128.timetable.data.metadata.response.FlightsNameResponse
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
+import com.dru128.timetable.data.JsonDataManager
+import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.request.get
 
 
-class RouteViewModel(application : Application): AndroidViewModel(application)
+class RouteViewModel: ViewModel()
 {
-    private var dataManager = RouteDataManager()
+    private var dataManager = JsonDataManager(App.globalContext)//RoomDataManager(application as App)
 
-    suspend fun getRoutes(): List<Route>?
+    suspend fun getRoutes(): Array<Route>?
     {
-        val fromCache = getFromCache()
+        val fromCache = dataManager.loadRoutes()
 
         if (fromCache.isNullOrEmpty())
         {
             val fromServer = getFromServer()
-
             if (fromServer.isNullOrEmpty()) return null
+            dataManager.saveRoutes(fromServer)
+            Log.d("Data", "get from server")
 
-            dataManager.updateRoutes(fromServer)
             return fromServer
         }
-        else
+        else {
+            Log.d("Data", "get from cash")
+
             return fromCache
+        }
     }
 
-    suspend fun getFlight(): List<FlightsNameResponse>? =
+/*    suspend fun getFlight(): List<FlightsNameResponse>? =
         try {
             Storage.client.get(EndPoint.routes_names_id)
         }
         catch (error: Exception) {
             Log.d("ErrorServer", error.message.toString())
             null
-        }
+        }*/
 
-
-    private suspend fun getFromServer(): List<Route>? =
+    private suspend fun getFromServer(): Array<Route>? =
         try {
+            Log.d("Server", "SUCCESS")
             Storage.client.get(EndPoint.all_routes)
         }
         catch (error: Exception) {
-            Log.d("ErrorServer", error.message.toString())
+            Log.d("Server", "ERROR: ${error.message}")
             null
         }
-
-    private suspend fun getFromCache(): List<Route> =
-        dataManager.getRoutes()
 }

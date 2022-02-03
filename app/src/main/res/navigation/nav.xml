@@ -45,7 +45,7 @@
         tools:layout="@layout/fragment_maps">
         <argument
             android:name="id"
-            app:argType="string" />
+            app:argType="integer"/>
     </fragment>
 
     <fragment

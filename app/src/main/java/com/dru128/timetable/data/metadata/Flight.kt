@@ -1,6 +1,5 @@
 package com.dru128.timetable.data.metadata
 
-import com.dru128.timetable.data.Route
 import kotlinx.serialization.Serializable
 
 

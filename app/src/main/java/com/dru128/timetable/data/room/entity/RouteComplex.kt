@@ -1,4 +1,4 @@
-package com.dru128.timetable.data
+package com.dru128.timetable.data.room.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -7,18 +7,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
-@Serializable
-@Entity(tableName = "Route")
+@Entity(tableName = "Route2")
 data class RouteComplex( // маршрут
-    @SerialName("id")
     @PrimaryKey
     var id: String,
-//    @SerialName("idm_Foreign")
-//    @ColumnInfo(name = "name")
-//    var name: String = "",
-//    @SerialName("lineMarshtriectori")
+    @ColumnInfo(name = "name")
+    var name: String = "",
 //    @ColumnInfo(name = "pointList")
 //    var points: List<RoutePoint> = listOf(),
-//    @SerialName("idOst")
-//    var busStopsWithTime: List<BusStopWithTime> = listOf()
+//    @ColumnInfo(name = "busStopList")
+//    var busStopsWithTime: List<BusStopWithTimeEntity> = listOf()
 )
