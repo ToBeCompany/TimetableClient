@@ -19,16 +19,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.widget.ImageButton
-        android:id="@+id/myLocationBtn_fragment_map7"
+        android:id="@+id/my_location_button"
         android:layout_width="56sp"
         android:layout_height="56sp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/my_location_button"
-        app:layout_constraintBottom_toTopOf="@+id/findBus_fragment_map"
-        app:layout_constraintEnd_toEndOf="@+id/findBus_fragment_map" />
+        app:layout_constraintBottom_toTopOf="@+id/findBusButton"
+        app:layout_constraintEnd_toEndOf="@+id/findBusButton" />
 
     <android.widget.ImageButton
-        android:id="@+id/findBus_fragment_map"
+        android:id="@+id/findBusButton"
         android:layout_width="56sp"
         android:layout_height="56sp"
         android:layout_marginEnd="8dp"

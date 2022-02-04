@@ -14,7 +14,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -52,8 +51,10 @@ import com.dru128.timetable.tools.ProgressManager
 import dru128.timetable.databinding.FragmentMapsBinding
 
 
-class MapsFragment : Fragment() {
-    lateinit var progressManager: ProgressManager
+class MapsFragment : Fragment()
+{
+    private lateinit var binding: FragmentMapsBinding
+    private lateinit var progressManager: ProgressManager
     private val PERMISSION_CODE = 200
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -69,7 +70,6 @@ class MapsFragment : Fragment() {
 
     lateinit var googleMap: GoogleMap
 
-    private lateinit var binding: FragmentMapsBinding
 
     private val args: MapsFragmentArgs by navArgs()
     var route/*: Flight*/: Route? = null
@@ -89,23 +89,15 @@ class MapsFragment : Fragment() {
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapsBinding.inflate(inflater)
 
         progressManager = ProgressManager(binding.parentMapsFragment, requireActivity())
         progressManager.start()
 
-        binding.findBusFragmentMap.setOnClickListener {
+        binding.findBusButton.setOnClickListener {
             if (busMarker == null)
-                Snackbar.make(
-                    requireView(),
-                    getString(R.string.bus_not_connected),
-                    Snackbar.LENGTH_LONG
-                ).show()
+                Snackbar.make(requireView(), getString(R.string.bus_not_connected), Snackbar.LENGTH_LONG).show()
             else
                 moveCamera(busMarker?.position)
             Log.d("findbusbtn", busMarker.toString())
@@ -165,7 +157,7 @@ class MapsFragment : Fragment() {
             true
         }
 
-        binding.myLocationBtnFragmentMap7.setOnClickListener {
+        binding.myLocationButton.setOnClickListener {
             checkLocationPermissions()
         }
 

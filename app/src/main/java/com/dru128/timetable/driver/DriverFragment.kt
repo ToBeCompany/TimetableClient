@@ -27,6 +27,7 @@ import com.dru128.timetable.tools.ProgressManager
 import com.dru128.timetable.tools.isServiceRunning
 import com.google.android.material.snackbar.Snackbar
 import dru128.timetable.R
+import dru128.timetable.databinding.FragmentDriverBinding
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -35,6 +36,7 @@ import kotlinx.serialization.json.Json
 
 class DriverFragment : Fragment()
 {
+    private lateinit var binding: FragmentDriverBinding
     private val viewModel: DriverViewModel by viewModels()
     private val PERMISSION_CODE = 200
 
@@ -75,20 +77,19 @@ class DriverFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        var root = inflater.inflate(R.layout.fragment_driver, container, false)
-
+        binding = FragmentDriverBinding.inflate(inflater)
         LocalBroadcastManager
             .getInstance(requireContext())
             .registerReceiver(serviceReceiver, IntentFilter(getString(R.string.action)))
 
         lastRoutePreference = LastRoutePreference(requireContext())
 
-        progressManager = ProgressManager(root.findViewById(R.id.parentDriverFragment), requireActivity())
+        progressManager = ProgressManager(binding.root, requireActivity())
         progressManager.start()
 
-        trackerButton = root.findViewById(R.id.ButtonTracker_fragmentDriver)
-        curRouteText = root.findViewById(R.id.routeTrackingText_DriverFragment)
-        routeSpinner = root.findViewById<Spinner>(R.id.routeList_DriverFragment)
+        trackerButton = binding.trackerButton
+        curRouteText = binding.routeTrackingName
+        routeSpinner = binding.routeList
 
         getDataFromServer()
 
@@ -104,7 +105,7 @@ class DriverFragment : Fragment()
             else
                 checkLocationPermissions()
         }
-        return root
+        return binding.root
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)

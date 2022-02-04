@@ -11,19 +11,20 @@ import androidx.navigation.findNavController
 import com.dru128.timetable.auth.UserPreference
 import com.dru128.timetable.data.metadata.TypeUser
 import dru128.timetable.R
+import dru128.timetable.databinding.FragmentMainBinding
+import dru128.timetable.databinding.FragmentSignInBinding
 
 
 class MainFragment : Fragment()
 {
+    private lateinit var binding: FragmentMainBinding
     private val viewModel: MainViewModel by viewModels()
-    lateinit var rootView: View
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
-        var root = inflater.inflate(R.layout.fragment_main, container, false)
-        rootView = root
+        binding = FragmentMainBinding.inflate(inflater)
 
-        return root
+        return binding.root
     }
 
     override fun onStart() {
@@ -35,7 +36,7 @@ class MainFragment : Fragment()
     {
         val userPreference = UserPreference(requireContext())
 
-        val navController = rootView.findNavController()
+        val navController = binding.root.findNavController()
 
         if (userPreference.currentUser == null)
         {

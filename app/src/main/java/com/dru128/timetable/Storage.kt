@@ -17,8 +17,6 @@ object Storage
 {
     var routes: Array<Route> = arrayOf()
 
-
-
     var client = HttpClient(Android) {
         install(JsonFeature) {
             serializer = KotlinxSerializer()

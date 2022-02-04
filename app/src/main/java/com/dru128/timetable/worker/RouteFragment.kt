@@ -13,13 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.Storage
 import com.dru128.timetable.data.metadata.Route
-import dru128.timetable.R
 import com.dru128.timetable.tools.ProgressManager
+import dru128.timetable.databinding.FragmentRouteBinding
 import kotlinx.coroutines.launch
 
 
 class RouteFragment : Fragment()
 {
+    private lateinit var binding: FragmentRouteBinding
     private val viewModel: RouteViewModel by viewModels()
 
     private lateinit var progressManager: ProgressManager
@@ -32,19 +33,19 @@ class RouteFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
-        var root = inflater.inflate(R.layout.fragment_route, container, false)
+        binding = FragmentRouteBinding.inflate(inflater)
 
 
-        progressManager = ProgressManager(root.findViewById(R.id.parentMainFragment), requireActivity())
+        progressManager = ProgressManager(binding.parent, requireActivity())
         progressManager.start()
 
-        recyclerView = root.findViewById(R.id.recucler_View_Mainfrag)
+        recyclerView = binding.recuclerViewMainfrag
 
         recyclerView?.adapter = adapter
         recyclerView?.layoutManager = LinearLayoutManager(context)
         getData()
 
-        return root
+        return binding.root
     }
 
     private fun getData() // получение данных и загрузка в список

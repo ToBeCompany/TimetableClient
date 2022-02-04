@@ -9,7 +9,7 @@
     tools:context="com.dru128.timetable.auth.SignInFragment">
 
     <EditText
-        android:id="@+id/codetext_signInFragment"
+        android:id="@+id/codeText"
         android:maxLength="50"
         android:padding="10sp"
         android:layout_width="0sp"
@@ -36,7 +36,7 @@
         android:layout_height="155dp"
         android:layout_marginTop="32dp"
         android:src="@drawable/rotor_text_logo"
-        app:layout_constraintBottom_toTopOf="@+id/codetext_signInFragment"
+        app:layout_constraintBottom_toTopOf="@+id/codeText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
