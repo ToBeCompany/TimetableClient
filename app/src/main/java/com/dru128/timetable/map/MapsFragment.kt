@@ -49,10 +49,10 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 import com.dru128.timetable.tools.ProgressManager
+import dru128.timetable.databinding.FragmentMapsBinding
 
 
-class MapsFragment : Fragment()
-{
+class MapsFragment : Fragment() {
     lateinit var progressManager: ProgressManager
     private val PERMISSION_CODE = 200
     private val locationManager by lazy {
@@ -69,43 +69,48 @@ class MapsFragment : Fragment()
 
     lateinit var googleMap: GoogleMap
 
+    private lateinit var binding: FragmentMapsBinding
+
     private val args: MapsFragmentArgs by navArgs()
     var route/*: Flight*/: Route? = null
-
-    lateinit var findBusButton: ImageButton
-    lateinit var myLocationButton: ImageButton
 
     private val callback = OnMapReadyCallback { google_map ->
         googleMap = google_map // ассинхронный вызов - в другом потоке
         route = Storage.routes[args.id]
-        if (route != null)
-        {
+        if (route != null) {
             Log.d("data", "(flight) is not null (SUCCESS)")
 
             (requireActivity() as MainActivity).setActionBarTitle(route?.name)
-            route?.positions?.get(0)?.let { tpCamera(geoPosToLatLng(it)) } // перемещаем камеру на первую остановку
+            route?.positions?.get(0)
+                ?.let { tpCamera(geoPosToLatLng(it)) } // перемещаем камеру на первую остановку
             dataReady()
         } else
             Log.d("data", "(flight) is null (FAIL)")
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var root = inflater.inflate(R.layout.fragment_maps, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentMapsBinding.inflate(inflater)
 
-        progressManager = ProgressManager(root.findViewById(R.id.parentMapsFragment), requireActivity())
+        progressManager = ProgressManager(binding.parentMapsFragment, requireActivity())
         progressManager.start()
 
-        findBusButton = root.findViewById(R.id.findBus_fragment_map)
-        myLocationButton = root.findViewById(R.id.myLocationBtn_fragment_map7)
-        findBusButton.setOnClickListener {
+        binding.findBusFragmentMap.setOnClickListener {
             if (busMarker == null)
-                Snackbar.make(requireView(), getString(R.string.bus_not_connected), Snackbar.LENGTH_LONG).show()
+                Snackbar.make(
+                    requireView(),
+                    getString(R.string.bus_not_connected),
+                    Snackbar.LENGTH_LONG
+                ).show()
             else
                 moveCamera(busMarker?.position)
             Log.d("findbusbtn", busMarker.toString())
         }
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,7 +131,13 @@ class MapsFragment : Fragment()
             startListeningTracker(route!!.id) // включаю вебсокет
 
         val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
-        polylineOptions.color(ResourcesCompat.getColor(requireContext().resources, R.color.polyline, null))
+        polylineOptions.color(
+            ResourcesCompat.getColor(
+                requireContext().resources,
+                R.color.polyline,
+                null
+            )
+        )
 
         route?.positions?.forEach { polylineOptions.add(geoPosToLatLng(it)) } // добавляем точки для линии
         val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
@@ -154,16 +165,16 @@ class MapsFragment : Fragment()
             true
         }
 
-        myLocationButton.setOnClickListener {
+        binding.myLocationBtnFragmentMap7.setOnClickListener {
             checkLocationPermissions()
         }
 
-        val connectivityManager = getSystemService(requireContext(), ConnectivityManager::class.java)
+        val connectivityManager =
+            getSystemService(requireContext(), ConnectivityManager::class.java)
         connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
     }
 
-    val networkCallback = object: ConnectivityManager.NetworkCallback()
-    {
+    val networkCallback = object : ConnectivityManager.NetworkCallback() {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
             startListeningTracker(route!!.id)
@@ -179,19 +190,22 @@ class MapsFragment : Fragment()
         }
     }
 
-    private fun startListeningTracker(trackerId: String)
-    {
+    private fun startListeningTracker(trackerId: String) {
         Log.d("Tracker", "startListening, id = $trackerId")
         if (isTracking) return
         isTracking = true
 
         val busMarkerIcon: BitmapDescriptor = DrawableConvertor().drawableToBitmapDescriptor(
-            ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!! // создаем и конвертируем Drawable к BitmapDescriptor
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.bus_marker,
+                null
+            )!! // создаем и конвертируем Drawable к BitmapDescriptor
         )
 
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket(trackerId).collect {
-                Log.d("Tracker", "new pos ${ it.toString() }")
+                Log.d("Tracker", "new pos ${it.toString()}")
 
                 val busPosition = geoPosToLatLng(it)
                 if (busMarker == null)
@@ -208,35 +222,50 @@ class MapsFragment : Fragment()
         }
     }
 
-    private fun stopListeningTracker()
-    {
+    private fun stopListeningTracker() {
         Log.d("Tracker", "stopListening")
         isTracking = false
         viewModel.stopWebSocket()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
-    {
-        if (requestCode == PERMISSION_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED } )
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == PERMISSION_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED })
             checkLocationPermissions()
         else
-            Snackbar.make(requireView(), getString(R.string.permission_not_granted), Snackbar.LENGTH_LONG).show()
+            Snackbar.make(
+                requireView(),
+                getString(R.string.permission_not_granted),
+                Snackbar.LENGTH_LONG
+            ).show()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    private fun checkLocationPermissions()
-    {
+    private fun checkLocationPermissions() {
 
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 ActivityCompat.requestPermissions(
-                    requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE
+                    requireActivity(),
+                    arrayOf(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ),
+                    PERMISSION_CODE
                 )
-            } else
-            {
+            } else {
                 if (!googleMap.isMyLocationEnabled) googleMap.isMyLocationEnabled = true
                 val currentLocationTask: Task<Location> = fusedLocationClient.getCurrentLocation(
                     PRIORITY_HIGH_ACCURACY,
@@ -244,17 +273,16 @@ class MapsFragment : Fragment()
                 )
 
                 currentLocationTask.addOnCompleteListener { task: Task<Location> ->
-                    if (task.isSuccessful)
-                    {
+                    if (task.isSuccessful) {
                         val location: Location = task.result
                         moveCamera(LatLng(location.latitude, location.longitude))
                     } else
                         "Location (failure): ${task.exception}"
                 }
             }
-        else
-        {
-            Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG).show()
+        else {
+            Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG)
+                .show()
         }
     }
 
@@ -288,5 +316,6 @@ class MapsFragment : Fragment()
         super.onDestroy()
     }
 
-    private fun geoPosToLatLng(geoPosition: GeoPosition): LatLng = LatLng(geoPosition.latitude, geoPosition.longitude)
+    private fun geoPosToLatLng(geoPosition: GeoPosition): LatLng =
+        LatLng(geoPosition.latitude, geoPosition.longitude)
 }
