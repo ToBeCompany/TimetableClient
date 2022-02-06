@@ -32,7 +32,6 @@
             android:textColor="@color/grey_new"
             android:textSize="16sp"
             android:textStyle="bold"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/time_busstop_item"
             app:layout_constraintStart_toEndOf="@+id/busImage_busstop_item"

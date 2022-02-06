@@ -3,7 +3,6 @@ package com.dru128.timetable.data.room.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,6 +22,3 @@ data class BusStopPoint(
     @ColumnInfo(name = "longitude")
     var longitude: Double = 0.0
 )
-{
-    fun toLatLng() = LatLng(latitude, longitude)
-}

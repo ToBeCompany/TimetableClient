@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Network
@@ -15,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -23,34 +23,43 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.navArgs
-import com.dru128.timetable.App
 import com.dru128.timetable.MainActivity
 import com.dru128.timetable.Storage
 import com.dru128.timetable.data.metadata.GeoPosition
-import dru128.timetable.R
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.tools.DrawableConvertor
-import com.dru128.timetable.worker.BusStopsBottomSheet
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.Task
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collect
 import com.dru128.timetable.tools.ProgressManager
+import com.dru128.timetable.worker.BusStopsBottomSheet
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonParser
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
+import com.mapbox.maps.plugin.animation.Cancelable
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
+import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.location
+import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMapsBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
+//https://docs.mapbox.com/android/navigation/examples/show-current-location/
 class MapsFragment : Fragment()
 {
     private lateinit var binding: FragmentMapsBinding
@@ -59,113 +68,106 @@ class MapsFragment : Fragment()
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
-    private val fusedLocationClient: FusedLocationProviderClient by lazy {
-        LocationServices.getFusedLocationProviderClient(App.globalContext)
-    }
-    private var cancellationTokenSource = CancellationTokenSource()
     private var isTracking = false
-    private var busMarker: Marker? = null
+    private var busMarker: PointAnnotation? = null
 
     private val viewModel: MapViewModel by viewModels()
 
-    lateinit var googleMap: GoogleMap
-
+    private lateinit var mapView: MapView
+    private lateinit var mapbox: MapboxMap
 
     private val args: MapsFragmentArgs by navArgs()
     var route/*: Flight*/: Route? = null
 
-    private val callback = OnMapReadyCallback { google_map ->
-        googleMap = google_map // ассинхронный вызов - в другом потоке
-        route = Storage.routes[args.id]
-        if (route != null) {
-            Log.d("data", "(flight) is not null (SUCCESS)")
+    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+        Log.d("onIndicatorPosition", it.latitude().toString() + " " + it.longitude().toString())
 
-            (requireActivity() as MainActivity).setActionBarTitle(route?.name)
-            route?.positions?.get(0)
-                ?.let { tpCamera(geoPosToLatLng(it)) } // перемещаем камеру на первую остановку
-            dataReady()
-        } else
-            Log.d("data", "(flight) is null (FAIL)")
-
+        mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
     }
 
+    @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapsBinding.inflate(inflater)
 
-        progressManager = ProgressManager(binding.parentMapsFragment, requireActivity())
+        progressManager = ProgressManager(binding.parent, requireActivity())
         progressManager.start()
 
-        binding.findBusButton.setOnClickListener {
-            if (busMarker == null)
-                Snackbar.make(requireView(), getString(R.string.bus_not_connected), Snackbar.LENGTH_LONG).show()
-            else
-                moveCamera(busMarker?.position)
-            Log.d("findbusbtn", busMarker.toString())
+        route = Storage.routes[args.id]
+        mapView = binding.map
+        mapbox = mapView.getMapboxMap()
+
+        mapbox.loadStyleUri(Style.MAPBOX_STREETS) {
+            dataReady()
+            addRouteOnMap()
+//            initLocationComponent()
+            mapView.location.updateSettings {
+                enabled = true
+                pulsingEnabled = true
+            }
         }
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val mapFragment =
-            childFragmentManager.findFragmentById(R.id.map_fragment_map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+    private fun initLocationComponent()
+    {
+        val locationComponentPlugin = mapView.location
+        locationComponentPlugin.updateSettings {
+            this.enabled = true
+            this.locationPuck = LocationPuck2D(
+                bearingImage = AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.drawable.mapbox_user_puck_icon,
+                ),
+                shadowImage = AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.drawable.mapbox_user_icon_shadow,
+                ),
+                scaleExpression = interpolate {
+                    linear()
+                    zoom()
+                    stop {
+                        literal(0.0)
+                        literal(0.6)
+                    }
+                    stop {
+                        literal(20.0)
+                        literal(1.0)
+                    }
+                }.toJson()
+            )
+        }
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
     }
 
-    @SuppressLint("MissingPermission")
+
     private fun dataReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
+        if (route == null) return
         progressManager.finish()
 
-        googleMap.uiSettings.isMyLocationButtonEnabled = false
+        (requireActivity() as MainActivity).setActionBarTitle(route!!.name)
 
+        if (route!!.positions[0] != null)
+            tpCamera(geoPosToPoint(route!!.positions[0]))
         if (!route?.id.isNullOrEmpty())
             startListeningTracker(route!!.id) // включаю вебсокет
 
-        val polylineOptions = PolylineOptions() // это будет маршрут (ломаная линия)
-        polylineOptions.color(
-            ResourcesCompat.getColor(
-                requireContext().resources,
-                R.color.polyline,
-                null
-            )
-        )
-
-        route?.positions?.forEach { polylineOptions.add(geoPosToLatLng(it)) } // добавляем точки для линии
-        val polyline = googleMap.addPolyline(polylineOptions) // добавляем линию (маршрут) на карту
-
-        val busStops = route!!.busStopsWithTime
-        for (i in busStops.indices) // добавляем маркеры на карту
-        {
-            var marker = googleMap.addMarker(
-                MarkerOptions()
-                    .position(
-                        LatLng(
-                            busStops[i].busStop?.position!!.latitude,
-                            busStops[i].busStop?.position!!.longitude
-                        )
-                    )
-                    .title(busStops[i].busStop?.name)
-            )
-                ?.setTag(i) // в тэг сохраняем индекс данных, потом по этому индексу будем находить даннные в массиве (ти-па привязки данных к маркеру)
-        }
-
-        googleMap.setOnMarkerClickListener { marker -> // при нажатии на маркер
-            if (marker.tag != null)
-                BusStopsBottomSheet(marker.tag as Int, busStops)
-                    .show(requireFragmentManager(), "BottomSheetDialog")
-            true
-        }
 
         binding.myLocationButton.setOnClickListener {
             checkLocationPermissions()
+        }
+        binding.findBusButton.setOnClickListener {
+            if (busMarker == null)
+                Snackbar.make(requireView(), getString(R.string.bus_not_connected), Snackbar.LENGTH_LONG).show()
+            else
+                moveCamera(busMarker!!.point)
         }
 
         val connectivityManager =
             getSystemService(requireContext(), ConnectivityManager::class.java)
         connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
     }
-
     val networkCallback = object : ConnectivityManager.NetworkCallback() {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
@@ -182,34 +184,91 @@ class MapsFragment : Fragment()
         }
     }
 
-    private fun startListeningTracker(trackerId: String) {
+    private fun addRouteOnMap()
+    {
+        Log.d("addRouteOnMap", "drawing route...")
+
+        val busStopIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.location_marker, null)!!)
+
+        val annotationApi = mapView.annotations
+        val polylineManager = annotationApi.createPolylineAnnotationManager()
+        val busStopManager = annotationApi.createPointAnnotationManager()
+
+// Define a list of geographic coordinates to be connected.
+        val points = mutableListOf<Point>()
+        route?.positions?.forEach { points.add(Point.fromLngLat(it.longitude, it.latitude)) } // добавляем точки для линии
+        val polylineAnnotationOptions = PolylineAnnotationOptions()
+            .withPoints(points.toList())
+            .withLineColor( ResourcesCompat.getColor(requireContext().resources, R.color.polyline, null) )
+            .withLineWidth(5.0)
+
+        val busStops = route!!.busStopsWithTime
+        for (i in busStops.indices) // добавляем маркеры на карту
+        {
+            val pointAnnotationOptions = PointAnnotationOptions()
+                .withPoint(
+                    Point.fromLngLat(
+                        busStops[i].busStop!!.position!!.longitude,
+                        busStops[i].busStop!!.position!!.latitude
+                    )
+                )
+                .withData(JsonParser.parseString(Json.encodeToString(i)))
+                .withIconImage(busStopIcon!!)
+
+            busStopManager.addClickListener(OnPointAnnotationClickListener { // listener нажатия на остановку на карте
+                val idBusStop = it.getData()?.asInt
+                if (idBusStop != null)
+                {
+                    val requestKey = requireContext().getString(R.string.itemSelected)
+                    val bottomSheet = BusStopsBottomSheet(idBusStop, busStops)
+                    bottomSheet.show(childFragmentManager, "BottomSheetDialog")
+
+                    childFragmentManager.setFragmentResultListener(requestKey, viewLifecycleOwner) { key, bundle ->
+                        // listener нажатия на остановку в Bottom sheet
+                        if (key == requestKey)
+                        {
+                            val selected = bundle.getInt(requireContext().getString(R.string.busStop_id))
+                            moveCamera(
+                                geoPosToPoint(route!!.busStopsWithTime[selected].busStop?.position!!)
+                            )
+                        }
+                    }
+                }
+
+
+                true
+            })
+
+            busStopManager.create(pointAnnotationOptions)
+        }
+        polylineManager.create(polylineAnnotationOptions)
+
+    }
+
+    private fun startListeningTracker(trackerId: String)
+    {
         Log.d("Tracker", "startListening, id = $trackerId")
         if (isTracking) return
         isTracking = true
 
-        val busMarkerIcon: BitmapDescriptor = DrawableConvertor().drawableToBitmapDescriptor(
-            ResourcesCompat.getDrawable(
-                resources,
-                R.drawable.bus_marker,
-                null
-            )!! // создаем и конвертируем Drawable к BitmapDescriptor
-        )
+        val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
+        val busMarkerManager = mapView.annotations.createPointAnnotationManager()
 
         lifecycle.coroutineScope.launchWhenStarted {
-            viewModel.startWebSocket(trackerId).collect {
-                Log.d("Tracker", "new pos ${it.toString()}")
-
-                val busPosition = geoPosToLatLng(it)
+            viewModel.startWebSocket(trackerId).collect { busPosition ->
+                Log.d("Tracker", "new pos $busPosition")
                 if (busMarker == null)
-                    busMarker = googleMap.addMarker(
-                        MarkerOptions()
-                            .position(busPosition)
-                            .title(route?.name)
-                            .icon(busMarkerIcon)
-                    )
-                else
-                    busMarker?.position = busPosition
-
+                {
+                    busMarker = busMarkerManager.create(
+                            PointAnnotationOptions()
+                                .withIconImage(busIcon)
+                                .withPoint(geoPosToPoint(busPosition))
+                        )
+                }
+                else {
+                    busMarker!!.point = geoPosToPoint(busPosition)
+                    busMarkerManager.update(busMarker!!)
+                }
             }
         }
     }
@@ -220,35 +279,18 @@ class MapsFragment : Fragment()
         viewModel.stopWebSocket()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED })
             checkLocationPermissions()
         else
-            Snackbar.make(
-                requireView(),
-                getString(R.string.permission_not_granted),
-                Snackbar.LENGTH_LONG
-            ).show()
+            Snackbar.make(requireView(), getString(R.string.permission_not_granted), Snackbar.LENGTH_LONG).show()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun checkLocationPermissions() {
 
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
                     requireActivity(),
                     arrayOf(
@@ -258,19 +300,7 @@ class MapsFragment : Fragment()
                     PERMISSION_CODE
                 )
             } else {
-                if (!googleMap.isMyLocationEnabled) googleMap.isMyLocationEnabled = true
-                val currentLocationTask: Task<Location> = fusedLocationClient.getCurrentLocation(
-                    PRIORITY_HIGH_ACCURACY,
-                    cancellationTokenSource.token
-                )
-
-                currentLocationTask.addOnCompleteListener { task: Task<Location> ->
-                    if (task.isSuccessful) {
-                        val location: Location = task.result
-                        moveCamera(LatLng(location.latitude, location.longitude))
-                    } else
-                        "Location (failure): ${task.exception}"
-                }
+                // разрешения выданы
             }
         else {
             Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG)
@@ -278,14 +308,21 @@ class MapsFragment : Fragment()
         }
     }
 
-    private fun moveCamera(point: LatLng?) {
-        if (point != null)
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 13.5f), 1500, null)
+    private fun moveCamera(point: Point?) {
+        if (point == null) return
+        val cancelable: Cancelable = mapView.camera.easeTo(
+            CameraOptions.Builder().center(point).zoom(14.0).build(),
+            MapAnimationOptions.Builder().duration(3000).build()
+        )
     }
 
-    private fun tpCamera(point: LatLng?) {
-        if (point != null)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 13.5f))
+    private fun tpCamera(point: Point?) {
+        if (point == null) return
+        val cameraPosition = CameraOptions.Builder()
+            .zoom(12.0)
+            .center(point)
+            .build()
+        mapView.getMapboxMap().setCamera(cameraPosition)
     }
 
     override fun onStop() {
@@ -304,10 +341,12 @@ class MapsFragment : Fragment()
     }
 
     override fun onDestroy() {
+//        mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         super.onDestroy()
     }
 
-    private fun geoPosToLatLng(geoPosition: GeoPosition): LatLng =
-        LatLng(geoPosition.latitude, geoPosition.longitude)
+    private fun geoPosToPoint(geoPosition: GeoPosition): Point =
+        Point.fromLngLat(geoPosition.longitude, geoPosition.latitude)
+
 }

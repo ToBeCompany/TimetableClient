@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TimeTable</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZHJ1MTI4IiwiYSI6ImNrejc5ZWQwczBoa2syeHFtOTk4M3pjNDMifQ.g9Lp7kfn1UCvotPwhER5wA</string>
 
 
     <string name="routes">маршруты</string>
@@ -46,8 +47,10 @@
     <string name="on_service">on_service</string>
     <string name="new_tracker">new_tracker</string>
     <string name="tracker_id">tracker_id</string>
+    <string name="busStop_id">busStop_id</string>
     <string name="which_tracker_id">which_tracker_id</string>
     <string name="route">route</string>
+    <string name="itemSelected">itemSelected</string>
 
     <!--  Notification  -->
     <string name="click_to_open_app">Нажмите чтобы открыть приложение</string>
