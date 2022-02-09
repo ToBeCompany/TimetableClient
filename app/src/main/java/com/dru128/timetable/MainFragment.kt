@@ -4,15 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
 import com.dru128.timetable.auth.UserPreference
 import com.dru128.timetable.data.metadata.TypeUser
-import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMainBinding
-import dru128.timetable.databinding.FragmentSignInBinding
 
 
 class MainFragment : Fragment()
@@ -61,5 +60,15 @@ class MainFragment : Fragment()
                     navController.navigate(MainFragmentDirections.actionMainFragmentToNotFoundUserFragment())
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivity).supportActionBar!!.hide()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as MainActivity).supportActionBar!!.show()
     }
 }

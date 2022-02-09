@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -37,8 +36,6 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.Cancelable
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
@@ -49,8 +46,6 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMapsBinding
@@ -79,13 +74,6 @@ class MapsFragment : Fragment()
     private val args: MapsFragmentArgs by navArgs()
     var route/*: Flight*/: Route? = null
 
-    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        Log.d("onIndicatorPosition", it.latitude().toString() + " " + it.longitude().toString())
-
-        mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
-        mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
-    }
-
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapsBinding.inflate(inflater)
@@ -100,46 +88,13 @@ class MapsFragment : Fragment()
         mapbox.loadStyleUri(Style.MAPBOX_STREETS) {
             dataReady()
             addRouteOnMap()
-//            initLocationComponent()
-            mapView.location.updateSettings {
-                enabled = true
-                pulsingEnabled = true
-            }
+        }
+        mapView.location.updateSettings {
+            enabled = true
+            pulsingEnabled = true
         }
         return binding.root
     }
-
-    private fun initLocationComponent()
-    {
-        val locationComponentPlugin = mapView.location
-        locationComponentPlugin.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                bearingImage = AppCompatResources.getDrawable(
-                    requireContext(),
-                    R.drawable.mapbox_user_puck_icon,
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    requireContext(),
-                    R.drawable.mapbox_user_icon_shadow,
-                ),
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
-        }
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-    }
-
 
     private fun dataReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
@@ -147,6 +102,7 @@ class MapsFragment : Fragment()
         progressManager.finish()
 
         (requireActivity() as MainActivity).setActionBarTitle(route!!.name)
+        checkLocationPermissions()
 
         if (route!!.positions[0] != null)
             tpCamera(geoPosToPoint(route!!.positions[0]))
@@ -194,7 +150,6 @@ class MapsFragment : Fragment()
         val polylineManager = annotationApi.createPolylineAnnotationManager()
         val busStopManager = annotationApi.createPointAnnotationManager()
 
-// Define a list of geographic coordinates to be connected.
         val points = mutableListOf<Point>()
         route?.positions?.forEach { points.add(Point.fromLngLat(it.longitude, it.latitude)) } // добавляем точки для линии
         val polylineAnnotationOptions = PolylineAnnotationOptions()
@@ -291,16 +246,10 @@ class MapsFragment : Fragment()
 
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ),
-                    PERMISSION_CODE
-                )
-            } else {
-                // разрешения выданы
+                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
+            } else
+            {// разрешения выданы
+
             }
         else {
             Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG)
@@ -341,7 +290,6 @@ class MapsFragment : Fragment()
     }
 
     override fun onDestroy() {
-//        mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         super.onDestroy()
     }
