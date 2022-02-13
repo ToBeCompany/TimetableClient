@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -74,6 +75,7 @@ class MapsFragment : Fragment()
     private val args: MapsFragmentArgs by navArgs()
     var route/*: Flight*/: Route? = null
 
+    @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapsBinding.inflate(inflater)
@@ -96,6 +98,7 @@ class MapsFragment : Fragment()
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun dataReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
         if (route == null) return
@@ -248,12 +251,13 @@ class MapsFragment : Fragment()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
             } else
-            {// разрешения выданы
-
+            { // разрешения выданы
+                var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if (location != null)
+                    moveCamera(Point.fromLngLat(location!!.longitude, location!!.latitude))
             }
         else {
-            Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG)
-                .show()
+            Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG).show()
         }
     }
 
