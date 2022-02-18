@@ -44,7 +44,7 @@ class DriverService() : Service()
 
     private var listener = LocationListener {
         val position = GeoPosition(latitude = it.latitude, longitude = it.longitude)
-        MainScope().launch {
+        MainScope().launch(Dispatchers.IO) {
             busLocation.emit(position)
         }
     }
@@ -128,7 +128,7 @@ class DriverService() : Service()
             5000, 10f,
             listener
         )
-        MainScope().launch {
+        MainScope().launch(Dispatchers.IO) {
             startWebSocket(trackerId)
         }
     }
@@ -140,7 +140,7 @@ class DriverService() : Service()
         val locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.removeUpdates(listener)
 
-        MainScope().launch {
+        MainScope().launch(Dispatchers.IO) {
             webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "driver turn off transponder "))
         }
     }

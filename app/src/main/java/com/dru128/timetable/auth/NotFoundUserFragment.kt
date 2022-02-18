@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.activity.addCallback
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import dru128.timetable.R
@@ -16,6 +18,9 @@ class NotFoundUserFragment : Fragment()
     {
         val root = inflater.inflate(R.layout.fragment_not_found_user, container, false)
 
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            ActivityCompat.finishAffinity(requireActivity())
+        }
         root.findViewById<Button>(R.id.loginOut_NotFoundUserFragment)
             .setOnClickListener {
                 val userPreference = UserPreference(requireContext())

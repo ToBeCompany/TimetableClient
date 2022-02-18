@@ -37,7 +37,6 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.animation.Cancelable
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
@@ -55,7 +54,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
-//https://docs.mapbox.com/android/navigation/examples/show-current-location/
 class MapsFragment : Fragment()
 {
     private lateinit var binding: FragmentMapsBinding
@@ -72,7 +70,7 @@ class MapsFragment : Fragment()
     private lateinit var mapView: MapView
     private lateinit var mapbox: MapboxMap
 
-    private val args: MapsFragmentArgs by navArgs()
+    private val args: MapsFragmentArgs  by navArgs()
     var route/*: Flight*/: Route? = null
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -91,10 +89,7 @@ class MapsFragment : Fragment()
             dataReady()
             addRouteOnMap()
         }
-        mapView.location.updateSettings {
-            enabled = true
-            pulsingEnabled = true
-        }
+
         return binding.root
     }
 
@@ -105,16 +100,21 @@ class MapsFragment : Fragment()
         progressManager.finish()
 
         (requireActivity() as MainActivity).setActionBarTitle(route!!.name)
-        checkLocationPermissions()
+
 
         if (route!!.positions[0] != null)
             tpCamera(geoPosToPoint(route!!.positions[0]))
         if (!route?.id.isNullOrEmpty())
             startListeningTracker(route!!.id) // включаю вебсокет
+        if (isGPSEnabled() && isGPSPermissionGranted())
+            mapView.location.updateSettings {
+                enabled = true
+                pulsingEnabled = true
+            }
 
 
         binding.myLocationButton.setOnClickListener {
-            checkLocationPermissions()
+            moveToUserLocation()
         }
         binding.findBusButton.setOnClickListener {
             if (busMarker == null)
@@ -239,31 +239,35 @@ class MapsFragment : Fragment()
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_CODE && grantResults.all { it == PackageManager.PERMISSION_GRANTED })
-            checkLocationPermissions()
+            moveToUserLocation()
         else
             Snackbar.make(requireView(), getString(R.string.permission_not_granted), Snackbar.LENGTH_LONG).show()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    private fun checkLocationPermissions() {
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    @SuppressLint("MissingPermission")
+    private fun moveToUserLocation()
+    {
+        if (isGPSEnabled())
+            if (isGPSPermissionGranted())
                 ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
-            } else
+            else
             { // разрешения выданы
-                var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                mapView.location.updateSettings {
+                    if (!enabled) enabled = true
+                    if (!pulsingEnabled) pulsingEnabled = true
+                }
+                val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 if (location != null)
-                    moveCamera(Point.fromLngLat(location!!.longitude, location!!.latitude))
+                    moveCamera(Point.fromLngLat(location.longitude, location.latitude))
             }
-        else {
+        else
             Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG).show()
-        }
     }
 
     private fun moveCamera(point: Point?) {
         if (point == null) return
-        val cancelable: Cancelable = mapView.camera.easeTo(
+        mapView.camera.easeTo(
             CameraOptions.Builder().center(point).zoom(14.0).build(),
             MapAnimationOptions.Builder().duration(3000).build()
         )
@@ -300,5 +304,13 @@ class MapsFragment : Fragment()
 
     private fun geoPosToPoint(geoPosition: GeoPosition): Point =
         Point.fromLngLat(geoPosition.longitude, geoPosition.latitude)
+
+    private fun isGPSPermissionGranted(): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+
+    private fun isGPSEnabled(): Boolean =
+        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
 }

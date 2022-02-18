@@ -5,6 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -33,8 +36,11 @@ class RouteFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
-        binding = FragmentRouteBinding.inflate(inflater)
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            ActivityCompat.finishAffinity(requireActivity())
+        }
 
+        binding = FragmentRouteBinding.inflate(inflater)
 
         progressManager = ProgressManager(binding.parent, requireActivity())
         progressManager.start()
@@ -66,5 +72,13 @@ class RouteFragment : Fragment()
             Log.d("data ready", "routes = ${routes?.size}")
         }
     }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        super.onCreate(savedInstanceState)
+    }
 
+    override fun onDestroy() {
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        super.onDestroy()
+    }
 }

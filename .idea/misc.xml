@@ -85,10 +85,11 @@
         <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable3/app/src/main/res/layout/fragment_maps.xml" value="0.23072916666666668" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable3/app/src/main/res/layout/item_map.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimeTable3/app/src/main/res/layout/item_view_marshrut.xml" value="0.23072916666666668" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/app_logo.xml" value="0.25" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_driver.xml" value="0.19166666666666668" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_maps.xml" value="0.371875" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_route.xml" value="0.371875" />
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_sign_in.xml" value="0.371875" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_sign_in.xml" value="0.25" />
       </map>
     </option>
   </component>

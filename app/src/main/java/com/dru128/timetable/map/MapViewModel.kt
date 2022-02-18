@@ -51,7 +51,7 @@ class MapViewModel(application : Application): AndroidViewModel(application)
 
     fun stopWebSocket()
     {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             Log.d("closeWebSocket", "user close map fragment")
             webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "user close map fragment"))
         }

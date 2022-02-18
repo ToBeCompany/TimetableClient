@@ -16,6 +16,9 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.activity.addCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -77,6 +80,10 @@ class DriverFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            finishAffinity(requireActivity())
+        }
+
         binding = FragmentDriverBinding.inflate(inflater)
         LocalBroadcastManager
             .getInstance(requireContext())
@@ -210,6 +217,11 @@ class DriverFragment : Fragment()
 
     override fun onDestroy() {
         super.onDestroy()
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(serviceReceiver)
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        super.onCreate(savedInstanceState)
     }
 }

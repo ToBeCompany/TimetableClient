@@ -26,19 +26,19 @@ class MainFragment : Fragment()
         return binding.root
     }
 
-    override fun onStart() {
+    override fun onStart()
+    {
+        (activity as MainActivity).supportActionBar?.hide()
         checkUserAndNavigate()
         super.onStart()
     }
 
-    private fun checkUserAndNavigate()
-    {
+    private fun checkUserAndNavigate() {
         val userPreference = UserPreference(requireContext())
 
         val navController = binding.root.findNavController()
 
-        if (userPreference.currentUser == null)
-        {
+        if (userPreference.currentUser == null) {
             navController.navigate(MainFragmentDirections.actionMainFragmentToSignInFragment())
             // отправить на экран аунтификации
         }
@@ -46,8 +46,7 @@ class MainFragment : Fragment()
         {
             lifecycle.coroutineScope.launchWhenStarted {
                 if (viewModel.getUser(userPreference.currentUser!!.id) != null)
-                    when (userPreference.currentUser!!.userType)
-                    {
+                    when (userPreference.currentUser!!.userType) {
                         TypeUser.DRIVER -> {
                             navController.navigate(MainFragmentDirections.actionMainFragmentToDriverFragment())
                         }
@@ -62,13 +61,8 @@ class MainFragment : Fragment()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        (activity as MainActivity).supportActionBar!!.hide()
-    }
-
     override fun onStop() {
         super.onStop()
-        (activity as MainActivity).supportActionBar!!.show()
+        (activity as MainActivity).supportActionBar?.show()
     }
 }
