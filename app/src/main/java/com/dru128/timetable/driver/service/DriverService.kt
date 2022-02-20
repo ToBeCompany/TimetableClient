@@ -9,6 +9,7 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -48,7 +49,11 @@ class DriverService() : Service()
             busLocation.emit(position)
         }
     }
-
+    val wakeLock: PowerManager.WakeLock  by lazy {
+        (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${getString(R.string.app_name)}::WakelockTag")
+        }
+    }
     val networkCallback = object: ConnectivityManager.NetworkCallback()
     {
         // сеть доступна для использования
@@ -73,6 +78,8 @@ class DriverService() : Service()
             .from(this)
             .notify(4,notification)
         startForeground(4, notification)
+
+        wakeLock.acquire() // запрещаю переходить в спящий режим
 
         val action: String = intent?.getStringExtra(getString(R.string.action)).toString()
         when (action)
@@ -171,5 +178,10 @@ class DriverService() : Service()
 
     override fun onBind(intent: Intent): IBinder? {
         return null
+    }
+
+    override fun onDestroy() {
+        wakeLock.release() // разрешаю переходить в спящий режим
+        super.onDestroy()
     }
 }

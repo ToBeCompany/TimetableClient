@@ -37,6 +37,7 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.localization.localizeLabels
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
@@ -49,6 +50,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManag
 import com.mapbox.maps.plugin.locationcomponent.location
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMapsBinding
+import java.util.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -86,6 +88,7 @@ class MapsFragment : Fragment()
         mapbox = mapView.getMapboxMap()
 
         mapbox.loadStyleUri(Style.MAPBOX_STREETS) {
+            it.localizeLabels(getCurrentLocale(requireContext()))
             dataReady()
             addRouteOnMap()
         }
@@ -253,13 +256,27 @@ class MapsFragment : Fragment()
                 ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
             else
             { // разрешения выданы
-                mapView.location.updateSettings {
-                    if (!enabled) enabled = true
-                    if (!pulsingEnabled) pulsingEnabled = true
+
+                mapView.location.apply {
+                    if (!enabled)  updateSettings { enabled = true }
+                    if (!pulsingEnabled) updateSettings { pulsingEnabled = true }
                 }
-                val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                if (location != null)
-                    moveCamera(Point.fromLngLat(location.longitude, location.latitude))
+
+                val gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if (gpsLocation != null)
+                {
+                    moveCamera(Point.fromLngLat(gpsLocation.longitude, gpsLocation.latitude))
+                    Log.d("user_location", "GPS: ${gpsLocation.latitude}, ${gpsLocation.longitude}")
+                }
+                else
+                {
+                    val networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                    if (networkLocation != null)
+                    {
+                        moveCamera(Point.fromLngLat(networkLocation.longitude, networkLocation.latitude))
+                        Log.d("user_location", "GPS: ${networkLocation.latitude}, ${networkLocation.longitude}")
+                    }
+                }
             }
         else
             Snackbar.make(requireView(), getString(R.string.turn_on_gps), Snackbar.LENGTH_LONG).show()
@@ -313,4 +330,11 @@ class MapsFragment : Fragment()
     private fun isGPSEnabled(): Boolean =
         locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
+    private fun getCurrentLocale(context: Context): Locale {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]
+        } else {
+            context.resources.configuration.locale
+        }
+    }
 }
