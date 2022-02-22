@@ -5,10 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B34D9BD8"
-    tools:context="com.dru128.timetable.auth.SignInFragment">
 
-    <EditText
+    tools:context="com.dru128.timetable.auth.SignInFragment">
+    <!--android:background="#B34D9BD8"-->
+<!--    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/codeText"
         android:maxLength="50"
         android:padding="10sp"
@@ -28,7 +28,45 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />-->
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/codeTextContainer"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:minHeight="80sp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:hint="@string/signing_code"
+        android:padding="10sp"
+        android:textColorHint="@color/colorPrimary"
+        app:boxStrokeColor="@color/colorPrimary"
+        app:hintTextColor="@color/colorPrimary"
+        app:boxCornerRadiusBottomEnd="24dp"
+        app:boxCornerRadiusTopEnd="24dp"
+        app:boxCornerRadiusBottomStart="24dp"
+        app:boxCornerRadiusTopStart="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/codeText"
+            android:focusedByDefault="true"
+            android:textStyle="bold"
+            android:maxLength="50"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <ImageView
         android:id="@+id/imageView6"
@@ -36,7 +74,7 @@
         android:layout_height="155dp"
         android:layout_marginTop="32dp"
         android:src="@drawable/rotor_text_logo"
-        app:layout_constraintBottom_toTopOf="@+id/codeText"
+        app:layout_constraintBottom_toTopOf="@+id/codeTextContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"

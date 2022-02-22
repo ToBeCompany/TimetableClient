@@ -30,6 +30,7 @@
             android:foregroundServiceType="location" />
 
         <activity
+            android:windowSoftInputMode="stateVisible"
             android:name="com.dru128.timetable.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"

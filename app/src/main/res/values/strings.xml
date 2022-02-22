@@ -26,7 +26,7 @@
 
 
     <!-- View -->
-    <string name="sigining_code">введите код аутентификации</string>
+    <string name="signing_code">Код аутентификации</string>
     <string name="on_tracker">Включить трекер</string>
     <string name="off_tracker">Выключить трекер</string>
     <string name="find_bus">найти автобус</string>
@@ -34,6 +34,7 @@
     <string name="tracking_route">Отслеживание по маршруту:</string>
     <string name="tracking_off">Отслеживание выключено</string>
     <string name="user_not_found">Аккаунт не найден</string>
+    <string name="logout">Выход</string>
     <string name="user_not_found_reasons">
         Возможные причины:
         \n • Аккаунт был удалён или заблокирован
