@@ -4,14 +4,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="1.3dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginTop="2dp"
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
-        app:cardCornerRadius="4sp"
-        android:layout_margin="2sp"
+        app:cardCornerRadius="6sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -50,15 +51,15 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
+<!--
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
         android:layout_marginTop="2dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@color/white_gray"
+        android:background="@color/white_grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />-->
 </LinearLayout>

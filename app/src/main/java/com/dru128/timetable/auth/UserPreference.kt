@@ -6,7 +6,7 @@ import com.dru128.timetable.data.metadata.User
 import com.dru128.timetable.data.metadata.type_user_creater
 
 
-        class UserPreference(var context: Context)
+class UserPreference(var context: Context)
 {
     private val TAG_AUTH: String = "TAG_AUTH"
     private var preference = PreferenceManager.getDefaultSharedPreferences(context)
@@ -35,7 +35,7 @@ import com.dru128.timetable.data.metadata.type_user_creater
         }
     }
 
-    private fun checkAuth(): Boolean = preference.getBoolean(TAG_AUTH, false)
+    fun checkAuth(): Boolean = preference.getBoolean(TAG_AUTH, false)
 
     private fun getDataUser(): User
     {

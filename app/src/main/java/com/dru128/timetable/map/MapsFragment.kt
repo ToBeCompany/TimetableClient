@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -307,16 +306,6 @@ class MapsFragment : Fragment()
     override fun onStart() {
         if (route != null) startListeningTracker(route!!.id)
         super.onStart()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onDestroy() {
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        super.onDestroy()
     }
 
     private fun geoPosToPoint(geoPosition: GeoPosition): Point =
