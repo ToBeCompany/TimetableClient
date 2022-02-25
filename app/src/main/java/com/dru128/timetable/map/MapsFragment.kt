@@ -21,6 +21,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.dru128.timetable.MainActivity
 import com.dru128.timetable.Storage
@@ -37,6 +38,8 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.localization.localizeLabels
+import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.TextTransform
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
@@ -46,11 +49,14 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMapsBinding
 import java.util.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -65,6 +71,7 @@ class MapsFragment : Fragment()
     }
     private var isTracking = false
     private var busMarker: PointAnnotation? = null
+    private var busStopMarkers: MutableList<PointAnnotation> = mutableListOf()
 
     private val viewModel: MapViewModel by viewModels()
 
@@ -73,7 +80,7 @@ class MapsFragment : Fragment()
 
     private val args: MapsFragmentArgs  by navArgs()
     var route/*: Flight*/: Route? = null
-
+    var cameraChangeListener: OnCameraChangeListener? = null
     @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -103,7 +110,6 @@ class MapsFragment : Fragment()
 
         (requireActivity() as MainActivity).setActionBarTitle(route!!.name)
 
-
         if (route!!.positions[0] != null)
             tpCamera(geoPosToPoint(route!!.positions[0]))
         if (!route?.id.isNullOrEmpty())
@@ -129,6 +135,7 @@ class MapsFragment : Fragment()
             getSystemService(requireContext(), ConnectivityManager::class.java)
         connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
     }
+
     val networkCallback = object : ConnectivityManager.NetworkCallback() {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
@@ -165,16 +172,22 @@ class MapsFragment : Fragment()
         val busStops = route!!.busStopsWithTime
         for (i in busStops.indices) // добавляем маркеры на карту
         {
-            val pointAnnotationOptions = PointAnnotationOptions()
-                .withPoint(
-                    Point.fromLngLat(
-                        busStops[i].busStop!!.position!!.longitude,
-                        busStops[i].busStop!!.position!!.latitude
+            busStopMarkers.add(
+                busStopManager.create(
+                    PointAnnotationOptions()
+                    .withPoint(
+                        Point.fromLngLat(
+                            busStops[i].busStop!!.position!!.longitude,
+                            busStops[i].busStop!!.position!!.latitude
+                        )
                     )
+                    .withData(JsonParser.parseString(Json.encodeToString(i)))
+                    .withIconImage(busStopIcon!!)
+                    .withTextField(busStops[i].busStop?.name.toString())
+                    .withTextAnchor(TextAnchor.BOTTOM)
                 )
-                .withData(JsonParser.parseString(Json.encodeToString(i)))
-                .withIconImage(busStopIcon!!)
-
+            )
+//            busStopMarkers.add(pointAnnotationOptions)
             busStopManager.addClickListener(OnPointAnnotationClickListener { // listener нажатия на остановку на карте
                 val idBusStop = it.getData()?.asInt
                 if (idBusStop != null)
@@ -194,13 +207,33 @@ class MapsFragment : Fragment()
                         }
                     }
                 }
-
-
                 true
             })
 
-            busStopManager.create(pointAnnotationOptions)
+//            busStopManager.create(pointAnnotationOptions)
         }
+        val isZoomChange = MutableStateFlow(false)
+        lifecycleScope.launchWhenStarted {
+            isZoomChange.collectLatest {
+                if (it)
+                {
+                    for (i in 0 until busStopMarkers.size)
+                        busStopMarkers[i].textField = busStops[i].busStop?.name.toString()
+                }
+                else
+                {
+                    for (i in 0 until busStopMarkers.size)
+                        busStopMarkers[i].textField = ""
+                }
+                busStopManager.update(busStopMarkers)
+
+            }
+        }
+        cameraChangeListener = OnCameraChangeListener { cameraChanged ->
+            isZoomChange.value = mapbox.cameraState.zoom > 13.0
+        }
+        mapbox.addOnCameraChangeListener(cameraChangeListener!!)
+
         polylineManager.create(polylineAnnotationOptions)
 
     }
@@ -306,6 +339,11 @@ class MapsFragment : Fragment()
     override fun onStart() {
         if (route != null) startListeningTracker(route!!.id)
         super.onStart()
+    }
+
+    override fun onDestroy() {
+        mapbox.removeOnCameraChangeListener(cameraChangeListener!!)
+        super.onDestroy()
     }
 
     private fun geoPosToPoint(geoPosition: GeoPosition): Point =

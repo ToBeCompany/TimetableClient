@@ -2,20 +2,18 @@ package com.dru128.timetable
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.dru128.timetable.auth.SignInFragmentDirections
 import com.dru128.timetable.auth.UserPreference
 import com.dru128.timetable.data.metadata.TypeUser
+import com.dru128.timetable.tools.ProgressManager
 import dru128.timetable.R
 import dru128.timetable.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
@@ -24,6 +22,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity()
 {
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var progressManager: ProgressManager
 
     private lateinit var binding: ActivityMainBinding
     private val navController: NavController by lazy {
@@ -36,6 +35,9 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        progressManager = ProgressManager(binding.parent, this@MainActivity)
+        progressManager.start()
 
         checkUserAndNavigate()
     }
@@ -54,9 +56,10 @@ class MainActivity : AppCompatActivity()
             }
             else
             {
-
+                supportActionBar?.hide()
                 if (viewModel.getUser(user.id) != null)
                 {
+                    supportActionBar?.show()
                     when (user.userType) {
                         TypeUser.DRIVER -> {
                             navController.graph = inflater.inflate(R.navigation.nav_driver)
@@ -72,6 +75,7 @@ class MainActivity : AppCompatActivity()
                     navController.navigate(SignInFragmentDirections.actionSignInFragmentToNotFoundUserFragment())
                 }
             }
+            progressManager.finish()
             NavigationUI.setupActionBarWithNavController(this@MainActivity, navController)
         }
     }
@@ -101,7 +105,6 @@ class MainActivity : AppCompatActivity()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
-//                android.R.id.home -> onBackPressed() // эмуляция кнопки назад
         }
         return super.onOptionsItemSelected(item)
     }
