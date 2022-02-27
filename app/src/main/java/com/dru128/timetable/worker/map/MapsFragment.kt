@@ -1,4 +1,4 @@
-package com.dru128.timetable.map
+package com.dru128.timetable.worker.map
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -39,7 +41,6 @@ import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.localization.localizeLabels
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
-import com.mapbox.maps.extension.style.layers.properties.generated.TextTransform
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
@@ -70,6 +71,10 @@ class MapsFragment : Fragment()
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
     private var isTracking = false
+    private val busMarkerManager by lazy {
+        mapView.annotations.createPointAnnotationManager()
+    }
+
     private var busMarker: PointAnnotation? = null
     private var busStopMarkers: MutableList<PointAnnotation> = mutableListOf()
 
@@ -102,7 +107,6 @@ class MapsFragment : Fragment()
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun dataReady() // это вызывается когда данные карт получены и можно работать (аналог onCreate)
     {
         if (route == null) return
@@ -131,12 +135,18 @@ class MapsFragment : Fragment()
                 moveCamera(busMarker!!.point)
         }
 
-        val connectivityManager =
-            getSystemService(requireContext(), ConnectivityManager::class.java)
-        connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+        val connectivityManager = getSystemService(requireContext(), ConnectivityManager::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+        } else {
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
+            connectivityManager!!.registerNetworkCallback(request, networkCallback)
+        }
     }
 
-    val networkCallback = object : ConnectivityManager.NetworkCallback() {
+    private val networkCallback = object : ConnectivityManager.NetworkCallback()
+    {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
             startListeningTracker(route!!.id)
@@ -187,7 +197,6 @@ class MapsFragment : Fragment()
                     .withTextAnchor(TextAnchor.BOTTOM)
                 )
             )
-//            busStopMarkers.add(pointAnnotationOptions)
             busStopManager.addClickListener(OnPointAnnotationClickListener { // listener нажатия на остановку на карте
                 val idBusStop = it.getData()?.asInt
                 if (idBusStop != null)
@@ -209,8 +218,6 @@ class MapsFragment : Fragment()
                 }
                 true
             })
-
-//            busStopManager.create(pointAnnotationOptions)
         }
         val isZoomChange = MutableStateFlow(false)
         lifecycleScope.launchWhenStarted {
@@ -233,9 +240,7 @@ class MapsFragment : Fragment()
             isZoomChange.value = mapbox.cameraState.zoom > 13.0
         }
         mapbox.addOnCameraChangeListener(cameraChangeListener!!)
-
         polylineManager.create(polylineAnnotationOptions)
-
     }
 
     private fun startListeningTracker(trackerId: String)
@@ -245,20 +250,21 @@ class MapsFragment : Fragment()
         isTracking = true
 
         val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
-        val busMarkerManager = mapView.annotations.createPointAnnotationManager()
 
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket(trackerId).collect { busPosition ->
                 Log.d("Tracker", "new pos $busPosition")
                 if (busMarker == null)
                 {
+                    Log.d("Tracker", "bus marker is null")
                     busMarker = busMarkerManager.create(
                             PointAnnotationOptions()
                                 .withIconImage(busIcon)
                                 .withPoint(geoPosToPoint(busPosition))
                         )
                 }
-                else {
+                else
+                {
                     busMarker!!.point = geoPosToPoint(busPosition)
                     busMarkerManager.update(busMarker!!)
                 }

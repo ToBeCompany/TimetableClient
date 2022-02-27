@@ -1,4 +1,4 @@
-package com.dru128.timetable.map
+package com.dru128.timetable.worker.map
 
 import android.view.LayoutInflater
 import android.view.View

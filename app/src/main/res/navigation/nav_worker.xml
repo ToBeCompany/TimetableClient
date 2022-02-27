@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.dru128.timetable.map.MapsFragment"
+        android:name="com.dru128.timetable.worker.map.MapsFragment"
         tools:layout="@layout/fragment_maps">
         <argument
             android:name="id"

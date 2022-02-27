@@ -8,6 +8,9 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
@@ -49,12 +52,12 @@ class DriverService() : Service()
             busLocation.emit(position)
         }
     }
-    val wakeLock: PowerManager.WakeLock  by lazy {
+    private val wakeLock: PowerManager.WakeLock  by lazy {
         (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
             newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${getString(R.string.app_name)}::WakelockTag")
         }
     }
-    val networkCallback = object: ConnectivityManager.NetworkCallback()
+    private val networkCallback = object: ConnectivityManager.NetworkCallback()
     {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
@@ -120,8 +123,13 @@ class DriverService() : Service()
 
 
         val connectivityManager = ContextCompat.getSystemService(applicationContext, ConnectivityManager::class.java)
-        connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+        } else {
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
+            connectivityManager!!.registerNetworkCallback(request, networkCallback)
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 

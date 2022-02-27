@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.data.metadata.BusStopWithTime
-import com.dru128.timetable.map.BusStopsRecycleAdapter
+import com.dru128.timetable.worker.map.BusStopsRecycleAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dru128.timetable.R
 
