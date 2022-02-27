@@ -12,6 +12,9 @@
 
     <uses-feature android:name="android.hardware.screen.portrait"/>
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+
     <application
         android:name="com.dru128.timetable.App"
         android:allowBackup="true"

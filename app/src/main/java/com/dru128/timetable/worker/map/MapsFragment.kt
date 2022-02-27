@@ -67,6 +67,9 @@ class MapsFragment : Fragment()
     private lateinit var binding: FragmentMapsBinding
     private lateinit var progressManager: ProgressManager
     private val PERMISSION_CODE = 200
+    val connectivityManager by lazy {
+        getSystemService(requireContext(), ConnectivityManager::class.java)
+    }
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
@@ -135,7 +138,6 @@ class MapsFragment : Fragment()
                 moveCamera(busMarker!!.point)
         }
 
-        val connectivityManager = getSystemService(requireContext(), ConnectivityManager::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
         } else {
@@ -348,6 +350,8 @@ class MapsFragment : Fragment()
     }
 
     override fun onDestroy() {
+
+        connectivityManager?.unregisterNetworkCallback(networkCallback)
         mapbox.removeOnCameraChangeListener(cameraChangeListener!!)
         super.onDestroy()
     }

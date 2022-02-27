@@ -1,4 +1,4 @@
-package com.dru128.timetable.data.room
+package com.dru128.timetable.data
 
 import com.dru128.timetable.data.metadata.Route
 
