@@ -102,6 +102,7 @@
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/circle_light_grey.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/circle_white.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/close.xml" value="0.1835" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/corner_bottom_sheet.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/frame.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/gps_hollow.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.3005" />
@@ -112,12 +113,17 @@
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/rounded_edittext.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/drawable/stop_circle.xml" value="0.1835" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/activity_main.xml" value="0.3009833262077811" />
-        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/busstop_item.xml" value="0.14" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/bottom_sheet_fragment.xml" value="0.3009833262077811" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/busstop_item.xml" value="0.33" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_driver.xml" value="0.19166666666666668" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_maps.xml" value="0.371875" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_not_found_user.xml" value="0.3009833262077811" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_route.xml" value="0.371875" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/fragment_sign_in.xml" value="0.25" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/item_map.xml" value="0.3009833262077811" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/item_view_marshrut.xml" value="0.3009833262077811" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/route_item.xml" value="0.3009833262077811" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/layout/route_spinner_dropdown_item.xml" value="0.3009833262077811" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/menu/options_menu.xml" value="0.3009833262077811" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3005" />
         <entry key="..\:/Users/User/AndroidStudioProjects/TimetableClient/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3005" />

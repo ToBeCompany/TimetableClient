@@ -31,7 +31,6 @@ import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.tools.ProgressManager
-import com.dru128.timetable.worker.BusStopsBottomSheet
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonParser
 import com.mapbox.geojson.Point
