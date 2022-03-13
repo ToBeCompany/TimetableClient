@@ -5,6 +5,11 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.dru128.timetable.driver.service.NotificationDriver
 import leakcanary.AppWatcher
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
+import org.koin.dsl.module
 
 
 class App: Application() // переопределяем класс приложения
@@ -17,6 +22,14 @@ class App: Application() // переопределяем класс прилож
         NotificationDriver.createNotificationChannel(this)
 
         globalContext = applicationContext
+
+        startKoin {
+            androidLogger(Level.DEBUG)
+            androidContext(this@App)
+            modules(
+                listOf(applicationModules)
+            )
+        }
 
     }
 

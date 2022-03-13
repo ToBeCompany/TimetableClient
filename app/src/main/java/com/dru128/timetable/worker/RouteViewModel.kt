@@ -12,7 +12,7 @@ import io.ktor.client.request.get
 
 class RouteViewModel: ViewModel()
 {
-    private var dataManager = JsonDataManager(App.globalContext)//RoomDataManager(application as App)
+    private var dataManager = JsonDataManager()
 
     suspend fun getRoutes(): Array<Route>?
     {

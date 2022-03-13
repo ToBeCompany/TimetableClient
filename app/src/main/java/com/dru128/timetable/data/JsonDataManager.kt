@@ -6,10 +6,14 @@ import com.dru128.timetable.data.metadata.Route
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 
-class JsonDataManager(var context: Context): DataManager
+class JsonDataManager: KoinComponent, DataManager
 {
+
+    private val context: Context by inject()
     private val TAG_ROUTES: String = "TAG_ROUTES"
     private var preference = PreferenceManager.getDefaultSharedPreferences(context)
 
