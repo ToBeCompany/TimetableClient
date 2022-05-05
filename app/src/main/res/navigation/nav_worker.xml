@@ -22,8 +22,8 @@
 
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.dru128.timetable.worker.map.MapsFragment"
-        tools:layout="@layout/fragment_maps">
+        android:name="com.dru128.timetable.worker.map.MapWorkerFragment"
+        tools:layout="@layout/fragment_map_worker">
         <argument
             android:name="id"
             app:argType="integer"/>

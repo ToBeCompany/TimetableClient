@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class User( // пользователь
     @SerialName("User_type") var userType: TypeUser = TypeUser.WORKER,
-    var name: String = "",
+    var name: String? = "",
     var id: String = ""
 )
 

@@ -29,4 +29,17 @@
     <color name="progress_shadow">#B3323232</color>
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">@color/blue_text</color>
+<!--    <string-array name="buses_colors">
+        <item>#D50000</item>
+        <item>#304FFE</item>
+        <item>#00C853</item>
+        <item>#AEEA00</item>
+        <item>#6200EA</item>
+        <item>#00BFA5</item>
+        <item>#AA00FF</item>
+        <item>#FF6D00</item>
+        <item>#DD2C00</item>
+        <item>#0091EA</item>
+    </string-array>-->
+
 </resources>

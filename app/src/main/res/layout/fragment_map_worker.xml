@@ -6,11 +6,11 @@
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dru128.timetable.worker.map.MapsFragment"
+    tools:context="com.dru128.timetable.worker.map.MapWorkerFragment"
     android:id="@+id/parent">
 
     <com.mapbox.maps.MapView
-        android:id="@+id/map"
+        android:id="@+id/worker_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

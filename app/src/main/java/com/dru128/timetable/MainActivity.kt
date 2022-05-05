@@ -1,6 +1,7 @@
 package com.dru128.timetable
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity()
 
         lifecycleScope.launch {
             if (user == null) {
+                this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 navController.graph = inflater.inflate(R.navigation.nav_auth)
                 // отправить на экран аунтификации
             }
@@ -62,12 +64,17 @@ class MainActivity : AppCompatActivity()
                     supportActionBar?.show()
                     when (user.userType) {
                         TypeUser.DRIVER -> {
+                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             navController.graph = inflater.inflate(R.navigation.nav_driver)
                         }
                         TypeUser.WORKER -> {
+                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                             navController.graph = inflater.inflate(R.navigation.nav_worker)
                         }
-                        TypeUser.ADMIN -> {}
+                        TypeUser.ADMIN -> {
+                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                            navController.graph = inflater.inflate(R.navigation.nav_admin)
+                        }
                     }
                 } else
                 {

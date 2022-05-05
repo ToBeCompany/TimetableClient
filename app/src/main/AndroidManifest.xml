@@ -26,12 +26,12 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
-
+        <!--android:screenOrientation="portrait"-->
         <activity
             android:windowSoftInputMode="stateVisible"
             android:name="com.dru128.timetable.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
+
             android:theme="@style/Theme.TimeTable.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

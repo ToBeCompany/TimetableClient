@@ -27,4 +27,13 @@ object EndPoint
 
     // получить данные пользователя по ID
     const val auth = "/sign/"
+
+    // удалить пользователя по ID
+    const val deleteUser = "/deleteUser/"
+
+    // добавить (создать) пользователя
+    const val createUser = "/createUser"
+
+    // добавить (создать) пользователя
+    const val getBuses = "/getBuses"
 }

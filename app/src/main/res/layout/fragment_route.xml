@@ -10,7 +10,7 @@
     tools:context="com.dru128.timetable.worker.RouteFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recucler_View_Mainfrag"
+        android:id="@+id/recycler_View_Mainfrag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

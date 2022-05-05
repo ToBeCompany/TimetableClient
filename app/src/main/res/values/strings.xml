@@ -41,6 +41,10 @@
         \n • Нет соединения с интернетом
         \n • Возникли проблемы на сервере</string>
     <string name="login_out">Очистить данные</string>
+    <string name="delete">Удалить</string>
+    <string name="id">Идентификатор</string>
+    <string name="add">Добавить</string>
+
 
     <!--  intent  -->
     <string name="action">action</string>
@@ -55,6 +59,4 @@
 
     <!--  Notification  -->
     <string name="click_to_open_app">Нажмите чтобы открыть приложение</string>
-
-
 </resources>
