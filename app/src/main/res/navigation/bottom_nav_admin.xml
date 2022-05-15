@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_nav_admin"
+    app:startDestination="@id/mapAdminFragment">
+
+    <fragment
+        android:id="@+id/mapAdminFragment"
+        android:name="com.dru128.timetable.admin.MapAdminFragment"
+        android:label="fragment_map_admin"
+        tools:layout="@layout/fragment_map_admin" />
+    <fragment
+        android:id="@+id/editUsersFragment"
+        android:name="com.dru128.timetable.admin.EditUsersFragment"
+        android:label="fragment_edit_users"
+        tools:layout="@layout/fragment_edit_users" />
+</navigation>

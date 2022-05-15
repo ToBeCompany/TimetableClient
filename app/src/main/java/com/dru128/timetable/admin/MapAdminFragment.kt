@@ -17,6 +17,7 @@ import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import dru128.timetable.databinding.FragmentMapAdminBinding
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -37,10 +38,10 @@ class MapAdminFragment : MapFragment()
         super.onCreateView(inflater, container, savedInstanceState)
 
         lifecycleScope.launch {
-            viewModel.getBuses()
             drawBuses()
-
+            viewModel.getBuses()
         }
+
         return binding.root
     }
 
@@ -50,35 +51,40 @@ class MapAdminFragment : MapFragment()
 
     }
 
-    fun drawBuses()
+    private fun drawBuses()
     {
-        Log.d("fun start", "drawBuses")
-
-        val buses = viewModel.buses
         val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, dru128.timetable.R.drawable.bus_marker, null)!!)!!
 
-        for ((name, position) in buses)
-        {
-            Log.d("Server", position.toString())
+        lifecycleScope.launch {
+            viewModel.buses.collect { busesPos ->
+                Log.d("UPDATE_BUS_POS", busesPos.values.toString())
 
-//            if (viewModel.busMarkers.containsKey(name))
-//            {
-//                busMarkerManager.update(viewModel.busMarkers[name]!!)
-//
-//            }
-//            else {
-                var busMarker = busMarkerManager.create(
-                    PointAnnotationOptions()
-                        .withIconImage(busIcon)
-                        .withPoint(geoPosToPoint(position))
-                )
-            busMarkerManager.update(busMarker)
-            viewModel.busMarkers.put(
-                    name,
-                    busMarker
-                )
-//            }
+                for ((name, position) in busesPos)
+                {
+
+                    if (viewModel.busMarkers.containsKey(name))
+                    {
+                        viewModel.busMarkers[name]?.point = geoPosToPoint(position)
+                        busMarkerManager.update(viewModel.busMarkers[name]!!)
+
+                    }
+                    else
+                    {
+                        val busMarker = busMarkerManager.create(
+                            PointAnnotationOptions()
+                                .withIconImage(busIcon)
+                                .withPoint(geoPosToPoint(position))
+                        )
+                        busMarkerManager.update(busMarker)
+                        viewModel.busMarkers[name] = busMarker
+                    }
+                }
+            }
         }
+
+
+
+
     }
 
     fun drawRoute(route: Route){}

@@ -3,7 +3,6 @@ package com.dru128.timetable.data
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.dru128.timetable.data.metadata.Route
-import com.dru128.timetable.data.room.DataManager
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

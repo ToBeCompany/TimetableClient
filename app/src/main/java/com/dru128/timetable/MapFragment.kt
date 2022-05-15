@@ -79,7 +79,7 @@ abstract class MapFragment: Fragment()
                 if (gpsLocation != null)
                 {
                     moveCamera(Point.fromLngLat(gpsLocation.longitude, gpsLocation.latitude))
-                    Log.d("user_location", "GPS: ${gpsLocation?.latitude}, ${gpsLocation?.longitude}")
+                    Log.d("user_location", "GPS: ${gpsLocation.latitude}, ${gpsLocation.longitude}")
                 }
                 else
                 {
