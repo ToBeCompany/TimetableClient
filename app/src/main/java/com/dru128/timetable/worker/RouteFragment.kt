@@ -39,7 +39,7 @@ class RouteFragment : Fragment()
         progressManager = ProgressManager(binding.parent, requireActivity())
         progressManager.start()
 
-        recyclerView = binding.recyclerViewMainfrag
+        recyclerView = binding.routesRecyclerView
 
         recyclerView?.adapter = adapter
         recyclerView?.layoutManager = LinearLayoutManager(context)

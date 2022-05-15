@@ -8,65 +8,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dru128.timetable.admin.EditUsersFragment">
+    android:background="@color/light_gray"
+    tools:context="com.dru128.timetable.admin.edituser.EditUsersFragment">
 
-    <LinearLayout
-        android:id="@+id/createUserLayout"
-        android:layout_width="0sp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/user_recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/user_item"/>
+<!--    <LinearLayout-->
+<!--        android:id="@+id/createUserLayout"-->
+<!--        android:layout_width="0sp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent">-->
 
-<!--        android:foreground="@drawable/frame"-->
+<!--&lt;!&ndash;        android:foreground="@drawable/frame"&ndash;&gt;-->
 
-        <Spinner
-            android:id="@+id/typeNewUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8sp"
-            android:minHeight="50sp"
-            android:foreground="@drawable/frame"
-            android:spinnerMode="dropdown"/>
+<!--        <Spinner-->
+<!--            android:id="@+id/typeNewUser"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="8sp"-->
+<!--            android:minHeight="50sp"-->
+<!--            android:foreground="@drawable/frame"-->
+<!--            android:spinnerMode="dropdown"/>-->
 
-        <EditText
-            android:id="@+id/idNewUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8sp"
-            android:hint="@string/id" />
+<!--        <EditText-->
+<!--            android:id="@+id/idNewUser"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="8sp"-->
+<!--            android:hint="@string/id" />-->
 
-        <Button
-            android:id="@+id/createUserButton"
-            android:layout_width="match_parent"
-            android:layout_height="72sp"
-            android:layout_margin="12sp"
-            android:text="@string/add" />
-    </LinearLayout>
+<!--        <Button-->
+<!--            android:id="@+id/createUserButton"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="72sp"-->
+<!--            android:layout_margin="12sp"-->
+<!--            android:text="@string/add" />-->
+<!--    </LinearLayout>-->
 
-    <LinearLayout
-        android:layout_width="0sp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createUserLayout">
+<!--    <LinearLayout-->
+<!--        android:layout_width="0sp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:orientation="vertical"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/createUserLayout">-->
 
-        <EditText
-            android:id="@+id/DeleteIdText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8sp"
-            android:hint="@string/id" />
+<!--        <EditText-->
+<!--            android:id="@+id/DeleteIdText"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="8sp"-->
+<!--            android:hint="@string/id" />-->
 
-        <Button
-            android:id="@+id/deleteUserButton"
-            android:layout_width="match_parent"
-            android:layout_height="72sp"
-            android:layout_margin="12sp"
-            android:text="@string/delete" />
-    </LinearLayout>
+<!--        <Button-->
+<!--            android:id="@+id/deleteUserButton"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="72sp"-->
+<!--            android:layout_margin="12sp"-->
+<!--            android:text="@string/delete" />-->
+<!--    </LinearLayout>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

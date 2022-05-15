@@ -44,6 +44,8 @@
     <string name="delete">Удалить</string>
     <string name="id">Идентификатор</string>
     <string name="add">Добавить</string>
+    <string name="dispatcher">Диспетчер</string>
+    <string name="admin">Админ</string>
 
 
     <!--  intent  -->

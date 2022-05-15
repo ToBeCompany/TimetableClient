@@ -1,4 +1,4 @@
-package com.dru128.timetable.admin
+package com.dru128.timetable.admin.edituser
 
 import android.app.Application
 import android.util.Log
@@ -25,13 +25,13 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
             null
         }
 
-    suspend fun deleteUser(id: String): String? =
+    suspend fun deleteUser(id: String): Boolean =
         try {
             Log.d("Server", "SUCCESS")
             Storage.client.get(EndPoint.deleteUser + id)
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
-            null
+            false
         }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -23,8 +24,7 @@ class AdminMainFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentAdminMainBinding.inflate(inflater)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+//        var navController = binding.navHostAdmin.findFragment<NavHostFragment>().navController
         val navController = (childFragmentManager.findFragmentById(R.id.nav_host_admin) as NavHostFragment).navController
 
 

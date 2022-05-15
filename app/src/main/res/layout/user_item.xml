@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginTop="2dp"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="6sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/parent_route_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/user_id"
+                android:minHeight="48sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8sp"
+                android:layout_marginEnd="8dp"
+                android:padding="4sp"
+                android:textColor="@color/dark_gray"
+                android:textSize="20sp"
+                tools:text="dgs7sdgs876gsd5" />
+
+            <TextView
+                android:id="@+id/user_role"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8sp"
+                android:minHeight="48sp"
+                android:padding="4sp"
+                android:textColor="@color/dark_gray"
+                android:textSize="20sp"
+                tools:text="Работник" />
+
+            <ImageView
+                android:id="@+id/user_delete"
+                android:layout_width="48sp"
+                android:layout_height="48sp"
+                android:layout_margin="8sp"
+                android:layout_marginStart="16dp"
+                android:padding="4sp"
+                android:src="@drawable/delete"
+                tools:text="Работник" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

@@ -31,7 +31,7 @@ class MapAdminViewModel(application : Application): AndroidViewModel(application
 
     suspend fun getBuses()
     {
-        while (true)
+/*        while (true)
         {
             buses.value = mapOf<String, GeoPosition>(
                 "bus 1" to GeoPosition((0..70).random().toDouble(), (0..70).random().toDouble()),
@@ -48,7 +48,7 @@ class MapAdminViewModel(application : Application): AndroidViewModel(application
                 "bus 12" to GeoPosition((0..70).random().toDouble(), (0..70).random().toDouble())
             )
             delay(1000)
-        }
+        }*/
     }
 
 

@@ -4,11 +4,11 @@
 
     <item
         android:id="@+id/mapAdminFragment"
-        android:title="map"
-        android:icon="@drawable/bus_icon_blue"/>
+        android:title="@string/dispatcher"
+        android:icon="@drawable/bus_icon_white"/>
     <item
         android:id="@+id/editUsersFragment"
-        android:title="edit users"
-        android:icon="@drawable/bus_icon_blue"/>
+        android:title="@string/admin"
+        android:icon="@drawable/supervised_user"/>
 
 </menu>
