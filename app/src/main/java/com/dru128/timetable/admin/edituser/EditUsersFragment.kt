@@ -5,20 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
-import com.dru128.timetable.data.metadata.type_user_creater
-import com.dru128.timetable.worker.RouteFragmentDirections
-import com.dru128.timetable.worker.RouteRecyclerAdapter
+import com.google.android.material.snackbar.Snackbar
+import dru128.timetable.R
 import dru128.timetable.databinding.FragmentEditUsersBinding
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -27,82 +25,67 @@ class EditUsersFragment : Fragment()
     private lateinit var binding: FragmentEditUsersBinding
     private val viewModel: EditUsersViewModel by viewModels()
 
-    val typeUserConvertor = mapOf<String, TypeUser>(
-        "Работник" to TypeUser.WORKER,
-        "Водитель" to TypeUser.DRIVER,
-        "Администратор" to TypeUser.ADMIN
-    )
 
-    private var adapter = UserRecyclerAdapter(
-        { id -> deleteUser(id) },
-        mutableListOf()
-    )
+
+    private var adapter: UserRecyclerAdapter? = null
     private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentEditUsersBinding.inflate(inflater)
 
+        binding.addUserButton.setOnClickListener {
+            AddUserDialog().show(childFragmentManager, AddUserDialog.TAG)
+        }
         initRecyclerView()
 
-//        initSpinner()
-//
-//        binding.createUserButton.setOnClickListener {
-//            lifecycleScope.launch{
-//                viewModel.createUser(
-//                    User(
-//                        userType = type_user_creater(binding.typeNewUser.selectedItem.toString()),
-//                        id = binding.idNewUser.text.toString()
-//                    )
-//                )
-//            }
-//        }
-//
-//        binding.deleteUserButton.setOnClickListener {
-//            lifecycleScope.launch{
-//                viewModel.deleteUser(binding.DeleteIdText.toString())
-//            }
-//        }
         return binding.root
     }
 
     private fun initRecyclerView()
     {
         lifecycleScope.launch {
+            adapter = UserRecyclerAdapter( { user -> deleteUser(user) }, viewModel.getUsers())
             recyclerView = binding.userRecyclerView
             recyclerView?.adapter = adapter
-            for (i in 0..9)
-                adapter.dataSet.add(User(TypeUser.WORKER, null, i.toString()))
-
             recyclerView?.layoutManager = LinearLayoutManager(context)
+            var a = arrayOf<User>()
+            for (i in 0..20) a += User(TypeUser.WORKER, null, i.toString())
+            viewModel.userList.value = a
+            adapter?.dataSet = a
+            adapter?.notifyDataSetChanged()
+            viewModel.userList.collect { newData ->
+                adapter?.dataSet = newData
+//                adapter?.notifyDataSetChanged()
+                Log.d("userList", "UDDATE22")
+
+            }
         }
     }
 
-//    private fun initSpinner()
-//    {
-//        var userTypes = arrayOf<String>()
-//        for ((key, value) in typeUserConvertor) userTypes += key
-//
-//        val adapter = ArrayAdapter(
-//            requireContext(),
-//            android.R.layout.simple_spinner_item,
-//            userTypes
-//        )
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//        binding.typeNewUser.adapter = adapter
-//
-//    }
-
-    fun deleteUser(id: String)
+    fun deleteUser(user: User)
     {
-        Log.d("request", "delete user by id = $id")
+        Log.d("request", "delete user by id = ${user.id}")
+
         lifecycleScope.launch {
-            var isSuccess = viewModel.deleteUser(id)
-            if (isSuccess)
+            val status = viewModel.deleteUser(user.id)
+            Log.d("status", "= $status")
+            if (status)
             {
-                adapter.dataSet.removeAt(position) // удалить пользователя из списка данных (dataset)
-                adapter.notifyDataSetChanged()
+                val users = viewModel.userList.value
+                val position = users.indexOf(user)
+
+                users
+                    .filter { it.id != user.id }
+                    .let { viewModel.userList.value = it.toTypedArray() }
+
+                adapter?.apply {
+                    notifyItemRemoved(position)
+                    notifyItemRangeChanged(position,  users.size)
+                }
             }
+            else
+                Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_delete_user), Snackbar.LENGTH_LONG).show()
         }
     }
 }

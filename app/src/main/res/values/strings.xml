@@ -23,6 +23,8 @@
     <string name="tracker_shutdown">Трекер выключен</string>
     <string name="bus_not_connected">Маршрут не отслеживается</string>
     <string name="choose_route">Выберите маршрут</string>
+    <string name="id_is_coped">ID скопирован в буфер обмена</string>
+    <string name="error_delete_user">Ошибка! Не удалось удалить пользователя</string>
 
 
     <!-- View -->
@@ -46,6 +48,9 @@
     <string name="add">Добавить</string>
     <string name="dispatcher">Диспетчер</string>
     <string name="admin">Админ</string>
+    <string name="worker">Работник</string>
+    <string name="driver">Водитель</string>
+    <string name="error">Ошибка</string>
 
 
     <!--  intent  -->

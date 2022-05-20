@@ -35,5 +35,8 @@ object EndPoint
     const val createUser = "/createUser"
 
     // добавить (создать) пользователя
+    const val allUsers = "/allUsers"
+
+    // добавить (создать) пользователя
     const val getBuses = "/getBuses"
 }

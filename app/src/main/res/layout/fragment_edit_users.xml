@@ -20,63 +20,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/user_item"/>
-<!--    <LinearLayout-->
-<!--        android:id="@+id/createUserLayout"-->
-<!--        android:layout_width="0sp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="vertical"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
 
-<!--&lt;!&ndash;        android:foreground="@drawable/frame"&ndash;&gt;-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_user_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/plus"/>
 
-<!--        <Spinner-->
-<!--            android:id="@+id/typeNewUser"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8sp"-->
-<!--            android:minHeight="50sp"-->
-<!--            android:foreground="@drawable/frame"-->
-<!--            android:spinnerMode="dropdown"/>-->
-
-<!--        <EditText-->
-<!--            android:id="@+id/idNewUser"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8sp"-->
-<!--            android:hint="@string/id" />-->
-
-<!--        <Button-->
-<!--            android:id="@+id/createUserButton"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="72sp"-->
-<!--            android:layout_margin="12sp"-->
-<!--            android:text="@string/add" />-->
-<!--    </LinearLayout>-->
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="0sp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:orientation="vertical"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/createUserLayout">-->
-
-<!--        <EditText-->
-<!--            android:id="@+id/DeleteIdText"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8sp"-->
-<!--            android:hint="@string/id" />-->
-
-<!--        <Button-->
-<!--            android:id="@+id/deleteUserButton"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="72sp"-->
-<!--            android:layout_margin="12sp"-->
-<!--            android:text="@string/delete" />-->
-<!--    </LinearLayout>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
