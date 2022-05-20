@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginLeft="3dp"
     android:layout_marginRight="3dp"
@@ -12,12 +12,12 @@
 
     <androidx.cardview.widget.CardView
         app:cardCornerRadius="6sp"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <GridLayout
             android:id="@+id/parent_route_item"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center"
@@ -26,38 +26,36 @@
 
             <TextView
                 android:id="@+id/user_id"
-                android:layout_height="wrap_content"
-                android:layout_width="0sp"
-                android:layout_margin="8sp"
+                android:width="300sp"
+                android:gravity="center_vertical"
+                android:layout_gravity="fill_vertical"
+                android:layout_columnSpan="6"
+                android:layout_row="0"
                 android:padding="4sp"
                 android:textColor="@color/dark_gray"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/user_role"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/user_delete"
+                android:textSize="20sp"
                 tools:text="dgs7sdgs876s" />
 
             <TextView
                 android:id="@+id/user_role"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8sp"
-                android:padding="4sp"
+                android:gravity="center_vertical"
+                android:layout_gravity="fill_vertical"
+                android:layout_columnSpan="3"
+                android:layout_row="0"
                 android:textColor="@color/dark_gray"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/user_delete"
-                app:layout_constraintTop_toTopOf="@+id/user_delete"
+                android:textSize="20sp"
+                android:padding="4sp"
                 tools:text="Работник" />
 
             <ImageView
                 android:id="@+id/user_delete"
-                android:layout_width="48sp"
-                android:layout_height="48sp"
+                android:layout_columnSpan="1"
+                android:layout_rowSpan="1"
+                android:layout_row="0"
+                android:layout_marginStart="24dp"
                 android:padding="4sp"
                 android:src="@drawable/delete"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Работник" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </GridLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

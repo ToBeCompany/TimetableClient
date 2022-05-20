@@ -12,6 +12,8 @@ object EndPoint
     const val webSocket_passenger = "passenger/"
     // вебсокет водителя
     const val webSocket_driver = "driver/"
+    // вебсокет водителя
+    const val webSocket_admin = "adminWebSocket/"
 
     // получить маршрут по ID (после передать ID маршрута)
     const val routeById = "/OneMarsh/"

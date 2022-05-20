@@ -4,10 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:minWidth="400sp"
-    android:minHeight="600sp">
-
+    android:layout_height="match_parent">
 
     <Spinner
         android:id="@+id/typeNewUser"
@@ -15,7 +12,9 @@
         android:paddingRight="8sp"
         android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_margin="32sp"
+        android:layout_marginTop="32sp"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
         android:foreground="@drawable/frame"
         android:minHeight="50sp"
         android:spinnerMode="dropdown"
@@ -23,12 +22,59 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/id_user"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:hint="@string/id"
+        android:layout_marginTop="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/typeNewUser"
+        app:layout_constraintStart_toStartOf="@+id/typeNewUser"
         app:layout_constraintTop_toBottomOf="@+id/typeNewUser" />
+
+    <CheckBox
+        android:id="@+id/auto_generation_checkbox"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:text="@string/auto_generation"
+        app:layout_constraintEnd_toEndOf="@+id/typeNewUser"
+        app:layout_constraintStart_toStartOf="@+id/typeNewUser"
+        app:layout_constraintTop_toBottomOf="@+id/id_user" />
+    <!--
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/auto_generation_checkbox">
+
+
+            <CheckedTextView
+                android:id="@+id/add_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4sp"
+                android:text="@string/add"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <CheckedTextView
+                android:id="@+id/close_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4sp"
+                android:text="@string/close"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

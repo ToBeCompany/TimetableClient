@@ -34,12 +34,14 @@ class MapWorkerViewModel(application : Application): AndroidViewModel(applicatio
         )
         {
             webSocketSession = this@webSocket
-            Log.d("start_websocket", "start client map routeId = $routeId")
-            for (frame in incoming) {
-                if (frame is Frame.Text) {
+            Log.d("WEB_SOCKET", "start client map routeId = $routeId")
+            for (frame in incoming)
+            {
+                if (frame is Frame.Text)
+                {
                     val position = Json.decodeFromString<GeoPosition>(frame.readText())
                     emit(position)
-                    Log.d("websocket", "update position: " + position.latitude.toString())
+                    Log.d("WEB_SOCKET", "update position: " + position.latitude.toString())
                 }
             }
         }
@@ -48,7 +50,7 @@ class MapWorkerViewModel(application : Application): AndroidViewModel(applicatio
 
     fun stopWebSocket() {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("closeWebSocket", "user close map fragment")
+            Log.d("WEB_SOCKET", "close web socket")
             webSocketSession?.close(
                 CloseReason(
                     CloseReason.Codes.NORMAL,

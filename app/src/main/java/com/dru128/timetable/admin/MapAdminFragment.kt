@@ -38,6 +38,9 @@ class MapAdminFragment : MapFragment()
         super.onCreateView(inflater, container, savedInstanceState)
 
         lifecycleScope.launch {
+            viewModel.startWebSocket().collect {
+
+            }
             drawBuses()
             viewModel.getBuses()
         }

@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity()
                         }
                         TypeUser.ADMIN -> {
                             this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+//                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                             navController.graph = inflater.inflate(R.navigation.nav_admin)
                         }
                     }

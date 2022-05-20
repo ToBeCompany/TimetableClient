@@ -46,6 +46,8 @@
     <string name="delete">Удалить</string>
     <string name="id">Идентификатор</string>
     <string name="add">Добавить</string>
+    <string name="close">Закрыть</string>
+    <string name="auto_generation">Автогенерация ID</string>
     <string name="dispatcher">Диспетчер</string>
     <string name="admin">Админ</string>
     <string name="worker">Работник</string>

@@ -1,5 +1,6 @@
 package com.dru128.timetable.admin.edituser
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -36,6 +37,7 @@ class EditUsersFragment : Fragment()
 
         binding.addUserButton.setOnClickListener {
             AddUserDialog().show(childFragmentManager, AddUserDialog.TAG)
+
         }
         initRecyclerView()
 
