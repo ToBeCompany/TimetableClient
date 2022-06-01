@@ -37,7 +37,7 @@ import kotlinx.serialization.json.Json
 
 /**
  * После переключения на нижней навигации перестают работать скрытие маршрутов
- * */
+ */
 
 //mapView.getMapboxMap().cameraState.center
 class MapAdminFragment : MapFragment()
@@ -61,18 +61,18 @@ class MapAdminFragment : MapFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
+        binding = FragmentMapAdminBinding.inflate(inflater)
         progressManager = ProgressManager(binding.root, requireActivity())
         progressManager.start()
 
-        binding = FragmentMapAdminBinding.inflate(inflater)
         mapView = binding.adminMap
         super.onCreateView(inflater, container, savedInstanceState)
 
-        lifecycleScope.launch { // тут включается вебсокет
-            viewModel.startWebSocket().collect {
-                Log.d("web socket admin", it.toString())
-            }
-        }
+//        lifecycleScope.launch { // тут включается вебсокет
+//            viewModel.startWebSocket().collect {
+//                Log.d("web socket admin", it.toString())
+//            }
+//        }
 
         progressManager.finish()
 
@@ -184,30 +184,30 @@ class MapAdminFragment : MapFragment()
 
             pointAnnotationManager.clickListeners
         }
-//        val isZoomChange = MutableStateFlow(false)
-//        lifecycleScope.launchWhenStarted {
-//            isZoomChange.collectLatest {
-//                if (it)
-//                {
-//                    for (title in busStopTitles)
-//                        viewAnnotationManager.updateViewAnnotation(
-//                            title,
-//                            viewAnnotationOptions { visible(true) }
-//                        )
-//                }
-//                else
-//                {
-//                    for (title in busStopTitles)
-//                        viewAnnotationManager.updateViewAnnotation(
-//                            title,
-//                            viewAnnotationOptions { visible(false) }
-//                        )
-//                }
-//            }
-//        }
+        val isZoomChange = MutableStateFlow(false)
+        lifecycleScope.launchWhenStarted {
+            isZoomChange.collectLatest {
+                if (it)
+                {
+                    for (title in busStopTitles)
+                        viewAnnotationManager.updateViewAnnotation(
+                            title,
+                            viewAnnotationOptions { visible(true) }
+                        )
+                }
+                else
+                {
+                    for (title in busStopTitles)
+                        viewAnnotationManager.updateViewAnnotation(
+                            title,
+                            viewAnnotationOptions { visible(false) }
+                        )
+                }
+            }
+        }
 
         cameraChangeListener = OnCameraChangeListener { cameraChanged ->
-//            isZoomChange.value = mapbox.cameraState.zoom > 13.0
+            isZoomChange.value = mapbox.cameraState.zoom > 13.0
         }
         mapbox.addOnCameraChangeListener(cameraChangeListener!!)
 
@@ -258,8 +258,9 @@ class MapAdminFragment : MapFragment()
             polylineAnnotationManager.delete(mapboxRoute.trackLine)
             for (title in mapboxRoute.busStopTitles)
                 viewAnnotationManager.removeViewAnnotation(title)
+            RouteAdminStorage.mapboxRoutes.remove(id)
         }
-        RouteAdminStorage.mapboxRoutes.remove(id)
+//        RouteAdminStorage.mapboxRoutes.remove(id)
     }
 
     override fun onStart() {

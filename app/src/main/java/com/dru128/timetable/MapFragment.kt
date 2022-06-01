@@ -29,13 +29,17 @@ import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.extension.localization.localizeLabels
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.annotation.AnnotationManager
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import dru128.timetable.R
 import dru128.timetable.databinding.BusstopTitleBinding
@@ -54,9 +58,9 @@ abstract class MapFragment: Fragment()
 
     private val PERMISSION_CODE = 200
 
-    val pointAnnotationManager by lazy { mapView.annotations.createPointAnnotationManager() }
-    val polylineAnnotationManager by lazy { mapView.annotations.createPolylineAnnotationManager() }
-    val viewAnnotationManager by lazy { mapView.viewAnnotationManager }
+    lateinit var pointAnnotationManager: PointAnnotationManager
+    lateinit var polylineAnnotationManager: PolylineAnnotationManager
+    lateinit var viewAnnotationManager: ViewAnnotationManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
@@ -65,6 +69,10 @@ abstract class MapFragment: Fragment()
             it.localizeLabels(getCurrentLocale(requireContext()))
             mapReady()
         }
+        pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
+        polylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager()
+        viewAnnotationManager = mapView.viewAnnotationManager
+
         Log.d("LOCALIZE", getCurrentLocale(requireContext()).country.toString())
         return super.onCreateView(inflater, container, savedInstanceState)
     }

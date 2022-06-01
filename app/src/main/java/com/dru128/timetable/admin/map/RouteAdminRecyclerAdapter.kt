@@ -54,16 +54,20 @@ class RouteAdminRecyclerAdapter(
             if (isShow)
             {
                 showRoute(dataSet[i])
-                binding.visibleRoute.setBackgroundResource(R.drawable.visibility)
                 binding.root.alpha = 1.0f
-                if (!binding.visibleRoute.isChecked) binding.visibleRoute.isChecked = true
+                binding.visibleRoute.apply {
+                    setBackgroundResource(R.drawable.visibility)
+                    if (!isChecked) isChecked = true
+                }
             }
             else
             {
                 hideRoute(dataSet[i].id)
-                binding.visibleRoute.setBackgroundResource(R.drawable.visibility_off)
                 binding.root.alpha = 0.7f
-                if (binding.visibleRoute.isChecked) binding.visibleRoute.isChecked = false
+                binding.visibleRoute.apply {
+                    setBackgroundResource(R.drawable.visibility_off)
+                    if (isChecked) isChecked = false
+                }
             }
         }
 
