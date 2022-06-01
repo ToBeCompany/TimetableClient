@@ -4,30 +4,45 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.renderscript.ScriptGroup
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import com.dru128.timetable.data.metadata.BusStop
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonParser
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
+import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.extension.localization.localizeLabels
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import dru128.timetable.R
+import dru128.timetable.databinding.BusstopTitleBinding
 import java.util.*
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 abstract class MapFragment: Fragment()
 {
@@ -39,18 +54,22 @@ abstract class MapFragment: Fragment()
 
     private val PERMISSION_CODE = 200
 
+    val pointAnnotationManager by lazy { mapView.annotations.createPointAnnotationManager() }
+    val polylineAnnotationManager by lazy { mapView.annotations.createPolylineAnnotationManager() }
+    val viewAnnotationManager by lazy { mapView.viewAnnotationManager }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         mapbox = mapView.getMapboxMap()
         mapbox.loadStyleUri(Style.MAPBOX_STREETS) {
             it.localizeLabels(getCurrentLocale(requireContext()))
-            dataReady()
+            mapReady()
         }
-
+        Log.d("LOCALIZE", getCurrentLocale(requireContext()).country.toString())
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    abstract fun dataReady()
+    abstract fun mapReady()
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -97,6 +116,62 @@ abstract class MapFragment: Fragment()
 
 
 
+
+    fun createBusStop(busStopData: BusStop, routeId: String,busStopIcon: Bitmap): PointAnnotationOptions
+    {
+        val position = Point.fromLngLat(
+            busStopData.position.longitude,
+            busStopData.position.latitude
+        )
+        return PointAnnotationOptions()
+            .withPoint(position)
+            .withData(
+                JsonParser.parseString(
+                    Json.encodeToString(
+                        RouteAndBusStopId(
+                            routeId = routeId,
+                            busStopId = busStopData.id
+                        )
+                    )
+                )
+            )
+            .withIconImage(busStopIcon)
+    }
+    fun createBusStopTitle(busStopData: BusStop, busStop: PointAnnotation): View
+    {
+        val busStopTittleOptions = viewAnnotationOptions {
+            geometry(Point.fromLngLat(busStopData.position.longitude, busStopData.position.latitude))
+            associatedFeatureId(busStop.featureIdentifier)
+            anchor(ViewAnnotationAnchor.BOTTOM)
+            offsetY((busStop.iconImageBitmap?.height!!).toInt())
+        }
+        val viewAnnotation = viewAnnotationManager.addViewAnnotation(
+            resId = R.layout.busstop_title,
+            options = busStopTittleOptions
+        )
+        BusstopTitleBinding.bind(viewAnnotation).apply {
+            busStopName.text = busStopData.name
+        }
+        return viewAnnotation
+    }
+    /*                JsonParser.parseString(
+                    Json.encodeToString(
+                        RouteAndBusStopId(
+                            routeId = routeId,
+                            busStopId = busStopData.id
+                        )
+                    )
+                )*/
+    fun createRouteLine(positions: List<GeoPosition>): PolylineAnnotationOptions
+    {
+        val points = List<Point>(positions.size) { i -> Point.fromLngLat(positions[i].longitude, positions[i].latitude) }
+        return PolylineAnnotationOptions()
+            .withPoints(points)
+            .withLineColor( ResourcesCompat.getColor(requireContext().resources, R.color.polyline, null) )
+            .withLineWidth(5.0)
+    }
+
+
     fun moveCamera(point: Point?) {
         if (point == null) return
         mapView.camera.easeTo(
@@ -111,13 +186,16 @@ abstract class MapFragment: Fragment()
             .zoom(12.0)
             .center(point)
             .build()
+        cameraPosition.center
+
         mapView.getMapboxMap().setCamera(cameraPosition)
     }
 
     fun geoPosToPoint(geoPosition: GeoPosition): Point =
         Point.fromLngLat(geoPosition.longitude, geoPosition.latitude)
 
-    private fun getCurrentLocale(context: Context): Locale {
+    private fun getCurrentLocale(context: Context): Locale
+    {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             context.resources.configuration.locales[0]
         } else {

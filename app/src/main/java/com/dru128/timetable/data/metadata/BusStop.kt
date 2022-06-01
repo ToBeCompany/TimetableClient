@@ -1,5 +1,6 @@
 package com.dru128.timetable.data.metadata
 
+import kotlin.String
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,5 +12,5 @@ data class BusStop( // остановка
     @SerialName("name")
     var name: String = "",
     @SerialName("geopos")
-    var position: GeoPosition? = null,
+    var position: GeoPosition,
 )

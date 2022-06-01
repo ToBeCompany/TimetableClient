@@ -5,8 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.dru128.timetable.Storage
+import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.Route
+import com.dru128.timetable.worker.map.RouteWorkerStorage
 import dru128.timetable.R
 
 
@@ -22,7 +23,7 @@ class RouteRecyclerAdapter(var click: (id: Int) -> Unit, var dataSet: Array<Rout
 
     fun updateData()
     {
-        dataSet = Storage.routes
+        dataSet = RouteWorkerStorage.routes
         notifyDataSetChanged()
     }
 

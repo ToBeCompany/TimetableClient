@@ -1,7 +1,3 @@
-<!--<ScrollView-->
-<!--    layout_width=""-->
-<!--    layout_height=""-->
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,15 +7,80 @@
     android:background="@color/light_gray"
     tools:context="com.dru128.timetable.admin.edituser.EditUsersFragment">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/sort_parent"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8sp"
+        app:layout_constraintEnd_toEndOf="@+id/user_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/user_recycler_view"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/parent_route_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:columnCount="10"
+            android:orientation="horizontal"
+            android:padding="4sp"
+            android:rowCount="1">
+
+            <EditText
+                android:id="@+id/sort_by_id_text"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/text_without_line"
+                android:drawableStart="@drawable/search"
+                android:hint="ID"
+                android:textColor="@color/dark_gray"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toStartOf="@+id/reset_id_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/reset_id_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/close"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/sort_by_id_text"
+                app:layout_constraintEnd_toStartOf="@+id/sort_by_role_spinner"
+                app:layout_constraintTop_toTopOf="@+id/sort_by_id_text" />
+
+            <Spinner
+                android:id="@+id/sort_by_role_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:maxWidth="150sp"
+                android:minWidth="90sp"
+                android:textColor="@color/dark_gray"
+                android:textSize="11sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/user_recycler_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="0sp"
+        android:layout_height="0sp"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="200dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/user_item"/>
+        app:layout_constraintTop_toBottomOf="@+id/sort_parent"
+        tools:listitem="@layout/user_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_user_button"

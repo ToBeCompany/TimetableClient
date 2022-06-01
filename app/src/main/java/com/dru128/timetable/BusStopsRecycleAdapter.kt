@@ -1,4 +1,4 @@
-package com.dru128.timetable.worker.map
+package com.dru128.timetable
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,14 +6,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-import dru128.timetable.R
 import com.dru128.timetable.data.metadata.BusStopWithTime
+import com.dru128.timetable.data.metadata.GeoPosition
+import dru128.timetable.R
+import kotlin.reflect.KFunction1
 
 
 class BusStopsRecycleAdapter(
-    var current: Int,
+    var current: String,
     var dataSet: List<BusStopWithTime>,
-    var itemClick: (Int) -> Unit
+    var itemClick: KFunction1<GeoPosition, Unit>
 )
     : RecyclerView.Adapter<BusStopsRecycleAdapter.ViewHolder>()
 {
@@ -38,17 +40,13 @@ class BusStopsRecycleAdapter(
 
         fun onBind(index: Int)
         {
-            if (dataSet[current] == dataSet[index])
-            {
-                itemView.setBackgroundColor(  ResourcesCompat.getColor(context.resources, R.color.light_blue, null) )
-            }
-            name_text.text = dataSet[index].busStop?.name ?: ""
-            time_text.text = dataSet[index].time ?: ""
+            if (dataSet[index].busStop.id == current)
+                itemView.setBackgroundColor(ResourcesCompat.getColor(context.resources, R.color.light_blue, null))
+            name_text.text = dataSet[index].busStop.name
+            time_text.text = dataSet[index].time
             itemView.setOnClickListener {
-                itemClick(index)
+                itemClick(dataSet[index].busStop.position)
             }
-
         }
     }
-
 }

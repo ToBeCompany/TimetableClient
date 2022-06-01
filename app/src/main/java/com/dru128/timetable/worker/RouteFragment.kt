@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dru128.timetable.Storage
+import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.tools.ProgressManager
+import com.dru128.timetable.worker.map.RouteWorkerStorage
 import dru128.timetable.databinding.FragmentRouteBinding
 import kotlinx.coroutines.launch
 
@@ -57,7 +57,7 @@ class RouteFragment : Fragment()
             {
                 progressManager.finish()
 
-                Storage.routes = routes
+                RouteWorkerStorage.routes = routes
                 adapter.updateData()
 
             } else {

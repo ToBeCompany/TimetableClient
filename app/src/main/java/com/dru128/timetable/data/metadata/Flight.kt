@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Flight( // рейс
-    var name: String,
-    var id: String,
+    var name: kotlin.String,
+    var id: kotlin.String,
     var bus: Bus,
     var route: Route,
     var driver: User

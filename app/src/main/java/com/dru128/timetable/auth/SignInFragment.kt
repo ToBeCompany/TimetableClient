@@ -36,8 +36,10 @@ class SignInFragment : Fragment()
                 if (!code.isNullOrEmpty())
                 {
                     lifecycle.coroutineScope.launchWhenStarted {
-
+                        binding.progressBar.visibility = View.VISIBLE
                         val response: User? = viewModel.getUser(code.toString())
+                        binding.progressBar.visibility = View.GONE
+
                         Log.d("response", response.toString())
 
                         if (response != null && response.isNotEmpy())

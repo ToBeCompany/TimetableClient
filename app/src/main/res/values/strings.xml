@@ -25,6 +25,10 @@
     <string name="choose_route">Выберите маршрут</string>
     <string name="id_is_coped">ID скопирован в буфер обмена</string>
     <string name="error_delete_user">Ошибка! Не удалось удалить пользователя</string>
+    <string name="error_create_user">Ошибка! Не удалось создать пользователя</string>
+    <string name="error_get_users">Ошибка! Не удалось получить список пользователей</string>
+    <string name="error_get_routes">Ошибка! Не удалось получить список маршрутов</string>
+    <string name="error_route_line_null">Ошибка! Нет данных линии маршрута</string>
 
 
     <!-- View -->
@@ -53,6 +57,7 @@
     <string name="worker">Работник</string>
     <string name="driver">Водитель</string>
     <string name="error">Ошибка</string>
+    <string name="online">онлайн</string>
 
 
     <!--  intent  -->

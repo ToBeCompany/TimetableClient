@@ -1,6 +1,5 @@
 package com.dru128.timetable
 
-import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.engine.cio.CIO
@@ -13,10 +12,8 @@ import io.ktor.http.takeFrom
 import java.security.Security
 
 
-object Storage
+object Repository
 {
-    var routes: Array<Route> = arrayOf()
-
     var client = HttpClient(Android) {
         install(JsonFeature) {
             serializer = KotlinxSerializer()

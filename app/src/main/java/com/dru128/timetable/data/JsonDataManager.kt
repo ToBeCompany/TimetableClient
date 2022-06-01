@@ -10,7 +10,7 @@ import kotlinx.serialization.json.Json
 
 class JsonDataManager(var context: Context): DataManager
 {
-    private val TAG_ROUTES: String = "TAG_ROUTES"
+    private val TAG_ROUTES: kotlin.String = "TAG_ROUTES"
     private var preference = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun loadRoutes(): Array<Route>?

@@ -1,5 +1,6 @@
 package com.dru128.timetable.data.metadata
 
+import kotlin.String
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

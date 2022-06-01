@@ -11,7 +11,7 @@ class MainViewModel(application : Application): AndroidViewModel(application)
 {
     suspend fun getUser(id: String): User? =
         try {
-            Storage.client.get(EndPoint.auth + id)
+            Repository.client.get(EndPoint.auth + id)
         }
         catch (error: Exception) {
             Log.d("ErrorServer", error.message.toString())

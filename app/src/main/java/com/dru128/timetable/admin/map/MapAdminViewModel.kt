@@ -1,49 +1,48 @@
-package com.dru128.timetable.admin
+package com.dru128.timetable.admin.map
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dru128.timetable.EndPoint
-import com.dru128.timetable.Storage
+import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.client.features.websocket.webSocket
 import io.ktor.client.request.get
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.websocket.CloseReason
-import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
-import io.ktor.http.cio.websocket.readText
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class MapAdminViewModel(application : Application): AndroidViewModel(application)
 {
     var webSocketSession: DefaultClientWebSocketSession? = null
 
-    var routes = arrayOf<Route>()
-    var buses = MutableStateFlow(mapOf<String, GeoPosition>())
-    var busMarkers = mutableMapOf<String, PointAnnotation>()
 
-    suspend fun getRoutes(): Array<Route>? =
+
+    suspend fun getRoutes(): Boolean
+    {
         try {
             Log.d("Server", "SUCCESS")
-            routes = Storage.client.get(EndPoint.all_routes)
-            routes
+            val _routes: Array<Route>? = Repository.client.get(EndPoint.all_routes)
+            if (_routes.isNullOrEmpty()) return false
+            RouteAdminStorage.routes.value = _routes
+//            RouteAdminStorage.routes.value = arrayOf()
+//            _routes.forEach { RouteAdminStorage.routes.value += TrackRoute(it) }
+            return true
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
-            null
+            return false
         }
+    }
+
+
 
     suspend fun getBuses()
     {
@@ -70,7 +69,7 @@ class MapAdminViewModel(application : Application): AndroidViewModel(application
 
     fun startWebSocket() = flow<GeoPosition>
     {
-        Storage.websocketClient().webSocket(
+        Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = "192.168.111.116",
             path = "all"

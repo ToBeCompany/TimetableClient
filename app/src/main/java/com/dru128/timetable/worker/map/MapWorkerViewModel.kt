@@ -5,9 +5,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dru128.timetable.EndPoint
-import com.dru128.timetable.Storage
+import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.GeoPosition
-import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.client.features.websocket.webSocket
 import io.ktor.http.HttpMethod
@@ -26,8 +25,8 @@ import kotlinx.serialization.json.Json
 class MapWorkerViewModel(application : Application): AndroidViewModel(application) {
     var webSocketSession: DefaultClientWebSocketSession? = null
 
-    fun startWebSocket(routeId: String) = flow<GeoPosition> {
-        Storage.websocketClient().webSocket(
+    fun startWebSocket(routeId: kotlin.String) = flow<GeoPosition> {
+        Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = EndPoint.host,
             path = (EndPoint.webSocket_passenger + routeId)

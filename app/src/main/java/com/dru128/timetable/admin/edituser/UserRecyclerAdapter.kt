@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
+import com.dru128.timetable.tools.Copy
 import com.google.android.material.snackbar.Snackbar
 import dru128.timetable.R
 import dru128.timetable.databinding.UserItemBinding
@@ -13,6 +14,9 @@ import dru128.timetable.databinding.UserItemBinding
 class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Array<User>)
     : RecyclerView.Adapter<UserRecyclerAdapter.ViewHolder>()
 {
+    private var filterId = ""
+    private var filterRole: TypeUser? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         val binding = UserItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -25,6 +29,26 @@ class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Arr
     }
 
     override fun getItemCount(): Int = dataSet.size
+
+    fun sortById(id: String, users: Array<User>) {
+        filterId = id
+        sort(users)
+    }
+    fun sortByRole(role: TypeUser?, users: Array<User>) {
+        filterRole = role
+        sort(users)
+    }
+
+    fun sort(users: Array<User>)
+    {
+        if (filterRole == null && filterId.isBlank())
+            dataSet = users
+        else
+            users
+                .filter { (it.userType == filterRole || filterRole == null) && it.id.contains(filterId) }
+                .let { dataSet = it.toTypedArray() }
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(binding: UserItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
@@ -49,6 +73,7 @@ class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Arr
                 deleteUser(dataSet[position])
             }
             userId.setOnClickListener {
+                Copy.copyText(context, dataSet[position].id)
                 Snackbar.make(it, context.resources.getString(R.string.id_is_coped), Snackbar.LENGTH_SHORT).show()
             }
         }

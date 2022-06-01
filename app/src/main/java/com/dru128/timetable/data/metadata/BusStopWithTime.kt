@@ -1,5 +1,6 @@
 package com.dru128.timetable.data.metadata
 
+import kotlin.String
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -7,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class BusStopWithTime(
     @SerialName("first")
-    var busStop: BusStop? = null,
+    var busStop: BusStop,
     @SerialName("second")
     var time: String = ""
 )

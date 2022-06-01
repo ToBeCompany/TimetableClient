@@ -2,7 +2,6 @@ package com.dru128.timetable.admin.edituser
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,8 @@ import dru128.timetable.databinding.AddUserDialogBinding
 
 class AddUserDialog: DialogFragment(/*R.layout.add_user_dialog*/)
 {
+    private var addUser: CreateUser? = null
+
     private lateinit var binding: AddUserDialogBinding
     val typeUserConvertor = mapOf<String, TypeUser>(
         "Работник" to TypeUser.WORKER,
@@ -33,42 +34,30 @@ class AddUserDialog: DialogFragment(/*R.layout.add_user_dialog*/)
             else
                 binding.idUser.visibility = View.VISIBLE
         }
-//        binding.createUserButton.setOnClickListener {
-//            lifecycleScope.launch{
-//                viewModel.createUser(
-//                    User(
-//                        userType = type_user_creater(binding.typeNewUser.selectedItem.toString()),
-//                        id = binding.idNewUser.text.toString()
-//                    )
-//                )
-//            }
-//        }
 
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
     {
         binding = AddUserDialogBinding.inflate(layoutInflater)
+        addUser = requireParentFragment() as CreateUser
 
         val builder = AlertDialog.Builder(activity)
         return builder
             .setView(binding.root)
             .setNegativeButton( requireContext().resources.getString(R.string.close) )
-            { dialog, id -> onCancel(dialog) }
+            { _dialog, _id -> onCancel(_dialog) }
             .setPositiveButton( requireContext().resources.getString(R.string.add) )
-            { dialog, id ->
-                var id =
-                    if (binding.autoGenerationCheckbox.isChecked) binding.idUser.text.toString()
-                    else ""
+            { _dialog, _id ->
+                val userId =
+                    if (binding.autoGenerationCheckbox.isChecked) ""
+                    else binding.idUser.text.toString()
                 val user = User(
                     userType = typeUserConvertor[binding.typeNewUser.selectedItem]!!,
-                    id = id
+                    id = userId
                 )
+                addUser?.createUser(user)
             }
             .create()
     }
@@ -85,7 +74,6 @@ class AddUserDialog: DialogFragment(/*R.layout.add_user_dialog*/)
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.typeNewUser.adapter = adapter
-
     }
 
     companion object {

@@ -7,36 +7,48 @@
     android:layout_height="match_parent"
     tools:context="com.dru128.timetable.auth.SignInFragment">
 
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="230dp"
+        android:layout_height="155dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/rotor_text_logo"
+        app:layout_constraintBottom_toTopOf="@+id/codeTextContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/codeTextContainer"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:minHeight="80sp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
         android:hint="@string/signing_code"
-        android:padding="10sp"
         android:textColorHint="@color/colorPrimary"
+        app:boxCornerRadiusBottomEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/colorPrimary"
         app:hintTextColor="@color/colorPrimary"
-        app:boxCornerRadiusBottomEnd="16dp"
-        app:boxCornerRadiusTopEnd="16dp"
-        app:boxCornerRadiusBottomStart="16dp"
-        app:boxCornerRadiusTopStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.45">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/codeText"
-            android:focusedByDefault="true"
-            android:textStyle="bold"
-            android:maxLength="50"
-            android:textColor="@color/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusedByDefault="true"
+            android:maxLength="50"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,19 +56,18 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="230dp"
-        android:layout_height="155dp"
-        android:layout_marginTop="32dp"
-        android:rotation="0"
-        android:rotationX="0"
-        android:rotationY="0"
-        android:src="@drawable/rotor_text_logo"
-        app:layout_constraintBottom_toTopOf="@+id/codeTextContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="true"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/codeTextContainer"
+        app:layout_constraintStart_toStartOf="@+id/codeTextContainer"
+        app:layout_constraintTop_toBottomOf="@+id/codeTextContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

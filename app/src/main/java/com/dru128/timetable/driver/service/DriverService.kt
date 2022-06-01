@@ -18,7 +18,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dru128.timetable.EndPoint
-import com.dru128.timetable.Storage
+import com.dru128.timetable.Repository
 import dru128.timetable.R
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.response.FlightsNameResponse
@@ -163,7 +163,7 @@ class DriverService() : Service()
 
     private suspend fun startWebSocket(trackerId: String)
     {
-        Storage.websocketClient().webSocket(
+        Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = EndPoint.host,
             path = EndPoint.webSocket_driver + trackerId

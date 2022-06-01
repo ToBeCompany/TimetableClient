@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.dru128.timetable.App
 import com.dru128.timetable.EndPoint
-import com.dru128.timetable.Storage
+import com.dru128.timetable.Repository
 import com.dru128.timetable.data.JsonDataManager
 import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.request.get
@@ -46,7 +46,7 @@ class RouteViewModel: ViewModel()
     private suspend fun getFromServer(): Array<Route>? =
         try {
             Log.d("Server", "SUCCESS")
-            Storage.client.get(EndPoint.all_routes)
+            Repository.client.get(EndPoint.all_routes)
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
