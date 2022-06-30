@@ -3,12 +3,12 @@
     <string name="app_name">Ротор.Транспорт</string>
     <string name="mapbox_access_token">pk.eyJ1IjoiZHJ1MTI4IiwiYSI6ImNrejc5ZWQwczBoa2syeHFtOTk4M3pjNDMifQ.g9Lp7kfn1UCvotPwhER5wA</string>
 
-
     <string name="routes">маршруты</string>
 
 
     <!-- Toolbar -->
     <string name="gps_tracker">GPS трекер</string>
+    <string name="create_route">Создание маршрута</string>
     <string name="signin_fragment_toolbar">Вход</string>
     <string name="route_fragment_toolbar">Маршруты</string>
     <string name="not_found_user_fragment_toolbar">Ошибка входа</string>
@@ -25,14 +25,19 @@
     <string name="choose_route">Выберите маршрут</string>
     <string name="id_is_coped">ID скопирован в буфер обмена</string>
     <string name="error_delete_user">Ошибка! Не удалось удалить пользователя</string>
+    <string name="error_delete_route">Ошибка! Не удалось удалить маршрут</string>
     <string name="error_create_user">Ошибка! Не удалось создать пользователя</string>
+    <string name="error_create_route">Ошибка! Не удалось создать маршрут</string>
+    <string name="error_edit_route">Ошибка! Не удалось изменить маршрут</string>
     <string name="error_get_users">Ошибка! Не удалось получить список пользователей</string>
     <string name="error_get_routes">Ошибка! Не удалось получить список маршрутов</string>
     <string name="error_route_line_null">Ошибка! Нет данных линии маршрута</string>
+    <string name="fill_all_fields">Заполните все поля!</string>
 
 
     <!-- View -->
     <string name="signing_code">Код аутентификации</string>
+    <string name="name_of_route">Название маршрута</string>
     <string name="on_tracker">Включить трекер</string>
     <string name="off_tracker">Выключить трекер</string>
     <string name="find_bus">найти автобус</string>
@@ -41,6 +46,10 @@
     <string name="tracking_off">Отслеживание выключено</string>
     <string name="user_not_found">Аккаунт не найден</string>
     <string name="logout">Выход</string>
+    <string name="delete_route">Удалить маршрут?</string>
+    <string name="delete_user">Удалить пользователя?</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="cancel">Отмена</string>
     <string name="user_not_found_reasons">
         Возможные причины:
         \n • Аккаунт был удалён или заблокирован
@@ -50,14 +59,23 @@
     <string name="delete">Удалить</string>
     <string name="id">Идентификатор</string>
     <string name="add">Добавить</string>
+    <string name="done">Готово</string>
     <string name="close">Закрыть</string>
     <string name="auto_generation">Автогенерация ID</string>
+    <string name="bus_stops">Остановки</string>
     <string name="dispatcher">Диспетчер</string>
     <string name="admin">Админ</string>
     <string name="worker">Работник</string>
     <string name="driver">Водитель</string>
     <string name="error">Ошибка</string>
     <string name="online">онлайн</string>
+    <string name="name">Название</string>
+    <string name="enter_name_of_bus_stop">Введите название остановки</string>
+    <string name="arrival_time">Время прибытия</string>
+    <string name="enter_bus_arrival_time">Введите время прибытия автобуса</string>
+    <string name="save">Сохранить</string>
+    <string name="bus_stop_data">Данные остановки</string>
+    <string name="user_data">Данные пользователя</string>
 
 
     <!--  intent  -->
@@ -73,4 +91,9 @@
 
     <!--  Notification  -->
     <string name="click_to_open_app">Нажмите чтобы открыть приложение</string>
+
+    <!--  keys  -->
+    <string name="bus_stop_name_key">bus_stop_name_key</string>
+    <string name="bus_stop_time_key">bus_stop_time_key</string>
+    <string name="bus_stop_id_key">bus_stop_id_key</string>
 </resources>

@@ -17,12 +17,14 @@ object Repository
     var client = HttpClient(Android) {
         install(JsonFeature) {
             serializer = KotlinxSerializer()
-//                    acceptContentTypes += ContentType("text", "plain")
+//            acceptContentTypes += ContentType.Text.Plain
         }
-        defaultRequest{
-            url.takeFrom( URLBuilder ().takeFrom(EndPoint.protocol + EndPoint.host).apply {
-                encodedPath += url.encodedPath
-            })
+        defaultRequest {
+            url.takeFrom(
+                    URLBuilder().takeFrom(EndPoint.protocol + EndPoint.host).apply {
+                    encodedPath += url.encodedPath
+                }
+            )
         }
     }
 

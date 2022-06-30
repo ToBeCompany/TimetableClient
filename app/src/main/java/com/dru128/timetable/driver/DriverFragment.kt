@@ -13,11 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.Spinner
-import android.widget.TextView
 import androidx.activity.addCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
@@ -43,42 +39,38 @@ class DriverFragment : Fragment()
     private val viewModel: DriverViewModel by viewModels()
     private val PERMISSION_CODE = 200
 
-    private lateinit var lastRoutePreference: LastRoutePreference
+    private val lastRoutePreference: LastRoutePreference by lazy {
+        LastRoutePreference(requireContext())
+    }
+
     private val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
     private lateinit var progressManager: ProgressManager
 
-    private lateinit var trackerButton: ImageButton
-    private lateinit var curRouteText: TextView
-    private lateinit var routeSpinner: Spinner
-
     private var isListiningPos = false
 
-    var serviceReceiver: BroadcastReceiver = object : BroadcastReceiver()
+    private var serviceReceiver: BroadcastReceiver = object : BroadcastReceiver()
     {
         override fun onReceive(context: Context, intent: Intent)
         {
             if (intent.hasExtra(getString(R.string.tracker_id)))
             {
                 val jsonRoute = intent.getStringExtra(getString(R.string.tracker_id)).toString()
+                val route: FlightsNameResponse = Json.decodeFromString(jsonRoute)
                 Log.d("receiver_driver", jsonRoute)
 
-                val route: FlightsNameResponse = Json.decodeFromString(jsonRoute)
-
                 isListiningPos = true
-                trackerButton.setBackgroundResource(R.drawable.stop_circle)
-                curRouteText.text = "${requireContext().getString(R.string.tracking_route)} ${route.name}"
+                updateViews(route.name)
             } else if (intent.hasExtra(getString(R.string.off_service)))
             {
-                trackerButton.setBackgroundResource(R.drawable.play_circle)
-                curRouteText.text = requireContext().getString(R.string.tracking_off)
                 isListiningPos = false
+                updateViews(null)
             }
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             finishAffinity(requireActivity())
@@ -89,14 +81,9 @@ class DriverFragment : Fragment()
             .getInstance(requireContext())
             .registerReceiver(serviceReceiver, IntentFilter(getString(R.string.action)))
 
-        lastRoutePreference = LastRoutePreference(requireContext())
-
         progressManager = ProgressManager(binding.root, requireActivity())
         progressManager.start()
 
-        trackerButton = binding.trackerButton
-        curRouteText = binding.routeTrackingName
-        routeSpinner = binding.routeList
 
         getDataFromServer()
 
@@ -106,8 +93,8 @@ class DriverFragment : Fragment()
             getRouteFromService()
         }
 
-        trackerButton.setOnClickListener {
-            if (routeSpinner.selectedItemPosition == 0) // выбрана подсказка "маршрут не выбран"
+        binding.trackerButton.setOnClickListener {
+            if (binding.routeList.selectedItemPosition == 0) // выбрана подсказка "маршрут не выбран"
                 Snackbar.make(requireView(), getString(R.string.choose_route), Snackbar.LENGTH_LONG).show()
             else
                 checkLocationPermissions()
@@ -151,21 +138,23 @@ class DriverFragment : Fragment()
             if (routeNames != null && routeNames.isNotEmpty())
             {
                 Log.d("ResponseServer", "data (flight) Ready")
-                progressManager.finish()
 
-                var spinnerSet = arrayOf<String>()
-                spinnerSet += routeNames.map { it.name.toString() }
+                val spinnerSet = Array<String>(routeNames.size) {
+                    routeNames[it].name
+                }
 
                 val adapter = RouteArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, spinnerSet, getString(R.string.route_not_selected))
                 adapter.setDropDownViewResource(R.layout.route_spinner_dropdown_item)
-                routeSpinner.adapter = adapter
+                binding.routeList.adapter = adapter
                 val lastRouteId = lastRoutePreference.getRouteId()
                 find@ for (i in routeNames.indices)
                     if (routeNames[i].id == lastRouteId)
                     {
-                        routeSpinner.setSelection(i)
+                        binding.routeList.setSelection(i)
                         break@find
                     }
+
+                progressManager.finish()
             }
             else
             {
@@ -186,28 +175,24 @@ class DriverFragment : Fragment()
     private fun startTracker()
     {
         Log.d("Tracker", "start")
-        val route = viewModel.routesInf[routeSpinner.selectedItemPosition]
-        if (route.id != null && route.name != null)
-        {
-            trackerButton.setBackgroundResource(R.drawable.stop_circle)
-            curRouteText.text = "${requireContext().getString(R.string.tracking_route)} ${route.name} ${routeSpinner.selectedItemPosition}"
-            requireContext().startService(
-                Intent(requireContext(), DriverService::class.java)
-                    .putExtra(getString(R.string.route), Json.encodeToString(route))
-                    .putExtra(getString(R.string.action), getString(R.string.on_service))
-            )
-            lastRoutePreference.setRouteId(route.id!!)
-            Snackbar.make(requireView(), getString(R.string.tracker_launched), Snackbar.LENGTH_LONG).show()
+        val route = viewModel.routesInf[binding.routeList.selectedItemPosition]
 
-        }
+        updateViews(route.name)
+
+        requireContext().startService(
+            Intent(requireContext(), DriverService::class.java)
+                .putExtra(getString(R.string.route), Json.encodeToString(route))
+                .putExtra(getString(R.string.action), getString(R.string.on_service))
+        )
+        lastRoutePreference.setRouteId(route.id)
+        Snackbar.make(requireView(), getString(R.string.tracker_launched), Snackbar.LENGTH_LONG).show()
     }
 
     private fun stopTracker()
     {
         Log.d("Tracker", "stop")
-        trackerButton.setBackgroundResource(R.drawable.play_circle)
+        updateViews(null)
 
-        curRouteText.text = requireContext().getString(R.string.tracking_off)
         requireContext().startService(
             Intent(requireContext(), DriverService::class.java)
                 .putExtra(getString(R.string.action), getString(R.string.off_service))
@@ -215,13 +200,23 @@ class DriverFragment : Fragment()
         Snackbar.make(requireView(), getString(R.string.tracker_shutdown), Snackbar.LENGTH_LONG).show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(serviceReceiver)
+    private fun updateViews(routeName: String?)
+    {
+        if (routeName.isNullOrBlank())
+        {
+            binding.progressTracker.visibility = View.GONE
+            binding.trackerButtonImage.setBackgroundResource(R.drawable.play_circle)
+            binding.routeTrackingName.text = requireContext().getString(R.string.tracking_off)
+        } else
+        {
+            binding.progressTracker.visibility = View.VISIBLE
+            binding.trackerButtonImage.setBackgroundResource(R.drawable.stop_circle)
+            binding.routeTrackingName.text = "${requireContext().getString(R.string.tracking_route)} $routeName"
+        }
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        super.onCreate(savedInstanceState)
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(serviceReceiver)
+        super.onDestroy()
     }
 }

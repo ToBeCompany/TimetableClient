@@ -26,10 +26,11 @@ class ProgressManager(var container: ConstraintLayout, var activity: FragmentAct
         shadowView = View(context)
         progressBar = ProgressBar(ContextThemeWrapper(context , R.style.Theme_TimeTable_ProgressBar))
 
-        shadowView.setBackgroundColor(ResourcesCompat.getColor(container.context.resources, R.color.progress_shadow, null))
-
         shadowView.id = View.generateViewId()
         progressBar.id = View.generateViewId()
+
+        shadowView.setBackgroundColor(ResourcesCompat.getColor(container.context.resources, R.color.progress_shadow, null))
+
 
         shadowView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         progressBar.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -38,14 +39,14 @@ class ProgressManager(var container: ConstraintLayout, var activity: FragmentAct
         container.addView(progressBar)
         ConstraintSet().apply {
             clone(container)
-            connect(progressBar.id, ConstraintSet.BOTTOM, container.id, ConstraintSet.BOTTOM)
-            connect(progressBar.id, ConstraintSet.END, container.id, ConstraintSet.END)
-            connect(progressBar.id, ConstraintSet.START, container.id, ConstraintSet.START)
-            connect(progressBar.id, ConstraintSet.TOP, container.id, ConstraintSet.TOP)
             connect(shadowView.id, ConstraintSet.BOTTOM, container.id, ConstraintSet.BOTTOM)
             connect(shadowView.id, ConstraintSet.END, container.id, ConstraintSet.END)
             connect(shadowView.id, ConstraintSet.START, container.id, ConstraintSet.START)
             connect(shadowView.id, ConstraintSet.TOP, container.id, ConstraintSet.TOP)
+            connect(progressBar.id, ConstraintSet.BOTTOM, container.id, ConstraintSet.BOTTOM)
+            connect(progressBar.id, ConstraintSet.END, container.id, ConstraintSet.END)
+            connect(progressBar.id, ConstraintSet.START, container.id, ConstraintSet.START)
+            connect(progressBar.id, ConstraintSet.TOP, container.id, ConstraintSet.TOP)
             applyTo(container)
         }
     }

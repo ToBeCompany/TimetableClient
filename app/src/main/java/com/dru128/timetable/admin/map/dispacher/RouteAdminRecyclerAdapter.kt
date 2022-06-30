@@ -1,10 +1,9 @@
-package com.dru128.timetable.admin.map
+package com.dru128.timetable.admin.map.dispacher
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.recyclerview.widget.RecyclerView
+import com.dru128.timetable.admin.map.RouteAdminStorage
 import com.dru128.timetable.data.metadata.Route
 import dru128.timetable.R
 import dru128.timetable.databinding.RouteAdminItemBinding
@@ -12,6 +11,8 @@ import dru128.timetable.databinding.RouteAdminItemBinding
 class RouteAdminRecyclerAdapter(
     var showRoute: (route: Route) -> Unit,
     var hideRoute: (id: String) -> Unit,
+    var deleteRoute: (id: String) -> Unit,
+    var editRoute: (id: String) -> Unit,
     var dataSet: Array<Route>
 ) : RecyclerView.Adapter<RouteAdminRecyclerAdapter.ViewHolder>()
 {
@@ -37,14 +38,27 @@ class RouteAdminRecyclerAdapter(
             binding.nameRoute.text = dataSet[position].name
 
             RouteAdminStorage.mapboxRoutes[dataSet[position].id]?.let { mapboxRoute ->
-                isShowRoute(mapboxRoute.isVisible, position)
+                if (mapboxRoute.isVisible)
+                {
+                    binding.root.alpha = 1.0f
+                    binding.visibleRoute.apply {
+                        setBackgroundResource(R.drawable.visibility)
+                        if (!isChecked) isChecked = true
+                    }
+                }
             }
 
             binding.visibleRoute.setOnCheckedChangeListener { v, isChecked ->
                 isShowRoute(isChecked, position)
             }
+            binding.deleteRoute.setOnClickListener {
+                deleteRoute(dataSet[position].id)
+            }
+            binding.editRoute.setOnClickListener {
+                editRoute(dataSet[position].id)
+            }
 
-      /*      dataSet[position].position.collect {
+      /*      dataSet[position].position.collect { // for online text
 
             }*/
         }

@@ -8,5 +8,20 @@
         android:id="@+id/adminMainFragment"
         android:name="com.dru128.timetable.admin.AdminMainFragment"
         android:label="@string/gps_tracker"
-        tools:layout="@layout/fragment_admin_main" />
+        tools:layout="@layout/fragment_admin_main" >
+        <action
+            android:id="@+id/action_adminMainFragment_to_createRouteFragment"
+            app:destination="@id/createRouteFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createRouteFragment"
+        android:name="com.dru128.timetable.admin.map.create_route.CreateRouteFragment"
+        android:label="@string/create_route"
+        tools:layout="@layout/fragment_create_route" >
+        <argument
+            android:name="jsonRoute"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

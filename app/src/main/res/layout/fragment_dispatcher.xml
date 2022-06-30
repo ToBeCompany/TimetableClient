@@ -1,11 +1,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-    tools:context="com.dru128.timetable.admin.map.MapAdminFragment">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.dru128.timetable.admin.map.dispacher.DispatcherFragment">
 
     <com.mapbox.maps.MapView
         android:id="@+id/admin_map"
@@ -20,14 +20,13 @@
         mapbox:mapbox_cameraZoom="10.0"/>
 
 
-    <ImageButton
+    <ImageView
         android:id="@+id/show_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/arrow_in_circle"
-        android:rotation="0"
+        android:src="@drawable/arrow_in_circle"
         app:layout_constraintEnd_toEndOf="@+id/admin_map"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,6 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0sp"
         android:background="@color/light_gray"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">

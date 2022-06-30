@@ -1,4 +1,4 @@
-package com.dru128.timetable
+package com.dru128.timetable.map
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -19,19 +19,20 @@ import androidx.fragment.app.Fragment
 import com.dru128.timetable.data.metadata.BusStop
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonElement
 import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.extension.localization.localizeLabels
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
-import com.mapbox.maps.plugin.annotation.AnnotationManager
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
@@ -39,14 +40,10 @@ import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.viewannotation.ViewAnnotationManager
-import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import dru128.timetable.R
-import dru128.timetable.databinding.BusstopTitleBinding
+import java.io.StringReader
 import java.util.*
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+
 
 abstract class MapFragment: Fragment()
 {
@@ -60,7 +57,6 @@ abstract class MapFragment: Fragment()
 
     lateinit var pointAnnotationManager: PointAnnotationManager
     lateinit var polylineAnnotationManager: PolylineAnnotationManager
-    lateinit var viewAnnotationManager: ViewAnnotationManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
@@ -69,11 +65,11 @@ abstract class MapFragment: Fragment()
             it.localizeLabels(getCurrentLocale(requireContext()))
             mapReady()
         }
+
+
         pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
         polylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager()
-        viewAnnotationManager = mapView.viewAnnotationManager
 
-        Log.d("LOCALIZE", getCurrentLocale(requireContext()).country.toString())
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -125,51 +121,20 @@ abstract class MapFragment: Fragment()
 
 
 
-    fun createBusStop(busStopData: BusStop, routeId: String,busStopIcon: Bitmap): PointAnnotationOptions
+    fun createBusStop(busStopData: BusStop, busStopIcon: Bitmap): PointAnnotationOptions
     {
-        val position = Point.fromLngLat(
-            busStopData.position.longitude,
-            busStopData.position.latitude
-        )
         return PointAnnotationOptions()
-            .withPoint(position)
+            .withPoint(geoPosToPoint(busStopData.position))
             .withData(
-                JsonParser.parseString(
-                    Json.encodeToString(
-                        RouteAndBusStopId(
-                            routeId = routeId,
-                            busStopId = busStopData.id
-                        )
-                    )
-                )
+//                JsonParser.parseString(busStopData.id)
+                    JsonParser.parseReader(StringReader(busStopData.id))
             )
             .withIconImage(busStopIcon)
+            .withIconAnchor(IconAnchor.BOTTOM)
+            .withTextField(busStopData.name)
+            .withTextAnchor(TextAnchor.TOP)
+            .withTextSize(10.0)
     }
-    fun createBusStopTitle(busStopData: BusStop, busStop: PointAnnotation): View
-    {
-        val busStopTittleOptions = viewAnnotationOptions {
-            geometry(Point.fromLngLat(busStopData.position.longitude, busStopData.position.latitude))
-            associatedFeatureId(busStop.featureIdentifier)
-            anchor(ViewAnnotationAnchor.BOTTOM)
-            offsetY((busStop.iconImageBitmap?.height!!).toInt())
-        }
-        val viewAnnotation = viewAnnotationManager.addViewAnnotation(
-            resId = R.layout.busstop_title,
-            options = busStopTittleOptions
-        )
-        BusstopTitleBinding.bind(viewAnnotation).apply {
-            busStopName.text = busStopData.name
-        }
-        return viewAnnotation
-    }
-    /*                JsonParser.parseString(
-                    Json.encodeToString(
-                        RouteAndBusStopId(
-                            routeId = routeId,
-                            busStopId = busStopData.id
-                        )
-                    )
-                )*/
     fun createRouteLine(positions: List<GeoPosition>): PolylineAnnotationOptions
     {
         val points = List<Point>(positions.size) { i -> Point.fromLngLat(positions[i].longitude, positions[i].latitude) }
@@ -183,8 +148,15 @@ abstract class MapFragment: Fragment()
     fun moveCamera(point: Point?) {
         if (point == null) return
         mapView.camera.easeTo(
-            CameraOptions.Builder().center(point).zoom(14.0).build(),
-            MapAnimationOptions.Builder().duration(3000).build()
+            CameraOptions
+                .Builder()
+                .center(point)
+                .zoom(14.0)
+                .build(),
+            MapAnimationOptions
+                .Builder()
+                .duration(3000)
+                .build()
         )
     }
 
@@ -194,13 +166,15 @@ abstract class MapFragment: Fragment()
             .zoom(12.0)
             .center(point)
             .build()
-        cameraPosition.center
 
-        mapView.getMapboxMap().setCamera(cameraPosition)
+        mapbox.setCamera(cameraPosition)
     }
 
     fun geoPosToPoint(geoPosition: GeoPosition): Point =
         Point.fromLngLat(geoPosition.longitude, geoPosition.latitude)
+
+    fun pointToGeoPos(point: Point): GeoPosition =
+        GeoPosition(latitude = point.latitude(), longitude = point.longitude())
 
     private fun getCurrentLocale(context: Context): Locale
     {

@@ -53,6 +53,8 @@
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/arrow_in_circle.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/arrow_right.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/arrow_riht.xml" value="0.3675" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/big_gps_green.xml" value="0.3345" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/bottom_sheet_background.xml" value="0.316" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/bus_icon_black.xml" value="0.144" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/bus_icon_blue.xml" value="0.315" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/bus_icon_white.xml" value="0.196" />
@@ -62,34 +64,52 @@
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/circle_dark_grey.xml" value="0.144" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/circle_light_grey.xml" value="0.144" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/delete.xml" value="0.3675" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/delete_marker.xml" value="0.316" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/delte_dot_marker.xml" value="0.316" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/edit.xml" value="0.3675" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/gps_hollow.xml" value="0.316" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/gps_progress_bar.xml" value="0.3345" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/gps_progress_icon.xml" value="0.2515" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/location_icon.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/my_location_button.xml" value="0.145" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/outline_gps_fixed.xml" value="0.225" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/play_circle.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/plus.xml" value="0.3675" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/plus_in_circle.xml" value="0.3075" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/route_dot_selected.xml" value="0.2505" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/search.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/stop_circle.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/supervised_user.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/text_without_line.xml" value="0.356" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/twotone_circle.xml" value="0.316" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/visibility.xml" value="0.3675" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/drawable/visibility_off.xml" value="0.3675" />
-        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout-large/fragment_edit_users.xml" value="0.5" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout-large/fragment_edit_users.xml" value="0.22" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout-large/user_item.xml" value="0.5" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/activity_main.xml" value="0.18802083333333333" />
-        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/bottom_sheet_fragment.xml" value="0.18802083333333333" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/add_user_dialog.xml" value="0.3859375" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/bottom_sheet_fragment.xml" value="0.5" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/bus_stop_admin_item.xml" value="0.25" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/bus_stop_item_worker.xml" value="0.36666666666666664" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/bus_stop_title.xml" value="0.18802083333333333" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/busstop_item.xml" value="0.264" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/busstop_tit.xml" value="0.365625" />
-        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/busstop_title.xml" value="0.24583333333333332" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/busstop_title.xml" value="0.67" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/dialog_create_route_name_id.xml" value="0.365625" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/edit_bus_stop_dialog.xml" value="0.25" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_admin_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_create_route.xml" value="0.33" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_dispatcher.xml" value="0.17" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_driver.xml" value="0.36666666666666664" />
-        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_edit_users.xml" value="0.6087321578505458" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_edit_users.xml" value="0.33" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_main.xml" value="0.18802083333333333" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_map_admin.xml" value="0.18" />
-        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_map_worker.xml" value="0.11354166666666667" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_map_worker.xml" value="0.3976411120471778" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_maps.xml" value="0.33" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_not_found_user.xml" value="0.18802083333333333" />
-        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_route.xml" value="0.18802083333333333" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_route.xml" value="0.33" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/fragment_sign_in.xml" value="0.25" />
+        <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/item_map.xml" value="0.36666666666666664" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/item_view_marshrut.xml" value="0.18802083333333333" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/route_admin_item.xml" value="0.5" />
         <entry key="..\:/Andrei/projects/TimetableClient/app/src/main/res/layout/route_item.xml" value="0.36666666666666664" />

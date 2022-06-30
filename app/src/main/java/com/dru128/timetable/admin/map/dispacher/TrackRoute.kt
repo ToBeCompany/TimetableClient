@@ -1,4 +1,4 @@
-package com.dru128.timetable.admin.map
+package com.dru128.timetable.admin.map.dispacher
 
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route

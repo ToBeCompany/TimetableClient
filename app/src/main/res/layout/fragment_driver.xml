@@ -23,32 +23,52 @@
         app:layout_constraintStart_toStartOf="parent"
         android:prompt="@string/routes"/>
 
-    <ImageButton
+
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/trackerButton"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:background="@drawable/play_circle"
+        android:layout_width="200sp"
+        android:layout_height="200sp"
+        app:cardCornerRadius="100sp"
+        app:cardElevation="16sp"
+        app:contentPadding="-20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/trackerButtonImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/play_circle"/>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/routeTrackingName"
-        android:layout_width="0sp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
+        android:padding="4sp"
         android:text="@string/tracking_off"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/progress_tracker"
         app:layout_constraintTop_toBottomOf="@+id/trackerButton" />
 
-
+    <ProgressBar
+        android:id="@+id/progress_tracker"
+        android:layout_width="32sp"
+        android:layout_height="32sp"
+        android:layout_marginStart="16dp"
+        android:visibility="gone"
+        android:indeterminateDrawable="@drawable/gps_progress_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/routeTrackingName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/routeTrackingName" />
 </androidx.constraintlayout.widget.ConstraintLayout>

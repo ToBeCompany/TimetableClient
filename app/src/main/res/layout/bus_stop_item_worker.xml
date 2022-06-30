@@ -3,19 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginTop="1dp"
+    android:layout_marginBottom="1dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/dark_grey"
+    app:cardElevation="8dp"
+    app:cardCornerRadius="6sp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom">
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:id="@+id/parent">
 
 
         <ImageView
-            android:id="@+id/busImage_busstop_item"
+            android:id="@+id/bus_icon"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@drawable/bus_icon_black"
@@ -24,7 +32,7 @@
             app:tint="@color/good_grey" />
 
         <TextView
-            android:id="@+id/busStopName_busstop_item"
+            android:id="@+id/bus_stop_name"
             android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -33,13 +41,13 @@
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/time_busstop_item"
-            app:layout_constraintStart_toEndOf="@+id/busImage_busstop_item"
-            app:layout_constraintTop_toTopOf="@+id/busImage_busstop_item"
+            app:layout_constraintEnd_toStartOf="@+id/bus_stop_time"
+            app:layout_constraintStart_toEndOf="@+id/bus_icon"
+            app:layout_constraintTop_toTopOf="@+id/bus_icon"
             tools:text="Пл. советов" />
 
         <TextView
-            android:id="@+id/time_busstop_item"
+            android:id="@+id/bus_stop_time"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginTop="4dp"
@@ -53,16 +61,4 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="18:00"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@color/white_grey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
 </androidx.cardview.widget.CardView>

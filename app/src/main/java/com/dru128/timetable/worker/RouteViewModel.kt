@@ -12,36 +12,27 @@ import io.ktor.client.request.get
 
 class RouteViewModel: ViewModel()
 {
-    private var dataManager = JsonDataManager(App.globalContext)//RoomDataManager(application as App)
+    private var dataManager = JsonDataManager(App.globalContext)
 
     suspend fun getRoutes(): Array<Route>?
     {
-        val fromCache = dataManager.loadRoutes()
-
-        if (fromCache.isNullOrEmpty())
-        {
+//        val fromCache = dataManager.loadRoutes()
+//
+//        if (fromCache.isNullOrEmpty())
+//        {
             val fromServer = getFromServer()
             if (fromServer.isNullOrEmpty()) return null
-            dataManager.saveRoutes(fromServer)
+//            dataManager.saveRoutes(fromServer)
             Log.d("Data", "get from server")
 
             return fromServer
-        }
-        else {
-            Log.d("Data", "get from cash")
-
-            return fromCache
-        }
+//        }
+//        else {
+//            Log.d("Data", "get from cash")
+//
+//            return fromCache
+//        }
     }
-
-/*    suspend fun getFlight(): List<FlightsNameResponse>? =
-        try {
-            Storage.client.get(EndPoint.routes_names_id)
-        }
-        catch (error: Exception) {
-            Log.d("ErrorServer", error.message.toString())
-            null
-        }*/
 
     private suspend fun getFromServer(): Array<Route>? =
         try {

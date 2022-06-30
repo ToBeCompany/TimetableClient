@@ -30,7 +30,6 @@ class RouteFragment : Fragment()
         { id -> findNavController().navigate(RouteFragmentDirections.actionRouteFragmentToMapsFragment(id)) },
         arrayOf()
     )
-    private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
@@ -39,10 +38,9 @@ class RouteFragment : Fragment()
         progressManager = ProgressManager(binding.parent, requireActivity())
         progressManager.start()
 
-        recyclerView = binding.routesRecyclerView
 
-        recyclerView?.adapter = adapter
-        recyclerView?.layoutManager = LinearLayoutManager(context)
+        binding.routesRecyclerView.adapter = adapter
+        binding.routesRecyclerView.layoutManager = LinearLayoutManager(context)
         getData()
 
         return binding.root

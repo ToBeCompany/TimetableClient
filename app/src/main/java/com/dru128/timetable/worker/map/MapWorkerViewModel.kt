@@ -24,8 +24,10 @@ import kotlinx.serialization.json.Json
 
 class MapWorkerViewModel(application : Application): AndroidViewModel(application) {
     var webSocketSession: DefaultClientWebSocketSession? = null
+    var isTracking = false
 
     fun startWebSocket(routeId: kotlin.String) = flow<GeoPosition> {
+        isTracking = true
         Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = EndPoint.host,
@@ -48,12 +50,13 @@ class MapWorkerViewModel(application : Application): AndroidViewModel(applicatio
     }.flowOn(Dispatchers.IO)
 
     fun stopWebSocket() {
+        isTracking = false
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("WEB_SOCKET", "close web socket")
             webSocketSession?.close(
                 CloseReason(
                     CloseReason.Codes.NORMAL,
-                    "user close map fragment"
+                    "map fragment was closed"
                 )
             )
         }

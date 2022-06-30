@@ -18,8 +18,6 @@ class App: Application() // переопределяем класс прилож
 
         globalContext = applicationContext
 
-//        Storage.routes = RoomDataManager(this).loadRoutes()
-
     }
 
 

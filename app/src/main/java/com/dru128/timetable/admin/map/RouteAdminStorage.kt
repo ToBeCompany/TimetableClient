@@ -1,5 +1,6 @@
 package com.dru128.timetable.admin.map
 
+import com.dru128.timetable.admin.map.dispacher.MapboxRoute
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation

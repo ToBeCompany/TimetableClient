@@ -15,7 +15,7 @@ class RouteArrayAdapter(
     ArrayAdapter<String?>(context, textViewResourceId, dataSet)
 {
 
-    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View?
+    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View?
     {
         return if (dataSet[position] == hidingItem)
             View(context).apply { visibility = View.GONE }

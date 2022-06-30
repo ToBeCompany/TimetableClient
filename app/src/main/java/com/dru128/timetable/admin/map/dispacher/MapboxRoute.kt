@@ -1,12 +1,10 @@
-package com.dru128.timetable.admin.map
+package com.dru128.timetable.admin.map.dispacher
 
-import android.view.View
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
 
 class MapboxRoute(
     var isVisible: Boolean = false,
     var trackLine: PolylineAnnotation,
-    var busStops: Array<PointAnnotation> = arrayOf(),
-    var busStopTitles: Array<View> = arrayOf()
+    var busStops: List<PointAnnotation> = listOf(),
 )

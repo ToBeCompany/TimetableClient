@@ -1,5 +1,6 @@
 package com.dru128.timetable.admin.edituser
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -50,18 +51,16 @@ class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Arr
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(binding: UserItemBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(var binding: UserItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
         var context = binding.root.context
 
-        var userRole = binding.userRole
-        var userId = binding.userId
-        var deleteUserButton = binding.userDelete
-
         fun onBind(position: Int)
         {
-            userId.text = dataSet[position].id
-            userRole.text = when (dataSet[position].userType)
+//            Log.d("data", "users size = ${dataSet[position].userType} ${dataSet[position].id}")
+
+            binding.userId.text = dataSet[position].id
+            binding.userRole.text = when (dataSet[position].userType)
             {
                 TypeUser.WORKER -> context.resources.getString(R.string.worker)
                 TypeUser.DRIVER -> context.resources.getString(R.string.driver)
@@ -69,10 +68,10 @@ class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Arr
                 else-> context.resources.getString(R.string.error)
             }
 
-            deleteUserButton.setOnClickListener {
+            binding.userDelete.setOnClickListener {
                 deleteUser(dataSet[position])
             }
-            userId.setOnClickListener {
+            binding.userId.setOnClickListener {
                 Copy.copyText(context, dataSet[position].id)
                 Snackbar.make(it, context.resources.getString(R.string.id_is_coped), Snackbar.LENGTH_SHORT).show()
             }

@@ -3,6 +3,7 @@ package com.dru128.timetable
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -14,6 +15,7 @@ import androidx.navigation.ui.NavigationUI
 import com.dru128.timetable.auth.SignInFragmentDirections
 import com.dru128.timetable.auth.UserPreference
 import com.dru128.timetable.data.metadata.TypeUser
+import com.dru128.timetable.data.metadata.User
 import com.dru128.timetable.tools.ProgressManager
 import dru128.timetable.R
 import dru128.timetable.databinding.ActivityMainBinding
@@ -88,11 +90,12 @@ class MainActivity : AppCompatActivity()
         }
     }
 
-    fun setActionBarTitle(title: String?) {
-        supportActionBar!!.title = title
+    fun setActionBarTitle(newTitle: String) {
+        supportActionBar?.title = newTitle
     }
+
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp()
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean
@@ -116,4 +119,5 @@ class MainActivity : AppCompatActivity()
         }
         return super.onOptionsItemSelected(item)
     }
+
 }

@@ -1,12 +1,17 @@
 package com.dru128.timetable
 
+import dru128.timetable.BuildConfig
+
 object EndPoint
 {
     // протокол сервера
     const val protocol = "https://"
 
     // HOST сервера
-    const val host = "fierce-woodland-54822.herokuapp.com"
+    val host = if (BuildConfig.BUILD_TYPE == "release")
+        "fierce-woodland-54822.herokuapp.com"
+    else
+        "safe-reaches-68287.herokuapp.com"
 
     // вебсокет пассажира
     const val webSocket_passenger = "passenger/"
@@ -30,15 +35,24 @@ object EndPoint
     // получить данные пользователя по ID
     const val auth = "/sign/"
 
+    // удалить маршрут по ID
+    const val deleteRoute = "/deleteRoute/"
+
+    // удалить маршрут по ID
+    const val createRoute = "/createRoute/"
+
+    // удалить маршрут по ID
+    const val editRoute = "/editRoute/"
+
     // удалить пользователя по ID
     const val deleteUser = "/deleteUser/"
 
     // добавить (создать) пользователя
-    const val createUser = "/createUser"
+    const val createUser = "/addUser"
 
-    // добавить (создать) пользователя
+    // получить всех пользователей
     const val allUsers = "/allUsers"
 
-    // добавить (создать) пользователя
+    // получить автобусы
     const val getBuses = "/getBuses"
 }

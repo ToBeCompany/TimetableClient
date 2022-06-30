@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-class BusStopWithTime(
+data class BusStopWithTime(
     @SerialName("first")
     var busStop: BusStop,
     @SerialName("second")

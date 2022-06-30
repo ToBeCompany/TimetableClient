@@ -10,11 +10,12 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
+import com.dru128.timetable.tools.IDGenerator
 import dru128.timetable.R
 import dru128.timetable.databinding.AddUserDialogBinding
 
-
-class AddUserDialog: DialogFragment(/*R.layout.add_user_dialog*/)
+interface CreateUser { fun createUser(user: User) }
+class AddUserDialog: DialogFragment()
 {
     private var addUser: CreateUser? = null
 
@@ -46,12 +47,13 @@ class AddUserDialog: DialogFragment(/*R.layout.add_user_dialog*/)
         val builder = AlertDialog.Builder(activity)
         return builder
             .setView(binding.root)
+            .setTitle(requireContext().resources.getString(R.string.user_data))
             .setNegativeButton( requireContext().resources.getString(R.string.close) )
             { _dialog, _id -> onCancel(_dialog) }
             .setPositiveButton( requireContext().resources.getString(R.string.add) )
             { _dialog, _id ->
                 val userId =
-                    if (binding.autoGenerationCheckbox.isChecked) ""
+                    if (binding.autoGenerationCheckbox.isChecked) IDGenerator.generateID()
                     else binding.idUser.text.toString()
                 val user = User(
                     userType = typeUserConvertor[binding.typeNewUser.selectedItem]!!,

@@ -18,9 +18,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.dru128.timetable.BusStopsBottomSheet
+import com.dru128.timetable.map.BusStopsBottomSheet
 import com.dru128.timetable.MainActivity
-import com.dru128.timetable.MapFragment
+import com.dru128.timetable.map.MapFragment
+import com.dru128.timetable.map.RouteAndBusStopId
+import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.tools.ProgressManager
@@ -30,12 +32,13 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMapWorkerBinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 
 class MapWorkerFragment: MapFragment()
@@ -43,15 +46,17 @@ class MapWorkerFragment: MapFragment()
     private lateinit var binding: FragmentMapWorkerBinding
     private lateinit var progressManager: ProgressManager
 
-    private var isTracking = false
 
     private var busMarker: PointAnnotation? = null
+    var busStopMarkers = listOf<PointAnnotation>()
 
     private val viewModel: MapWorkerViewModel by viewModels()
     private val args: MapWorkerFragmentArgs  by navArgs()
     val route/*: Flight*/:Route by lazy { RouteWorkerStorage.routes[args.id] }
 
-    var cameraChangeListener: OnCameraChangeListener? = null
+    private var cameraChangeListener: OnCameraChangeListener? = null
+    private val pointClickListener: OnPointAnnotationClickListener by lazy { addBusStopClickListener() }
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
@@ -82,7 +87,6 @@ class MapWorkerFragment: MapFragment()
                 pulsingEnabled = true
             }
 
-
         binding.myLocationButton.setOnClickListener {
             moveToUserLocation()
         }
@@ -101,6 +105,8 @@ class MapWorkerFragment: MapFragment()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
             connectivityManager!!.registerNetworkCallback(request, networkCallback)
         }
+
+
     }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
@@ -124,7 +130,7 @@ class MapWorkerFragment: MapFragment()
     {
         Log.d("addRouteOnMap", "drawing route...")
 
-        var busStopTitles = arrayOf<View>()
+
         val busStopIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.location_marker, null)!!)!!
 
         val positions = route.positions
@@ -135,36 +141,10 @@ class MapWorkerFragment: MapFragment()
         else
             polylineAnnotationManager.create(createRouteLine(positions)) // построение линии маршруты
 
-        for (i in busStops.indices) // добавляем маркеры на карту
-        {
-            val busStop = pointAnnotationManager.create(
-                createBusStop(busStops[i].busStop, TODO(),busStopIcon)
+        busStopMarkers = List<PointAnnotation>(route.busStopsWithTime.size) { i ->
+            pointAnnotationManager.create(
+                createBusStop(busStops[i].busStop, busStopIcon)
             )
-
-            val busStopTitle = createBusStopTitle(busStops[i].busStop, busStop)
-            busStopTitles += busStopTitle
-
-            pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { // listener нажатия на остановку на карте
-                val idBusStop = it.getData()?.asString
-                if (idBusStop != null)
-                {
-                    val requestKey = requireContext().getString(R.string.itemSelected)
-                    val bottomSheet = BusStopsBottomSheet(idBusStop, busStops)
-                    bottomSheet.show(childFragmentManager, "BottomSheetDialog")
-
-                    childFragmentManager.setFragmentResultListener(requestKey, viewLifecycleOwner) { key, bundle ->
-                        // listener нажатия на остановку в Bottom sheet
-                        if (key == requestKey)
-                        {
-                            val selected = bundle.getInt(requireContext().getString(R.string.busStop_id))
-                            moveCamera(
-                                geoPosToPoint(route.busStopsWithTime[selected].busStop.position)
-                            )
-                        }
-                    }
-                }
-                true
-            })
         }
 
         val isZoomChange = MutableStateFlow(false)
@@ -172,34 +152,30 @@ class MapWorkerFragment: MapFragment()
             isZoomChange.collectLatest {
                 if (it)
                 {
-                    for (title in busStopTitles)
-                        viewAnnotationManager.updateViewAnnotation(
-                            title,
-                            viewAnnotationOptions { visible(true) }
-                        )
+                    for (i in busStopMarkers.indices)
+                        busStopMarkers[i].textField = busStops[i].busStop.name
                 }
                 else
                 {
-                    for (title in busStopTitles)
-                        viewAnnotationManager.updateViewAnnotation(
-                            title,
-                            viewAnnotationOptions { visible(false) }
-                        )
+                    for (element in busStopMarkers)
+                        element.textField = ""
                 }
+                pointAnnotationManager.update(busStopMarkers)
             }
         }
 
         cameraChangeListener = OnCameraChangeListener { cameraChanged ->
             isZoomChange.value = mapbox.cameraState.zoom > 13.0
         }
+
+        pointAnnotationManager.addClickListener(pointClickListener)
         mapbox.addOnCameraChangeListener(cameraChangeListener!!)
     }
 
     private fun startListeningTracker(trackerId: String)
     {
         Log.d("Tracker", "startListening, id = $trackerId")
-        if (isTracking) return
-        isTracking = true
+        if (viewModel.isTracking) return
 
         val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
 
@@ -224,9 +200,31 @@ class MapWorkerFragment: MapFragment()
         }
     }
 
+    private fun addBusStopClickListener(): OnPointAnnotationClickListener = OnPointAnnotationClickListener { _busStopAnnotation ->
+        // listener нажатия на остановку на карте
+        for (busStop in busStopMarkers)
+            if (_busStopAnnotation == busStop && _busStopAnnotation.getData() != null)
+            {
+                val requestKey = requireContext().getString(R.string.itemSelected)
+                val busStopId = busStop.getData()!!.asString
+
+                val bottomSheet = BusStopsBottomSheet(busStopId, route.busStopsWithTime)
+                bottomSheet.show(childFragmentManager, "BottomSheetMap $busStopId")
+                childFragmentManager.setFragmentResultListener(requestKey, viewLifecycleOwner) { key, bundle ->
+                    // listener нажатия на остановку в Bottom sheet
+                    if (key == requestKey)
+                    {
+                        val position = Json.decodeFromString<GeoPosition>(bundle.getString(requireContext().getString(R.string.busStop_id)).toString())
+                        moveCamera( geoPosToPoint(position) )
+                    }
+                }
+
+            }
+        true
+    }
+
     private fun stopListeningTracker() {
         Log.d("Tracker", "stopListening")
-        isTracking = false
         viewModel.stopWebSocket()
     }
 
@@ -242,6 +240,7 @@ class MapWorkerFragment: MapFragment()
     }
 
     override fun onStop() {
+        pointAnnotationManager.removeClickListener(pointClickListener)
         stopListeningTracker()
         super.onStop()
     }

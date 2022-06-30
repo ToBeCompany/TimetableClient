@@ -5,10 +5,11 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
-import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -18,11 +19,13 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     suspend fun getUsers(): Boolean
     {
         try {
-            Log.d("Server", "SUCCESS")
 
-            for (i in 0..10) UsersStorage.userList.value += User(TypeUser.WORKER, null, (0..91111).random().toString())
-//            val response: Array<User> = Storage.client.get(EndPoint.allUsers) ?: return false
-//            UsersStorage.userList = MutableStateFlow(response)
+//            for (i in 0..10) UsersStorage.userList.value += User(TypeUser.WORKER, null, (0..91111).random().toString())
+            val response: Array<User> = Repository.client.get(EndPoint.allUsers) ?: return false
+            response.forEach { Log.d("data", "role = ${it.userType}, id = ${it.id}") }
+
+            UsersStorage.userList = MutableStateFlow(response)
+            Log.d("Server", "SUCCESS")
             return true
         }
         catch (error: Exception) {
@@ -31,24 +34,15 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
         }
     }
 
-
-
-
     suspend fun createUser(user: User): Boolean =
         try {
-            Log.d("Server", "SUCCESS")
-            val response: Boolean? = Repository.client.post(EndPoint.createUser + user) {
+            val response: HttpResponse = Repository.client.post(EndPoint.createUser) {
                 this.body = Json.encodeToString(user)
             }
 
-            if (response != null && response)
-            {
-                UsersStorage.userList.value.plus(user)
-                true
-            }
-            else
-                false
-
+            UsersStorage.userList.value += user
+            Log.d("Server", "SUCCESS")
+            true
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
@@ -60,15 +54,10 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
             Log.d("Server", "SUCCESS")
             val response: Boolean? = Repository.client.get(EndPoint.deleteUser + id)
 
-            if (response != null && response) // если удаление прош
-            {
-                UsersStorage.userList.value
-                    .filter { it.id != id }
-                    .let { UsersStorage.userList.value = it.toTypedArray() }
-                true
-            }
-            else
-                 false
+            UsersStorage.userList.value
+                .filter { it.id != id }
+                .let { UsersStorage.userList.value = it.toTypedArray() }
+            true
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")

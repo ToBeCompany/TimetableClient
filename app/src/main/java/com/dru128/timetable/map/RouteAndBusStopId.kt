@@ -1,4 +1,4 @@
-package com.dru128.timetable
+package com.dru128.timetable.map
 
 import kotlinx.serialization.Serializable
 

@@ -1,5 +1,6 @@
 package com.dru128.timetable.admin.edituser
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -13,13 +14,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.dru128.timetable.admin.map.RouteAdminStorage
 import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
 import com.google.android.material.snackbar.Snackbar
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentEditUsersBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -47,7 +47,8 @@ class EditUsersFragment : Fragment(), CreateUser
         binding.userRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.userRecyclerView.adapter = adapter
 
-        binding.createUserButton?.setOnClickListener {
+        binding.createUserButton.setOnClickListener {
+            Log.d("event", "show dialog create user")
             AddUserDialog().show(childFragmentManager, AddUserDialog.TAG)
         }
 
@@ -94,36 +95,46 @@ class EditUsersFragment : Fragment(), CreateUser
                     adapter.notifyDataSetChanged()
                 }
                 else
-                    Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_get_users), Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_get_users), Snackbar.LENGTH_LONG).show()
             }
         }
         else
         {
             Log.d("request", "get users from repository")
-//            adapter.dataSet = UsersStorage.userList.value
-//            adapter.notifyDataSetChanged()
+            adapter.dataSet = UsersStorage.userList.value
+            adapter.notifyDataSetChanged()
         }
     }
 
     fun deleteUser(user: User)
     {
-        Log.d("request", "delete user by id: ${user.id}")
-        lifecycleScope.launch {
-            val status = viewModel.deleteUser(user.id)
-            Log.d("status", "= $status")
-            if (status)
-            {
-                val users = UsersStorage.userList.value
-                val position = users.indexOf(user)
+        Log.d("event", "show dialog delete user")
+        AlertDialog.Builder(requireActivity())
+            .setTitle(requireContext().resources.getString(R.string.delete_user))
+//               .setIcon(R.drawable.hungrycat)
+            .setNegativeButton(requireContext().resources.getString(R.string.cancel)) { dialog, _id -> dialog.dismiss() }
+            .setPositiveButton(requireContext().resources.getString(R.string.confirm)) { dialog, _id ->
+                Log.d("request", "delete user by id: ${user.id}")
+                lifecycleScope.launch {
+                    val status = viewModel.deleteUser(user.id)
+                    Log.d("status", "= $status")
+                    if (status)
+                    {
+                        val users = UsersStorage.userList.value
+                        val position = users.indexOf(user)
 
-                adapter.apply {
-                    notifyItemRemoved(position)
-                    notifyItemRangeChanged(position,  users.size)
+                        adapter.apply {
+                            notifyItemRemoved(position)
+                            notifyItemRangeChanged(position,  users.size)
+                        }
+                    }
+                    else
+                        Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_delete_user), Snackbar.LENGTH_LONG).show()
                 }
+                dialog.dismiss()
             }
-            else
-                Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_delete_user), Snackbar.LENGTH_LONG).show()
-        }
+            .create()
+            .show()
     }
 
     override fun createUser(user: User)
@@ -163,8 +174,8 @@ class EditUsersFragment : Fragment(), CreateUser
 
     override fun onResume()
     {
-        adapter.
-        sort(UsersStorage.userList.value)
+        adapter.sort(UsersStorage.userList.value)
         super.onResume()
     }
+
 }

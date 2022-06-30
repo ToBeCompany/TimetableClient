@@ -18,6 +18,7 @@ class DriverViewModel(application : Application): AndroidViewModel(application)
     suspend fun getFlight(): Array<FlightsNameResponse>? =
         try {
             val response: List<FlightsNameResponse> = Repository.client.get(EndPoint.routes_names_id)
+            routesInf = arrayOf()
             routesInf += FlightsNameResponse( App.globalContext.getString(R.string.route_not_selected), "" )
             routesInf += response
             routesInf

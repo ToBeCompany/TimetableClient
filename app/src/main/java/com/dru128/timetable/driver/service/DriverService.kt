@@ -19,49 +19,54 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
-import dru128.timetable.R
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.response.FlightsNameResponse
+import dru128.timetable.R
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.client.features.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.websocket.CloseReason
-import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
-class DriverService() : Service()
+class DriverService : Service()
 {
+    private var serviceScope: CoroutineScope = CoroutineScope(Job())
     private var webSocketSession: DefaultClientWebSocketSession? = null
+
     private var route: FlightsNameResponse? = null
+    private var isTrackerOn = false
 
     private val busLocation = MutableSharedFlow<GeoPosition>()
-
+    
     private var listener = LocationListener {
         val position = GeoPosition(latitude = it.latitude, longitude = it.longitude)
-        MainScope().launch(Dispatchers.IO) {
+        serviceScope.launch {
             busLocation.emit(position)
         }
     }
+
     private val wakeLock: PowerManager.WakeLock  by lazy {
         (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
             newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${getString(R.string.app_name)}::WakelockTag")
         }
     }
+
     private val networkCallback = object: ConnectivityManager.NetworkCallback()
     {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
-            startSearch(route?.id.toString())
+            route?.let { _route ->
+                startSearch(_route.id)
+            }
             Log.d("network", "is on")
             super.onAvailable(network)
         }
@@ -82,7 +87,6 @@ class DriverService() : Service()
             .notify(4,notification)
         startForeground(4, notification)
 
-        wakeLock.acquire() // запрещаю переходить в спящий режим
 
         val action: String = intent?.getStringExtra(getString(R.string.action)).toString()
         when (action)
@@ -91,11 +95,12 @@ class DriverService() : Service()
             {
                 val _route: FlightsNameResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
                 Log.d("startServiceAndTracker", _route.toString())
-                startSearch(_route.id!!)
+                startSearch(_route.id)
                 route = _route
             }
             getString(R.string.off_service) ->
             {
+                Log.d("DestroyService", "")
                 stopSearch()
                 val _intent = Intent(getString(R.string.action))
                 _intent.putExtra(getString(R.string.off_service), getString(R.string.off_service))
@@ -108,7 +113,7 @@ class DriverService() : Service()
             {
                 stopSearch()
                 val _route: FlightsNameResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
-                startSearch(_route.id!!)
+                startSearch(_route.id)
                 route = _route
             }
             getString(R.string.which_tracker_id) ->
@@ -121,21 +126,14 @@ class DriverService() : Service()
             }
         }
 
-
-        val connectivityManager = ContextCompat.getSystemService(applicationContext, ConnectivityManager::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
-        } else {
-            val request = NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
-            connectivityManager!!.registerNetworkCallback(request, networkCallback)
-        }
         return super.onStartCommand(intent, flags, startId)
     }
 
     @SuppressLint("MissingPermission")
     private fun startSearch(trackerId: String) // это нужно запустить в самом начале работы программы
     {
+        if (isTrackerOn) return
+        isTrackerOn = true
         Log.d("LocationListener", "start listening")
         val locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(
@@ -143,26 +141,31 @@ class DriverService() : Service()
             5000, 10f,
             listener
         )
-        MainScope().launch(Dispatchers.IO) {
+        serviceScope.launch {
             startWebSocket(trackerId)
         }
+
     }
 
     private fun stopSearch()
     {
+        if (!isTrackerOn) return
+        isTrackerOn = false
         Log.d("LocationListener", "stop listening")
 
         val locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.removeUpdates(listener)
 
-        MainScope().launch(Dispatchers.IO) {
+        serviceScope.launch {
             webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "driver turn off transponder "))
+            serviceScope.cancel()
         }
     }
 
 
     private suspend fun startWebSocket(trackerId: String)
     {
+        Log.d("startWebSocket", "route id = $trackerId")
         Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = EndPoint.host,
@@ -171,15 +174,14 @@ class DriverService() : Service()
         {
             webSocketSession = this@webSocket
 
-            busLocation.collect {
-                Log.d("newLocationTracker id= $trackerId", "${it.latitude.toString()} ${it.longitude.toString()}")
-                withContext(Dispatchers.IO) {
-                    send(
-                        Frame.Text(
-                            Json.encodeToString(it)
-                        )
-                    )
-                }
+            busLocation.collect { geoPosition ->
+                Log.d("UPD_BUS_LOC", "id= $trackerId | ${geoPosition.latitude} ${geoPosition.longitude}")
+
+//                send(
+//                    Frame.Text(
+//                        Json.encodeToString(geoPosition)
+//                    )
+//                )
             }
         }
     }
@@ -188,7 +190,23 @@ class DriverService() : Service()
         return null
     }
 
+    override fun onCreate()
+    {
+        wakeLock.acquire() // запрещаю переходить в спящий режим
+        val connectivityManager = ContextCompat.getSystemService(applicationContext, ConnectivityManager::class.java) // вешаю лисенер потери интернета
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager?.registerDefaultNetworkCallback(networkCallback)
+        } else {
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
+            connectivityManager?.registerNetworkCallback(request, networkCallback)
+        }
+        super.onCreate()
+    }
+
     override fun onDestroy() {
+        val connectivityManager = ContextCompat.getSystemService(applicationContext, ConnectivityManager::class.java)
+        connectivityManager?.unregisterNetworkCallback(networkCallback)
         wakeLock.release() // разрешаю переходить в спящий режим
         super.onDestroy()
     }

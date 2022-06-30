@@ -7,9 +7,11 @@
 
     <fragment
         android:id="@+id/mapAdminFragment"
-        android:name="com.dru128.timetable.admin.map.MapAdminFragment"
+        android:name="com.dru128.timetable.admin.map.dispacher.DispatcherFragment"
         android:label="@string/dispatcher"
-        tools:layout="@layout/fragment_map_admin" />
+        tools:layout="@layout/fragment_dispatcher" >
+    </fragment>
+
     <fragment
         android:id="@+id/editUsersFragment"
         android:name="com.dru128.timetable.admin.edituser.EditUsersFragment"

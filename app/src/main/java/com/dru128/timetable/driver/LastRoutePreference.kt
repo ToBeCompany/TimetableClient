@@ -16,6 +16,6 @@ class LastRoutePreference(var context: Context)
             .apply()
     }
 
-    fun getRouteId(): String?
+    fun getRouteId(): String
         = preference.getString(TAG_ROUTE_ID, null).toString()
 }
