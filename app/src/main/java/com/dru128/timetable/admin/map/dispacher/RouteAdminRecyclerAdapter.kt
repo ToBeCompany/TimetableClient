@@ -1,6 +1,7 @@
 package com.dru128.timetable.admin.map.dispacher
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.admin.map.RouteAdminStorage
@@ -13,7 +14,7 @@ class RouteAdminRecyclerAdapter(
     var hideRoute: (id: String) -> Unit,
     var deleteRoute: (id: String) -> Unit,
     var editRoute: (id: String) -> Unit,
-    var dataSet: Array<Route>
+    var dataSet: Array<DispatcherRouteItem>
 ) : RecyclerView.Adapter<RouteAdminRecyclerAdapter.ViewHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -29,15 +30,23 @@ class RouteAdminRecyclerAdapter(
 
     override fun getItemCount(): Int = dataSet.size
 
+    fun routePositionById(id: String): Int?
+    {
+        for (i in dataSet.indices)
+            if (dataSet[i].route.id == id)
+                return i
+        return null
+    }
+
     inner class ViewHolder(var binding: RouteAdminItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
         var context = binding.root.context
 
         fun onBind(position: Int)
         {
-            binding.nameRoute.text = dataSet[position].name
+            binding.nameRoute.text = dataSet[position].route.name
 
-            RouteAdminStorage.mapboxRoutes[dataSet[position].id]?.let { mapboxRoute ->
+            RouteAdminStorage.mapboxRoutes[dataSet[position].route.id]?.let { mapboxRoute ->
                 if (mapboxRoute.isVisible)
                 {
                     binding.root.alpha = 1.0f
@@ -52,22 +61,23 @@ class RouteAdminRecyclerAdapter(
                 isShowRoute(isChecked, position)
             }
             binding.deleteRoute.setOnClickListener {
-                deleteRoute(dataSet[position].id)
+                deleteRoute(dataSet[position].route.id)
             }
             binding.editRoute.setOnClickListener {
-                editRoute(dataSet[position].id)
+                editRoute(dataSet[position].route.id)
             }
 
-      /*      dataSet[position].position.collect { // for online text
 
-            }*/
+            binding.isOnline.visibility =
+                if (dataSet[position].isOnline) View.VISIBLE
+                else View.INVISIBLE
         }
 
         private fun isShowRoute(isShow: Boolean, i: Int)
         {
             if (isShow)
             {
-                showRoute(dataSet[i])
+                showRoute(dataSet[i].route)
                 binding.root.alpha = 1.0f
                 binding.visibleRoute.apply {
                     setBackgroundResource(R.drawable.visibility)
@@ -76,7 +86,7 @@ class RouteAdminRecyclerAdapter(
             }
             else
             {
-                hideRoute(dataSet[i].id)
+                hideRoute(dataSet[i].route.id)
                 binding.root.alpha = 0.7f
                 binding.visibleRoute.apply {
                     setBackgroundResource(R.drawable.visibility_off)

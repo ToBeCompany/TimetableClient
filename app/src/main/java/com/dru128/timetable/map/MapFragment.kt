@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
@@ -19,15 +20,16 @@ import androidx.fragment.app.Fragment
 import com.dru128.timetable.data.metadata.BusStop
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.JsonElement
 import com.google.gson.JsonParser
-import com.google.gson.JsonSyntaxException
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.localization.localizeLabels
+import com.mapbox.maps.extension.style.expressions.dsl.generated.zoom
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
@@ -47,8 +49,15 @@ import java.util.*
 
 abstract class MapFragment: Fragment()
 {
+    private object MapFragmentState
+    {
+        var cameraZoom: Double? = null
+        var cameraPosition: Point? = null
+    }
+
     lateinit var mapView: MapView
     lateinit var mapbox: MapboxMap
+
     val locationManager by lazy {
         requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
@@ -65,10 +74,17 @@ abstract class MapFragment: Fragment()
             it.localizeLabels(getCurrentLocale(requireContext()))
             mapReady()
         }
+        mapbox.setBounds(agglomerationOfBarnaul)
 
 
         pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
         polylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager()
+
+        Log.d("MAP_CAMERA", "position: " + MapFragmentState.cameraPosition.toString())
+        Log.d("MAP_CAMERA", "zoom: " + MapFragmentState.cameraZoom.toString())
+
+        if (MapFragmentState.cameraZoom != null && MapFragmentState.cameraPosition != null)
+            tpCamera(MapFragmentState.cameraPosition, MapFragmentState.cameraZoom)
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }
@@ -144,7 +160,10 @@ abstract class MapFragment: Fragment()
             .withLineWidth(5.0)
     }
 
-
+    fun moveCamera(point: GeoPosition?) {
+        if (point != null)
+            moveCamera(geoPosToPoint(point))
+    }
     fun moveCamera(point: Point?) {
         if (point == null) return
         mapView.camera.easeTo(
@@ -160,10 +179,14 @@ abstract class MapFragment: Fragment()
         )
     }
 
-    fun tpCamera(point: Point?) {
+    fun tpCamera(point: GeoPosition?, zoom: Double? = null) {
+        if (point != null)
+            tpCamera(geoPosToPoint(point), zoom)
+    }
+    fun tpCamera(point: Point?, zoom: Double? = null) {
         if (point == null) return
         val cameraPosition = CameraOptions.Builder()
-            .zoom(12.0)
+            .zoom(zoom ?: 12.0)
             .center(point)
             .build()
 
@@ -192,4 +215,22 @@ abstract class MapFragment: Fragment()
 
     fun isGPSEnabled(): Boolean =
         locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+    private val agglomerationOfBarnaul: CameraBoundsOptions = CameraBoundsOptions.Builder()
+        .bounds(
+            CoordinateBounds(
+                Point.fromLngLat(83.284087, 53.522732),
+                Point.fromLngLat( 84.1435581550414, 53.118062596069514),
+                false
+            )
+        )
+        .minZoom(10.0)
+        .build()
+
+    override fun onStop()
+    {
+        MapFragmentState.cameraZoom = mapbox.cameraState.zoom
+        MapFragmentState.cameraPosition = mapbox.cameraState.center
+        super.onStop()
+    }
 }

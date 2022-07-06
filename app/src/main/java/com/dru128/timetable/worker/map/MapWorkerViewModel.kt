@@ -7,13 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.GeoPosition
-import io.ktor.client.features.websocket.DefaultClientWebSocketSession
-import io.ktor.client.features.websocket.webSocket
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
-import io.ktor.http.cio.websocket.CloseReason
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.close
-import io.ktor.http.cio.websocket.readText
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.Frame
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -22,7 +22,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
-class MapWorkerViewModel(application : Application): AndroidViewModel(application) {
+class MapWorkerViewModel(application : Application): AndroidViewModel(application)
+{
     var webSocketSession: DefaultClientWebSocketSession? = null
     var isTracking = false
 
@@ -42,7 +43,7 @@ class MapWorkerViewModel(application : Application): AndroidViewModel(applicatio
                 {
                     val position = Json.decodeFromString<GeoPosition>(frame.readText())
                     emit(position)
-                    Log.d("WEB_SOCKET", "update position: " + position.latitude.toString())
+                    Log.d("WEB_SOCKET", "update position: $position")
                 }
             }
         }

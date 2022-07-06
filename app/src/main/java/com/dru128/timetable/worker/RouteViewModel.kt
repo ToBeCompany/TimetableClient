@@ -7,6 +7,7 @@ import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
 import com.dru128.timetable.data.JsonDataManager
 import com.dru128.timetable.data.metadata.Route
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 
 
@@ -36,8 +37,7 @@ class RouteViewModel: ViewModel()
 
     private suspend fun getFromServer(): Array<Route>? =
         try {
-            Log.d("Server", "SUCCESS")
-            Repository.client.get(EndPoint.all_routes)
+            Repository.client.get(EndPoint.all_routes).body()
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")

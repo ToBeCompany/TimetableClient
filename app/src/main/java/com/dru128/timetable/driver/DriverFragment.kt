@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.dru128.timetable.data.metadata.response.FlightsNameResponse
+import com.dru128.timetable.data.metadata.response.RouteNamesResponse
 import com.dru128.timetable.driver.service.DriverService
 import com.dru128.timetable.tools.ProgressManager
 import com.dru128.timetable.tools.isServiceRunning
@@ -57,7 +57,7 @@ class DriverFragment : Fragment()
             if (intent.hasExtra(getString(R.string.tracker_id)))
             {
                 val jsonRoute = intent.getStringExtra(getString(R.string.tracker_id)).toString()
-                val route: FlightsNameResponse = Json.decodeFromString(jsonRoute)
+                val route: RouteNamesResponse = Json.decodeFromString(jsonRoute)
                 Log.d("receiver_driver", jsonRoute)
 
                 isListiningPos = true
@@ -134,7 +134,7 @@ class DriverFragment : Fragment()
     private fun getDataFromServer()
     {
         viewModel.viewModelScope.launch {
-            val routeNames: Array<FlightsNameResponse>? = viewModel.getFlight()
+            val routeNames: Array<RouteNamesResponse>? = viewModel.getRouteNames()
             if (routeNames != null && routeNames.isNotEmpty())
             {
                 Log.d("ResponseServer", "data (flight) Ready")

@@ -20,13 +20,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.GeoPosition
-import com.dru128.timetable.data.metadata.response.FlightsNameResponse
+import com.dru128.timetable.data.metadata.response.RouteNamesResponse
 import dru128.timetable.R
-import io.ktor.client.features.websocket.DefaultClientWebSocketSession
-import io.ktor.client.features.websocket.webSocket
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
-import io.ktor.http.cio.websocket.CloseReason
-import io.ktor.http.cio.websocket.close
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 
 
 class DriverService : Service()
@@ -42,7 +44,7 @@ class DriverService : Service()
     private var serviceScope: CoroutineScope = CoroutineScope(Job())
     private var webSocketSession: DefaultClientWebSocketSession? = null
 
-    private var route: FlightsNameResponse? = null
+    private var route: RouteNamesResponse? = null
     private var isTrackerOn = false
 
     private val busLocation = MutableSharedFlow<GeoPosition>()
@@ -93,7 +95,7 @@ class DriverService : Service()
         {
             getString(R.string.on_service) ->
             {
-                val _route: FlightsNameResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
+                val _route: RouteNamesResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
                 Log.d("startServiceAndTracker", _route.toString())
                 startSearch(_route.id)
                 route = _route
@@ -112,7 +114,7 @@ class DriverService : Service()
             getString(R.string.new_tracker) ->
             {
                 stopSearch()
-                val _route: FlightsNameResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
+                val _route: RouteNamesResponse = Json.decodeFromString(intent?.getStringExtra(getString(R.string.route)).toString())
                 startSearch(_route.id)
                 route = _route
             }
@@ -165,7 +167,6 @@ class DriverService : Service()
 
     private suspend fun startWebSocket(trackerId: String)
     {
-        Log.d("startWebSocket", "route id = $trackerId")
         Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = EndPoint.host,
@@ -173,15 +174,16 @@ class DriverService : Service()
         )
         {
             webSocketSession = this@webSocket
+            Log.d("startWebSocket", "url = ${this.call.request.url}   route id = $trackerId")
 
             busLocation.collect { geoPosition ->
                 Log.d("UPD_BUS_LOC", "id= $trackerId | ${geoPosition.latitude} ${geoPosition.longitude}")
 
-//                send(
-//                    Frame.Text(
-//                        Json.encodeToString(geoPosition)
-//                    )
-//                )
+                send(
+                    Frame.Text(
+                        Json.encodeToString(geoPosition)
+                    )
+                )
             }
         }
     }

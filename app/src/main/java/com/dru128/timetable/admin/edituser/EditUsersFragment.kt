@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dru128.timetable.admin.map.RouteAdminStorage
 import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
 import com.google.android.material.snackbar.Snackbar
@@ -49,7 +48,11 @@ class EditUsersFragment : Fragment(), CreateUser
 
         binding.createUserButton.setOnClickListener {
             Log.d("event", "show dialog create user")
-            AddUserDialog().show(childFragmentManager, AddUserDialog.TAG)
+            val createUserDialog = AddUserDialog()
+            createUserDialog.isCancelable = false
+            createUserDialog.show(childFragmentManager, AddUserDialog.TAG)
+
+
         }
 
         binding.sortByIdText.addTextChangedListener { _id ->
@@ -94,8 +97,8 @@ class EditUsersFragment : Fragment(), CreateUser
                     adapter.dataSet = UsersStorage.userList.value
                     adapter.notifyDataSetChanged()
                 }
-                else
-                    Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_get_users), Snackbar.LENGTH_LONG).show()
+//                else
+//                    Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_get_users), Snackbar.LENGTH_LONG).show()
             }
         }
         else
@@ -119,15 +122,7 @@ class EditUsersFragment : Fragment(), CreateUser
                     val status = viewModel.deleteUser(user.id)
                     Log.d("status", "= $status")
                     if (status)
-                    {
-                        val users = UsersStorage.userList.value
-                        val position = users.indexOf(user)
-
-                        adapter.apply {
-                            notifyItemRemoved(position)
-                            notifyItemRangeChanged(position,  users.size)
-                        }
-                    }
+                        adapter.sort(UsersStorage.userList.value)
                     else
                         Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_delete_user), Snackbar.LENGTH_LONG).show()
                 }
@@ -144,15 +139,7 @@ class EditUsersFragment : Fragment(), CreateUser
             val status = viewModel.createUser(user)
             Log.d("status", "= $status")
             if (status)
-            {
-                val users = UsersStorage.userList.value
-                val position = users.indexOf(user)
-
-                adapter.apply {
-                    notifyItemInserted(position)
-                    notifyItemRangeChanged(position,  users.size)
-                }
-            }
+                adapter.sort(UsersStorage.userList.value)
             else
                 Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_create_user), Snackbar.LENGTH_LONG).show()
         }

@@ -1,6 +1,7 @@
 package com.dru128.timetable.worker.map
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -8,9 +9,11 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
@@ -27,6 +30,9 @@ import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.tools.ProgressManager
 import com.google.android.material.snackbar.Snackbar
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraBoundsOptions
+import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
@@ -79,7 +85,7 @@ class MapWorkerFragment: MapFragment()
 
         (requireActivity() as MainActivity).setActionBarTitle(route.name)
 
-        tpCamera(geoPosToPoint(route.positions[0]))
+        tpCamera(route.positions.firstOrNull()) // наводим камеру на первую остановку маршрута
         startListeningTracker(route.id) // включаю вебсокет
         if (isGPSEnabled() && isGPSPermissionGranted())
             mapView.location.updateSettings {
@@ -99,14 +105,12 @@ class MapWorkerFragment: MapFragment()
 
         val connectivityManager = getSystemService(requireContext(), ConnectivityManager::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+            connectivityManager?.registerDefaultNetworkCallback(networkCallback)
         } else {
             val request = NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
-            connectivityManager!!.registerNetworkCallback(request, networkCallback)
+            connectivityManager?.registerNetworkCallback(request, networkCallback)
         }
-
-
     }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
@@ -129,8 +133,6 @@ class MapWorkerFragment: MapFragment()
     private fun addRouteOnMap()
     {
         Log.d("addRouteOnMap", "drawing route...")
-
-
         val busStopIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.location_marker, null)!!)!!
 
         val positions = route.positions
@@ -174,8 +176,8 @@ class MapWorkerFragment: MapFragment()
 
     private fun startListeningTracker(trackerId: String)
     {
-        Log.d("Tracker", "startListening, id = $trackerId")
         if (viewModel.isTracking) return
+        Log.d("Tracker", "startListening, id = $trackerId")
 
         val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
 
@@ -195,6 +197,7 @@ class MapWorkerFragment: MapFragment()
                 {
                     busMarker!!.point = geoPosToPoint(busPosition)
                     pointAnnotationManager.update(busMarker!!)
+
                 }
             }
         }
@@ -215,7 +218,7 @@ class MapWorkerFragment: MapFragment()
                     if (key == requestKey)
                     {
                         val position = Json.decodeFromString<GeoPosition>(bundle.getString(requireContext().getString(R.string.busStop_id)).toString())
-                        moveCamera( geoPosToPoint(position) )
+                        moveCamera(position)
                     }
                 }
 

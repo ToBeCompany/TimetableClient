@@ -1,10 +1,14 @@
 package com.dru128.timetable.admin.map.create_route
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -18,7 +22,7 @@ import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.map.MapFragment
 import com.dru128.timetable.tools.DrawableConvertor
-import com.dru128.timetable.tools.IDGenerator
+import com.dru128.timetable.tools.IDManager
 import com.dru128.timetable.tools.ProgressManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonParser
@@ -77,8 +81,10 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
         mapView = binding.map
         super.onCreateView(inflater, container, savedInstanceState)
-
+        showCrosshair()
         progressManager.finish()
+
+
 
         return binding.root
     }
@@ -103,19 +109,21 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
             lifecycleScope.launch {
                 if (route.id.isBlank())
                 {
-                    route.id = IDGenerator.generateID()
+                    route.id = IDManager.generateID()
                     val status = viewModel.createRoute(route)
                     Log.d("status", "= $status")
                     if (status)
                     {
                         Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
                     }
-                    else
+                    else {
+                        route.id = ""
                         Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_create_route), Snackbar.LENGTH_LONG).show()
+                    }
                 }
                 else
                 {
-                    val status = viewModel.createRoute(route)
+                    val status = viewModel.editRoute(route)
                     Log.d("status", "= $status")
                     if (status)
                         Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
@@ -146,13 +154,26 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
         lifecycleScope.launchWhenStarted {
             isZoomChange.collectLatest {
-                if (it)
+                if (it) {
                     for (i in busStopMarkers.indices)
-                        busStopMarkers[i].textField = viewModel.route.busStopsWithTime[i].busStop.name
-                else
+                        busStopMarkers[i].textField =
+                            viewModel.route.busStopsWithTime[i].busStop.name
+
+                    for (i in routeDots.indices)
+                        routeDots[i].iconImageBitmap = dotIcon
+                }
+                else {
                     for (pointAnnotation in busStopMarkers)
                         pointAnnotation.textField = ""
+
+
+                    for (i in routeDots.indices)
+                        routeDots[i].iconImageBitmap = null
+
+                    removeSelectingFromDots()
+                }
                 pointAnnotationManager.update(busStopMarkers)
+                pointAnnotationManager.update(routeDots)
             }
         }
 
@@ -162,9 +183,10 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
     }
 
 
-    fun deleteBusStop(id: String)
+    private fun deleteBusStop(id: String)
     {
         val position = viewModel.route.busStopsWithTime.indexOf( findBusStopById(id) )
+
 
         viewModel.route.busStopsWithTime
             .filter { it.busStop.id != id }
@@ -179,10 +201,11 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         }
 
         pointAnnotationManager.delete(busStopMarkers[position])
-        Log.d("deleteBusStop", id)
+        busStopMarkers.removeAt(position)
+        Log.d("deleteBusStop", "id = $id")
     }
 
-    fun busStopChanged(newBusStop: BusStopWithTime)
+    private fun busStopChanged(newBusStop: BusStopWithTime)
     {
         Log.d("event", "busStopChanged")
         for (i in 0 until viewModel.route.busStopsWithTime.size)
@@ -380,7 +403,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
     {
         val busStop = BusStopWithTime(
             busStop = BusStop(
-                id = IDGenerator.generateID(),
+                id = IDManager.generateID(),
                 name = name,
                 position = pointToGeoPos(mapbox.cameraState.center)
             ),
@@ -415,4 +438,13 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
     private fun findBusStopById(id: String): BusStopWithTime?
             = viewModel.route.busStopsWithTime.find { it.busStop.id == id }
+
+
+    private fun showCrosshair() {
+        val crosshair = View(requireContext())
+        crosshair.layoutParams = FrameLayout.LayoutParams(10, 10, Gravity.CENTER)
+        crosshair.setBackgroundColor(Color.BLUE)
+        mapView.addView(crosshair)
+    }
+
 }

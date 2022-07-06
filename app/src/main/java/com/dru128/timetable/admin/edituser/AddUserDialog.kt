@@ -3,16 +3,19 @@ package com.dru128.timetable.admin.edituser
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.dru128.timetable.data.metadata.TypeUser
 import com.dru128.timetable.data.metadata.User
-import com.dru128.timetable.tools.IDGenerator
+import com.dru128.timetable.tools.IDManager
 import dru128.timetable.R
 import dru128.timetable.databinding.AddUserDialogBinding
+
 
 interface CreateUser { fun createUser(user: User) }
 class AddUserDialog: DialogFragment()
@@ -44,23 +47,44 @@ class AddUserDialog: DialogFragment()
         binding = AddUserDialogBinding.inflate(layoutInflater)
         addUser = requireParentFragment() as CreateUser
 
+        binding.createUserButton.setOnClickListener {
+
+                if (binding.autoGenerationCheckbox.isChecked)
+                {
+                    addUser?.createUser(
+                        User(
+                            userType = typeUserConvertor[binding.typeNewUser.selectedItem]!!,
+                            id = IDManager.generateID()
+                        )
+                    )
+                    dismiss()
+                } else
+                {
+                    val userId = binding.idUser.text.toString()
+                    if (userId.length < 8 || userId.isBlank())
+                        Toast.makeText(requireContext(), "Идентификатор должен быть не короче 8 символов!", Toast.LENGTH_LONG).show()
+                    else if (IDManager.validateId(userId))
+                    {
+                        addUser?.createUser(
+                            User(
+                                userType = typeUserConvertor[binding.typeNewUser.selectedItem]!!,
+                                id = userId
+                            )
+                        )
+                        dismiss()
+                    } else
+                        Toast.makeText(requireContext(), "Идентификатор может содержать только латинские символы и цифры!", Toast.LENGTH_LONG).show()
+
+                }
+        }
+        binding.cancelButton.setOnClickListener {
+            dismiss()
+        }
+
         val builder = AlertDialog.Builder(activity)
         return builder
             .setView(binding.root)
             .setTitle(requireContext().resources.getString(R.string.user_data))
-            .setNegativeButton( requireContext().resources.getString(R.string.close) )
-            { _dialog, _id -> onCancel(_dialog) }
-            .setPositiveButton( requireContext().resources.getString(R.string.add) )
-            { _dialog, _id ->
-                val userId =
-                    if (binding.autoGenerationCheckbox.isChecked) IDGenerator.generateID()
-                    else binding.idUser.text.toString()
-                val user = User(
-                    userType = typeUserConvertor[binding.typeNewUser.selectedItem]!!,
-                    id = userId
-                )
-                addUser?.createUser(user)
-            }
             .create()
     }
 
@@ -80,9 +104,5 @@ class AddUserDialog: DialogFragment()
 
     companion object {
         const val TAG = "AddUserDialog"
-    }
-
-    override fun setCancelable(cancelable: Boolean) {
-        super.setCancelable(false)
     }
 }

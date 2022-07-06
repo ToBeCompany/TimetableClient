@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.dru128.timetable.Repository
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.worker.map.RouteWorkerStorage
 import dru128.timetable.R
@@ -37,7 +36,6 @@ class RouteRecyclerAdapter(var click: (id: Int) -> Unit, var dataSet: Array<Rout
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         var context = itemView.context
-
         var routeNameText = itemView.findViewById<TextView>(R.id.nameRoute_route_item)
 
         fun onBind(position: Int)

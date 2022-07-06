@@ -20,13 +20,13 @@
         mapbox:mapbox_cameraZoom="10.0"/>
 
 
-    <ImageView
+    <ImageButton
         android:id="@+id/show_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:src="@drawable/arrow_in_circle"
+        android:background="@drawable/arrow_in_circle"
         app:layout_constraintEnd_toEndOf="@+id/admin_map"
         app:layout_constraintTop_toTopOf="parent" />
 

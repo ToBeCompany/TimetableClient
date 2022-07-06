@@ -70,7 +70,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tracking_status"
+            android:id="@+id/is_online"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/online"
@@ -86,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="end"
-            app:constraint_referenced_ids="visible_route, tracking_status" />
+            app:constraint_referenced_ids="visible_route, is_online" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

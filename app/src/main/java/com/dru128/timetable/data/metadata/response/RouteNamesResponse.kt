@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class FlightsNameResponse(
+data class RouteNamesResponse(
     var name: String = "",
     var id: String = ""
 )

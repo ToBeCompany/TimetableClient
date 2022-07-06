@@ -11,9 +11,12 @@ import com.dru128.timetable.data.metadata.User
 import com.mapbox.android.gestures.StandardGestureDetector
 import com.mapbox.geojson.Point
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 
 class CreateRouteViewModel : ViewModel()
 {
@@ -22,40 +25,46 @@ class CreateRouteViewModel : ViewModel()
     var isInitRoute = false
     var route: Route = Route()
 
-
-
-    suspend fun createRoute(route: Route): Boolean =
+    suspend fun createRoute(route: Route): Boolean
+    {
         try {
-            Log.d("Server", "SUCCESS")
-            val response: Boolean? = Repository.client.post(EndPoint.createRoute) {
-                this.body = Json.encodeToString(route)
+            val response: HttpResponse = Repository.client.post(EndPoint.createRoute) {
+                this.setBody(Json.encodeToJsonElement(route))
             }
-            Log.d("createRoute", "ответ = $response")
+            Log.d("Server", "Status code: ${response.status.value}")
 
-
-            RouteAdminStorage.routes.value += route
-            true
-        }
-        catch (error: Exception) {
+            if (response.status.value == 200)
+            {
+                RouteAdminStorage.routes += route
+                Log.d("Server", "SUCCESS")
+                return true
+            } else
+                return false
+        } catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
-            false
+            return false
         }
-
-    suspend fun editRoute(route: Route): Boolean =
+    }
+    suspend fun editRoute(route: Route): Boolean
+    {
         try {
-            Log.d("Server", "SUCCESS")
-            val response: Boolean? = Repository.client.post(EndPoint.editRoute) {
-                this.body = Json.encodeToString(route)
+            val response: HttpResponse = Repository.client.post(EndPoint.editRoute) {
+                this.setBody(Json.encodeToJsonElement(route))
             }
+            Log.d("Server", "Status code: ${response.status.value}")
 
-            for (i in RouteAdminStorage.routes.value.indices)
-                if (RouteAdminStorage.routes.value[i].id == route.id)
-                    RouteAdminStorage.routes.value[i] = route
-
-            true
-        }
-        catch (error: Exception) {
+            if (response.status.value == 200)
+            {
+                for (i in RouteAdminStorage.routes.indices)
+                    if (RouteAdminStorage.routes[i].id == route.id)
+                        RouteAdminStorage.routes[i] = route
+                Log.d("Server", "SUCCESS")
+                return true
+            } else
+                return false
+        } catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
-            false
+            return false
         }
+    }
 }

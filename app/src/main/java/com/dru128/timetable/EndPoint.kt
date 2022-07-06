@@ -14,11 +14,11 @@ object EndPoint
         "safe-reaches-68287.herokuapp.com"
 
     // вебсокет пассажира
-    const val webSocket_passenger = "passenger/"
+    const val webSocket_passenger = "/passenger/"
     // вебсокет водителя
-    const val webSocket_driver = "driver/"
+    const val webSocket_driver = "/driver/"
     // вебсокет водителя
-    const val webSocket_admin = "adminWebSocket/"
+    const val webSocket_dispatcher = "/all"
 
     // получить маршрут по ID (после передать ID маршрута)
     const val routeById = "/OneMarsh/"
@@ -36,16 +36,16 @@ object EndPoint
     const val auth = "/sign/"
 
     // удалить маршрут по ID
-    const val deleteRoute = "/deleteRoute/"
+    const val deleteRoute = "/deleteRoute"
 
     // удалить маршрут по ID
-    const val createRoute = "/createRoute/"
+    const val createRoute = "/createRoute"
 
     // удалить маршрут по ID
-    const val editRoute = "/editRoute/"
+    const val editRoute = "/editRoute"
 
     // удалить пользователя по ID
-    const val deleteUser = "/deleteUser/"
+    const val deleteUser = "/deleteUser"
 
     // добавить (создать) пользователя
     const val createUser = "/addUser"
