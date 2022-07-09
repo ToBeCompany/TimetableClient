@@ -58,7 +58,9 @@ class MapWorkerFragment: MapFragment()
 
     private val viewModel: MapWorkerViewModel by viewModels()
     private val args: MapWorkerFragmentArgs  by navArgs()
-    val route/*: Flight*/:Route by lazy { RouteWorkerStorage.routes[args.id] }
+    val route/*: Flight*/:Route by lazy {
+        RouteWorkerStorage.routes.find { it.id == args.id }!!
+    }
 
     private var cameraChangeListener: OnCameraChangeListener? = null
     private val pointClickListener: OnPointAnnotationClickListener by lazy { addBusStopClickListener() }

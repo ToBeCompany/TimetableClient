@@ -5,7 +5,8 @@
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dru128.timetable.admin.map.dispacher.DispatcherFragment">
+    tools:context="com.dru128.timetable.admin.map.dispacher.DispatcherFragment"
+    android:id="@+id/parent">
 
     <com.mapbox.maps.MapView
         android:id="@+id/admin_map"

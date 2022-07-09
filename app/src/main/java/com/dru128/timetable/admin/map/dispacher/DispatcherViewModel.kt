@@ -3,9 +3,11 @@ package com.dru128.timetable.admin.map.dispacher
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dru128.timetable.App
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
 import com.dru128.timetable.admin.map.RouteAdminStorage
+import com.dru128.timetable.data.JsonDataManager
 import com.dru128.timetable.data.metadata.Route
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -34,7 +36,44 @@ class DispatcherViewModel : ViewModel()
     var isVisibleRoutePanel = MutableStateFlow<Boolean>(true)
     var isTracking: Boolean = false
 
-    suspend fun getRoutes(): Boolean
+    private var dataManager = JsonDataManager(App.globalContext)
+
+    suspend fun getRoutes(): Array<Route>?
+    {
+        val serverVersion = getDBVersionFromServer()
+        val cacheVersion = dataManager.getDBVersion()
+
+        if (serverVersion != null)
+            if (cacheVersion != null && cacheVersion == serverVersion)
+            {
+                Log.d("ROUTE_DATA", "get from cache")
+                return dataManager.loadRoutes() // маршруты с сервера не изменились
+            }
+            else
+            {
+                Log.d("ROUTE_DATA", "get from server")
+                getRoutesFromServer()?.let { fromServer ->
+                    dataManager.saveRoutes(fromServer, serverVersion)
+
+                    return  fromServer // маршруты получены с сервера и сохранены в кэш
+                }
+                return null // маршруты с сервера не удалось получить
+            }
+        else
+            return null
+    }
+
+    private suspend fun getDBVersionFromServer(): Int? =
+        try {
+            Repository.client.get(EndPoint.get_db_version).body()
+        }
+        catch (error: Exception) {
+            Log.d("Server", "ERROR: ${error.message}")
+            null
+        }
+
+
+    private suspend fun getRoutesFromServer(): Array<Route>?
     {
         try {
             val response: HttpResponse = Repository.client.get(EndPoint.all_routes)
@@ -42,20 +81,15 @@ class DispatcherViewModel : ViewModel()
             if (response.status.value == 200)
             {
                 val routes = response.body<Array<Route>>()
-                RouteAdminStorage.routes = routes
-
-                routes.forEach {
-                    buses[it.id] = BusLocation()
-                }
                 Log.d("Server", "SUCCESS")
-                return true
+                return routes
             }
             else
-                return false
+                return null
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
-            return false
+            return null
         }
     }
 
@@ -69,8 +103,8 @@ class DispatcherViewModel : ViewModel()
             path = EndPoint.webSocket_dispatcher
         )
         {
-            Log.d("WEB_SOCKET", "web socket admin start")
             webSocketSession = this@webSocket
+            Log.d("WEB_SOCKET", "web socket admin start")
 
             for (frame in incoming)
             {
@@ -103,17 +137,14 @@ class DispatcherViewModel : ViewModel()
     {
         try {
             val response: HttpResponse = Repository.client.delete(EndPoint.deleteRoute) {
-                this.setBody(id)
+                this.setBody(
+                    mapOf("id" to id)
+                )
             }
             Log.d("Server", "Status code: ${response.status.value}")
 
             if (response.status.value == 200)
             {
-                RouteAdminStorage.mapboxRoutes.remove(id)
-                RouteAdminStorage.busMarkers.remove(id)
-                RouteAdminStorage.routes
-                    .filter { it.id != id }
-                    .let { RouteAdminStorage.routes = it.toTypedArray() }
                 Log.d("Server", "SUCCESS")
                 return true
             } else
@@ -123,14 +154,4 @@ class DispatcherViewModel : ViewModel()
             return false
         }
     }
-/**    suspend fun getBuses(): Map<String, GeoPosition>? =
-        try {
-            Log.d("Server", "SUCCESS")
-            buses = Storage.client.get(EndPoint.getBuses)
-            buses
-        }
-        catch (error: Exception) {
-            Log.d("Server", "ERROR: ${error.message}")
-            null
-        }*/
 }

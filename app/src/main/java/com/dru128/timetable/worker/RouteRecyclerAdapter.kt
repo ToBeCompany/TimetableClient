@@ -1,29 +1,25 @@
 package com.dru128.timetable.worker
 
 import android.view.LayoutInflater
-import android.view.View
+import android.view.View.OnLongClickListener
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.worker.map.RouteWorkerStorage
-import dru128.timetable.R
+import dru128.timetable.databinding.RouteItemBinding
 
 
-class RouteRecyclerAdapter(var click: (id: Int) -> Unit, var dataSet: Array<Route> = arrayOf())
-    : RecyclerView.Adapter<RouteRecyclerAdapter.ViewHolder>()
+class RouteRecyclerAdapter(
+    var click: (id: String) -> Unit,
+    var longClick: (id: String) -> Unit,
+    var dataSet: Array<Route> = arrayOf()
+) : RecyclerView.Adapter<RouteRecyclerAdapter.ViewHolder>()
 {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        val View = LayoutInflater.from(parent.context).inflate(R.layout.route_item, parent, false) // тут item
-        return ViewHolder(View)
-    }
-
-    fun updateData()
-    {
-        dataSet = RouteWorkerStorage.routes
-        notifyDataSetChanged()
+        val binding = RouteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
@@ -33,16 +29,19 @@ class RouteRecyclerAdapter(var click: (id: Int) -> Unit, var dataSet: Array<Rout
 
     override fun getItemCount(): Int = dataSet.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    inner class ViewHolder(var binding: RouteItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
-        var context = itemView.context
-        var routeNameText = itemView.findViewById<TextView>(R.id.nameRoute_route_item)
+        var context = binding.root.context
 
         fun onBind(position: Int)
         {
-            routeNameText.text = dataSet[position].name
-            itemView.setOnClickListener {
-                click(position)
+            binding.routeName.text = dataSet[position].name
+            binding.root.setOnClickListener {
+                click(dataSet[position].id)
+            }
+            binding.root.setOnLongClickListener {
+                longClick(dataSet[position].id)
+                true
             }
         }
     }

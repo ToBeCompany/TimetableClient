@@ -17,25 +17,29 @@ class RouteViewModel: ViewModel()
 
     suspend fun getRoutes(): Array<Route>?
     {
-//        val fromCache = dataManager.loadRoutes()
-//
-//        if (fromCache.isNullOrEmpty())
-//        {
-            val fromServer = getFromServer()
-            if (fromServer.isNullOrEmpty()) return null
-//            dataManager.saveRoutes(fromServer)
-            Log.d("Data", "get from server")
+        val serverVersion = getDBVersionFromServer()
+        val cacheVersion = dataManager.getDBVersion()
 
-            return fromServer
-//        }
-//        else {
-//            Log.d("Data", "get from cash")
-//
-//            return fromCache
-//        }
+        if (serverVersion != null)
+            if (cacheVersion != null && cacheVersion == serverVersion)
+            {
+                Log.d("DATA", "get from cache")
+                return dataManager.loadRoutes() // маршруты с сервера не изменились
+            }
+            else
+            {
+                Log.d("DATA", "get from server")
+                getRoutesFromServer()?.let { fromServer ->
+                    dataManager.saveRoutes(fromServer, serverVersion)
+                    return  fromServer // маршруты получены с сервера и сохранены в кэш
+                }
+                return null // маршруты с сервера не удалось получить
+            }
+        else
+            return null
     }
 
-    private suspend fun getFromServer(): Array<Route>? =
+    private suspend fun getRoutesFromServer(): Array<Route>? =
         try {
             Repository.client.get(EndPoint.all_routes).body()
         }
@@ -43,4 +47,28 @@ class RouteViewModel: ViewModel()
             Log.d("Server", "ERROR: ${error.message}")
             null
         }
+
+    private suspend fun getDBVersionFromServer(): Int? =
+        try {
+            Repository.client.get(EndPoint.get_db_version).body()
+        }
+        catch (error: Exception) {
+            Log.d("Server", "ERROR: ${error.message}")
+            null
+        }
+
+    fun addToFavourite(id: String)
+    {
+        Log.d("event", "add to favourite route, id = $id")
+        dataManager.addToFavouriteRoutes(id)
+    }
+
+    fun deleteFromFavourite(id: String)
+    {
+        Log.d("event", "delete from favourite route, id = $id")
+        dataManager.deleteFromFavouriteRoutes(id)
+    }
+
+    fun getFavouriteRoutes(): Array<String>
+        = dataManager.loadFavouriteRoutes()
 }

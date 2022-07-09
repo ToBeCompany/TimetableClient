@@ -1,5 +1,8 @@
 package com.dru128.timetable.admin.map.dispacher
 
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +11,7 @@ import com.dru128.timetable.admin.map.RouteAdminStorage
 import com.dru128.timetable.data.metadata.Route
 import dru128.timetable.R
 import dru128.timetable.databinding.RouteAdminItemBinding
+
 
 class RouteAdminRecyclerAdapter(
     var showRoute: (route: Route) -> Unit,
@@ -46,18 +50,15 @@ class RouteAdminRecyclerAdapter(
         {
             binding.nameRoute.text = dataSet[position].route.name
 
-            RouteAdminStorage.mapboxRoutes[dataSet[position].route.id]?.let { mapboxRoute ->
-                if (mapboxRoute.isVisible)
-                {
-                    binding.root.alpha = 1.0f
-                    binding.visibleRoute.apply {
-                        setBackgroundResource(R.drawable.visibility)
-                        if (!isChecked) isChecked = true
-                    }
-                }
-            }
+            val mapboxRoute = RouteAdminStorage.mapboxRoutes[ dataSet[position].route.id ]
+            if (mapboxRoute == null)
+                isShowRoute(false, position)
+            else
+                isShowRoute(mapboxRoute.isVisible, position)
+
 
             binding.visibleRoute.setOnCheckedChangeListener { v, isChecked ->
+                Log.d("setOnCheckedChangeListener", isChecked.toString())
                 isShowRoute(isChecked, position)
             }
             binding.deleteRoute.setOnClickListener {
@@ -75,10 +76,12 @@ class RouteAdminRecyclerAdapter(
 
         private fun isShowRoute(isShow: Boolean, i: Int)
         {
+            Log.d("isShowRoute", isShow.toString())
             if (isShow)
             {
                 showRoute(dataSet[i].route)
-                binding.root.alpha = 1.0f
+                binding.root.transitionAlpha = 1f
+//                binding.root.setCardBackgroundColor( Color.WHITE)
                 binding.visibleRoute.apply {
                     setBackgroundResource(R.drawable.visibility)
                     if (!isChecked) isChecked = true
@@ -87,7 +90,8 @@ class RouteAdminRecyclerAdapter(
             else
             {
                 hideRoute(dataSet[i].route.id)
-                binding.root.alpha = 0.7f
+                binding.root.transitionAlpha = 0.7f
+//                binding.root.setCardBackgroundColor( Color.GRAY)
                 binding.visibleRoute.apply {
                     setBackgroundResource(R.drawable.visibility_off)
                     if (isChecked) isChecked = false

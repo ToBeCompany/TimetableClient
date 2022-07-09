@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity()
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean
+    override fun onCreateOptionsMenu(menu: Menu): Boolean
     {
         if (UserPreference(this).currentUser != null)
             menuInflater.inflate(R.menu.options_menu, menu)

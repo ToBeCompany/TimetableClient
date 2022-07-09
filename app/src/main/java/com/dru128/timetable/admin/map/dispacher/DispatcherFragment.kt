@@ -21,6 +21,8 @@ import com.dru128.timetable.map.MapFragment
 import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.tools.ProgressManager
 import com.google.android.material.snackbar.Snackbar
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
@@ -32,14 +34,11 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.find
 import kotlin.collections.forEach
-import kotlin.collections.indexOf
 import kotlin.collections.indices
 import kotlin.collections.isEmpty
 import kotlin.collections.iterator
 import kotlin.collections.set
 import kotlin.collections.toList
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -52,6 +51,8 @@ import kotlinx.serialization.json.Json
 class DispatcherFragment : MapFragment()
 {
     private val busIcon by lazy { DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null))!! }
+    private val progressManager: ProgressManager by lazy { ProgressManager(binding.root, requireActivity()) }
+    private val isZoomChange = MutableStateFlow(false)
 
     private lateinit var binding: FragmentDispatcherBinding
     private val viewModel: DispatcherViewModel by viewModels()
@@ -69,19 +70,11 @@ class DispatcherFragment : MapFragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentDispatcherBinding.inflate(inflater)
-        val progressManager = ProgressManager(binding.root, requireActivity())
         progressManager.start()
 
         mapView = binding.adminMap
         super.onCreateView(inflater, container, savedInstanceState)
 
-//        lifecycleScope.launch { // тут включается вебсокет
-//            viewModel.startWebSocket().collect {
-//                Log.d("web socket admin", it.toString())
-//            }
-//        }
-
-        progressManager.finish()
         return binding.root
     }
 
@@ -91,23 +84,25 @@ class DispatcherFragment : MapFragment()
         lifecycleScope.launch {
             if (RouteAdminStorage.routes.isEmpty())
             {
-                Log.d("request", "get routes from server")
-                val status: Boolean = viewModel.getRoutes()
-                Log.d("status", "= $status")
-                if (status)
+                val routes = viewModel.getRoutes()
+                if (!routes.isNullOrEmpty())
                 {
+                    RouteAdminStorage.routes = routes
+
+                    routes.forEach { viewModel.buses[it.id] = BusLocation() }
+
                     startListeningTracker()
-                    Log.d("data", "routes size = ${RouteAdminStorage.routes.size}")
-                    val dispatcherRoutes = Array<DispatcherRouteItem> ( RouteAdminStorage.routes.size) {
-                        DispatcherRouteItem(RouteAdminStorage.routes[it], false)
+                    val dispatcherRoutes = Array<DispatcherRouteItem> ( routes.size) {
+                        DispatcherRouteItem(routes[it], false)
                     }
-                    adapter.dataSet = dispatcherRoutes                }
+                    adapter.dataSet = dispatcherRoutes
+                }
                 else
                     Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_get_routes), Snackbar.LENGTH_LONG).show()
             }
             else
             {
-                Log.d("request", "get routes from repository")
+                Log.d("ROUTE_DATA", "get routes from repository")
                 startListeningTracker()
                 val dispatcherRoutes = Array<DispatcherRouteItem> ( RouteAdminStorage.routes.size) {
                     DispatcherRouteItem(RouteAdminStorage.routes[it], false)
@@ -145,35 +140,7 @@ class DispatcherFragment : MapFragment()
         }
 
         initRecyclerView()
-    }
-
-    private fun drawBuses()
-    {
-        val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, dru128.timetable.R.drawable.bus_marker, null)!!)!!
-
-        lifecycleScope.launch {
-
-//            RouteAdminStorage.buses.collect { busesPos ->
-//                Log.d("UPDATE_BUS_POS", busesPos.values.toString())
-//
-//                for ((name, position) in busesPos) {
-//
-//                    if (RouteAdminStorage.busMarkers.containsKey(name)) {
-//                        RouteAdminStorage.busMarkers[name]?.point = geoPosToPoint(position)
-//                        pointAnnotationManager.update(RouteAdminStorage.busMarkers[name]!!)
-//
-//                    } else {
-//                        val busMarker = pointAnnotationManager.create(
-//                            PointAnnotationOptions()
-//                                .withIconImage(busIcon)
-//                                .withPoint(geoPosToPoint(position))
-//                        )
-//                        pointAnnotationManager.update(busMarker)
-//                        RouteAdminStorage.busMarkers[name] = busMarker
-//                    }
-//                }
-//            }
-        }
+        progressManager.finish()
     }
 
     private fun showRoute(route: Route)
@@ -192,7 +159,6 @@ class DispatcherFragment : MapFragment()
         }
         busStopMarkers.forEach { pointAnnotationManager.selectAnnotation(it) }
 
-        val isZoomChange = MutableStateFlow(false)
         lifecycleScope.launchWhenStarted {
             isZoomChange.collectLatest {
                 if (it)
@@ -205,10 +171,6 @@ class DispatcherFragment : MapFragment()
             }
         }
 
-        cameraChangeListener = OnCameraChangeListener { cameraChanged ->
-            isZoomChange.value = mapbox.cameraState.zoom > 13.0
-        }
-        mapbox.addOnCameraChangeListener(cameraChangeListener!!)
 
         RouteAdminStorage.mapboxRoutes[route.id] = MapboxRoute(
             isVisible = true,
@@ -255,10 +217,8 @@ class DispatcherFragment : MapFragment()
             mapboxRoute.isVisible = false
             pointAnnotationManager.delete(mapboxRoute.busStops.toList())
             polylineAnnotationManager.delete(mapboxRoute.trackLine)
-            RouteAdminStorage.mapboxRoutes.remove(id)
+            RouteAdminStorage.mapboxRoutes.remove(id, mapboxRoute)
         }
-
-//        RouteAdminStorage.mapboxRoutes.remove(id)
     }
 
     private fun deleteRoute(routeId: String)
@@ -275,13 +235,24 @@ class DispatcherFragment : MapFragment()
                     Log.d("status", "= $status")
                     if (status)
                     {
-                        val position = RouteAdminStorage.routes.indexOf( findRouteById(routeId) )
-
-                        adapter.apply {
-                            notifyItemRemoved(position)
-                            notifyItemRangeChanged(position,  RouteAdminStorage.routes.size)
-                        }
                         hideRoute(routeId)
+                        removeBusLocationChangeListener(routeId)
+
+                        RouteAdminStorage.routes
+                            .filter { it.id != routeId }
+                            .let { RouteAdminStorage.routes = it.toTypedArray() }
+
+                        RouteAdminStorage.routes.forEach {
+
+                            Log.d("routes:", it.name)
+                        }
+
+
+                        val dispatcherRoutes = Array<DispatcherRouteItem> ( RouteAdminStorage.routes.size) {
+                            DispatcherRouteItem(RouteAdminStorage.routes[it], false)
+                        }
+                        adapter.dataSet = dispatcherRoutes
+                        adapter.notifyDataSetChanged()
                     }
                     else
                         Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_delete_route), Snackbar.LENGTH_LONG).show()
@@ -316,10 +287,12 @@ class DispatcherFragment : MapFragment()
         lifecycle.coroutineScope.launchWhenStarted {
             viewModel.startWebSocket()
         }
+        Log.d("buses", viewModel.buses.size.toString())
 
         for ((id, busLocation) in viewModel.buses)
         {
             lifecycleScope.launch {
+                Log.d("buses", busLocation.toString())
                 busLocation.isActual.collect { isActual ->
                     Log.d("isActualChanged", isActual.toString())
                     if (isActual)
@@ -372,6 +345,9 @@ class DispatcherFragment : MapFragment()
                         PointAnnotationOptions()
                             .withIconImage(busIcon)
                             .withPoint(geoPosToPoint(position))
+                            .withIconAnchor(IconAnchor.BOTTOM)
+                            .withTextAnchor(TextAnchor.TOP)
+                            .withTextSize(11.0)
                     )
                     pointAnnotationManager.update(busMarker)
                     RouteAdminStorage.busMarkers[id] = busMarker
@@ -397,18 +373,33 @@ class DispatcherFragment : MapFragment()
                 findRouteById(mapboxRoute.key)?.let { _route ->
                     showRoute(_route)
                 }
+
         pointAnnotationManager.addClickListener(pointClickListener)
+        cameraChangeListener = OnCameraChangeListener { cameraChanged ->
+            isZoomChange.value = mapbox.cameraState.zoom > 13.0
+        }
+        mapbox.addOnCameraChangeListener(cameraChangeListener!!)
 
-        if (!viewModel.isTracking)
-            startListeningTracker()
-
+        lifecycleScope.launchWhenStarted {
+            isZoomChange.collectLatest {
+                if (it)
+                    for ((key, value) in RouteAdminStorage.busMarkers) {
+                        value.textField = findRouteById(key)?.name
+                        pointAnnotationManager.update(value)
+                    }
+                else
+                    for ((key, value) in RouteAdminStorage.busMarkers) {
+                        value.textField = ""
+                        pointAnnotationManager.update(value)
+                    }
+            }
+        }
         super.onStart()
     }
 
     override fun onStop() {
         pointAnnotationManager.removeClickListener(pointClickListener)
-        if (viewModel.isTracking)
-            stopListeningTracker()
+
         super.onStop()
     }
 }

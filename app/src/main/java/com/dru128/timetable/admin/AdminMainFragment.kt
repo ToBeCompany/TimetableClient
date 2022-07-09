@@ -26,7 +26,6 @@ class AdminMainFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentAdminMainBinding.inflate(inflater)
-//        var navController = binding.navHostAdmin.findFragment<NavHostFragment>().navController
         val navController = (childFragmentManager.findFragmentById(R.id.nav_host_admin) as NavHostFragment).navController
 
 

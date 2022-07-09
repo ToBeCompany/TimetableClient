@@ -27,7 +27,7 @@ class MapWorkerViewModel(application : Application): AndroidViewModel(applicatio
     var webSocketSession: DefaultClientWebSocketSession? = null
     var isTracking = false
 
-    fun startWebSocket(routeId: kotlin.String) = flow<GeoPosition> {
+    fun startWebSocket(routeId: String) = flow<GeoPosition> {
         isTracking = true
         Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
@@ -37,10 +37,13 @@ class MapWorkerViewModel(application : Application): AndroidViewModel(applicatio
         {
             webSocketSession = this@webSocket
             Log.d("WEB_SOCKET", "start client map routeId = $routeId")
+
             for (frame in incoming)
             {
+                Log.d("WEB_SOCKET", "update position111")
                 if (frame is Frame.Text)
                 {
+                    Log.d("WEB_SOCKET", "update position222")
                     val position = Json.decodeFromString<GeoPosition>(frame.readText())
                     emit(position)
                     Log.d("WEB_SOCKET", "update position: $position")

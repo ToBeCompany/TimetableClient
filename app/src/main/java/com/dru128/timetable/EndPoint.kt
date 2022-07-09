@@ -20,6 +20,9 @@ object EndPoint
     // вебсокет водителя
     const val webSocket_dispatcher = "/all"
 
+    // получить автобусы
+    const val get_db_version = "/version"
+
     // получить маршрут по ID (после передать ID маршрута)
     const val routeById = "/OneMarsh/"
 

@@ -8,9 +8,8 @@
     android:layout_marginTop="2dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="6sp"
-    android:alpha="0.7">
-
+    app:cardCornerRadius="6sp">
+<!-- инициализируется динамически -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/parent_route_item"
         android:layout_width="match_parent"
@@ -23,7 +22,6 @@
             android:layout_height="32sp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:background="@drawable/visibility_off"
             android:checked="false"
             android:textOff=""
             android:textOn=""

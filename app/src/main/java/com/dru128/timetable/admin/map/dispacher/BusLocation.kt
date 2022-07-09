@@ -37,13 +37,15 @@ class BusLocation(
                 }
             }
         }
+
     }
 
-    fun newCountdown() = scope.launch (start = CoroutineStart.LAZY)
+    private fun newCountdown() = scope.launch (start = CoroutineStart.LAZY)
     {
+        val timeout = 60_000L
         Log.d("event", "newCountdown")
-        delay(60_000L)
+        delay(timeout)
         isActual.emit(false)
-        Log.d("actual", "time 30 sec = false")
+        Log.d("actual", "= false. timeout $timeout milsec")
     }
 }
