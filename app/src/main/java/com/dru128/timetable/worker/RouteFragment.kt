@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dru128.timetable.data.metadata.Route
+import com.dru128.timetable.tools.ProgressManager
 import com.dru128.timetable.worker.map.RouteWorkerStorage
 import com.google.android.material.snackbar.Snackbar
 import dru128.timetable.R
@@ -44,7 +45,9 @@ class RouteFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentRouteBinding.inflate(inflater)
-        super.onViewCreated(binding.root, savedInstanceState);
+        super.onViewCreated(binding.root, savedInstanceState)
+        val progressManager = ProgressManager(binding.parent, requireActivity())
+        progressManager.start()
 
 
         binding.routesRecyclerView.adapter = adapter
@@ -54,9 +57,9 @@ class RouteFragment : Fragment()
 
         getData()
 
+        progressManager.finish()
         return binding.root
     }
-//requireActivity().findViewById(android.R.id.content)
 
     private fun getData() // получение данных и загрузка в список
     {

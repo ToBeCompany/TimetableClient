@@ -8,6 +8,7 @@
     android:id="@+id/parent"
     tools:context="com.dru128.timetable.worker.RouteFragment">
 <androidx.core.widget.NestedScrollView
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,7 +23,8 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone">
 
         <TextView
             android:layout_marginTop="8dp"
