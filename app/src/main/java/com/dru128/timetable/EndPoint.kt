@@ -5,13 +5,13 @@ import dru128.timetable.BuildConfig
 object EndPoint
 {
     // протокол сервера
-    const val protocol = "https://"
+    const val protocol = "http://"
 
     // HOST сервера
     val host = if (BuildConfig.BUILD_TYPE == "release")
-        "fierce-woodland-54822.herokuapp.com"
+        "timetable.apzrotor.ru:8080"
     else
-        "safe-reaches-68287.herokuapp.com"
+        "timetable.apzrotor.ru:8080"
 
     // вебсокет пассажира
     const val webSocket_passenger = "/passenger/"
