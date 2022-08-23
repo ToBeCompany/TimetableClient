@@ -104,34 +104,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
         binding.routeName.addTextChangedListener { viewModel.route.name = it.toString() }
 
-        binding.createRouteButton.setOnClickListener {
-            val route = viewModel.route
-            lifecycleScope.launch {
-                if (route.id.isBlank())
-                {
-                    route.id = IDManager.generateID()
-                    val status = viewModel.createRoute(route)
-                    Log.d("status", "= $status")
-                    if (status)
-                    {
-                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
-                    }
-                    else {
-                        route.id = ""
-                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_create_route), Snackbar.LENGTH_LONG).show()
-                    }
-                }
-                else
-                {
-                    val status = viewModel.editRoute(route)
-                    Log.d("status", "= $status")
-                    if (status)
-                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
-                    else
-                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_edit_route), Snackbar.LENGTH_LONG).show()
-                }
-            }
-        }
+        addCreateRouteButtonListener()
 
         Log.d("isInitRoute", viewModel.isInitRoute.toString())
 
@@ -180,6 +153,38 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         pointAnnotationManager.addClickListener(routeDotClickListener)
         mapbox.addOnMapClickListener(mapClickListener)
         mapbox.addOnCameraChangeListener(cameraChangeListener)
+    }
+
+    private fun addCreateRouteButtonListener()
+    {
+        binding.createRouteButton.setOnClickListener {
+            val route = viewModel.route
+            lifecycleScope.launch {
+                if (route.id.isBlank())
+                {
+                    route.id = IDManager.generateID()
+                    val status = viewModel.createRoute(route)
+                    Log.d("status", "= $status")
+                    if (status)
+                    {
+                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
+                    }
+                    else {
+                        route.id = ""
+                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_create_route), Snackbar.LENGTH_LONG).show()
+                    }
+                }
+                else
+                {
+                    val status = viewModel.editRoute(route)
+                    Log.d("status", "= $status")
+                    if (status)
+                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
+                    else
+                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_edit_route), Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
 

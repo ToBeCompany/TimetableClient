@@ -9,9 +9,9 @@ object EndPoint
 
     // HOST сервера
     val host = if (BuildConfig.BUILD_TYPE == "release")
-        "fierce-woodland-54822.herokuapp.com"
+        "fierce-woodland-54822.herokuapp.com" // for release
     else
-        "safe-reaches-68287.herokuapp.com"
+        "fierce-woodland-54822.herokuapp.com"//"safe-reaches-68287.herokuapp.com" //for debugfierce-woodland-54822.herokuapp.com
 
     // вебсокет пассажира
     const val webSocket_passenger = "/passenger/"

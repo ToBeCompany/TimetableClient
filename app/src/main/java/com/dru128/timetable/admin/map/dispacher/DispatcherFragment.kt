@@ -8,11 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dru128.timetable.admin.AdminMainFragmentDirections
 import com.dru128.timetable.admin.map.RouteAdminStorage
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
@@ -20,6 +19,7 @@ import com.dru128.timetable.map.BusStopsBottomSheet
 import com.dru128.timetable.map.MapFragment
 import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.tools.ProgressManager
+import com.dru128.timetable.tools.Resource
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
@@ -35,7 +35,6 @@ import kotlin.collections.component2
 import kotlin.collections.find
 import kotlin.collections.forEach
 import kotlin.collections.indices
-import kotlin.collections.isEmpty
 import kotlin.collections.iterator
 import kotlin.collections.set
 import kotlin.collections.toList
@@ -78,43 +77,36 @@ class DispatcherFragment : MapFragment()
         return binding.root
     }
 
-
-    private fun initRecyclerView()
+    override fun mapReady()
     {
-        lifecycleScope.launch {
-            if (RouteAdminStorage.routes.isEmpty())
-            {
-                val routes = viewModel.getRoutes()
-                if (!routes.isNullOrEmpty())
-                {
-                    RouteAdminStorage.routes = routes
+        addShowPanelButtonListener()
+        addCreateRouteButtonListener()
+        addRefreshListener()
+        
+        collectRoutes()
+        loadRoutes()
 
-                    routes.forEach { viewModel.buses[it.id] = BusLocation() }
+        binding.routesRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.routesRecyclerView.adapter = adapter
 
-                    startListeningTracker()
-                    val dispatcherRoutes = Array<DispatcherRouteItem> ( routes.size) {
-                        DispatcherRouteItem(routes[it], false)
-                    }
-                    adapter.dataSet = dispatcherRoutes
-                }
-                else
-                    Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_get_routes), Snackbar.LENGTH_LONG).show()
-            }
-            else
-            {
-                Log.d("ROUTE_DATA", "get routes from repository")
-                startListeningTracker()
-                val dispatcherRoutes = Array<DispatcherRouteItem> ( RouteAdminStorage.routes.size) {
-                    DispatcherRouteItem(RouteAdminStorage.routes[it], false)
-                }
-                adapter.dataSet = dispatcherRoutes
-            }
-            binding.routesRecyclerView.layoutManager = LinearLayoutManager(context)
-            binding.routesRecyclerView.adapter = adapter
+        progressManager.finish()
+    }
+
+    private fun loadRoutes()
+    {
+        lifecycleScope.launchWhenStarted {
+            viewModel.getRoutes()
         }
     }
 
-    override fun mapReady()
+    private fun addRefreshListener()
+    {
+        binding.swipeRefresh.setOnRefreshListener {
+            loadRoutes()
+        }
+    }
+
+    private fun addShowPanelButtonListener()
     {
         binding.showPanel.rotation = if (viewModel.isVisibleRoutePanel.value) 0f else 180f
         binding.showPanel.setOnClickListener { v ->
@@ -127,25 +119,74 @@ class DispatcherFragment : MapFragment()
                 }
             }
         }
-
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenStarted {
             viewModel.isVisibleRoutePanel.collect {
                 binding.routePanel.visibility = if (it) View.VISIBLE else View.GONE
             }
         }
-
-        binding.createRouteButton.setOnClickListener { v ->
-            Navigation.findNavController(requireActivity(), R.id.nav_host_main)
-                .navigate(AdminMainFragmentDirections.actionAdminMainFragmentToCreateRouteFragment(""))
-        }
-
-        initRecyclerView()
-        progressManager.finish()
     }
+
+    private fun addCreateRouteButtonListener()
+    {
+        binding.createRouteButton.setOnClickListener { v ->
+            v.findNavController()
+                .navigate(DispatcherFragmentDirections.actionMapAdminFragmentToCreateRouteFragment(""))
+        }
+    }
+
+    private fun collectRoutes()
+    {
+        lifecycleScope.launchWhenStarted {
+            RouteAdminStorage.routes.collectLatest { response ->
+                when (response)
+                {
+                    is Resource.Error -> {
+                        binding.swipeRefresh.isRefreshing = false
+                        Log.d("ErrorRoute", response.message.toString())
+                        Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_get_routes), Snackbar.LENGTH_LONG).show()
+                    }
+                    is Resource.Loading -> {
+                        binding.swipeRefresh.isRefreshing = true
+                    }
+                    is Resource.Success -> { // данные маршрутов обновлены
+                        Log.d("action", "get routes | size = ${response.data?.size}")
+                        binding.swipeRefresh.isRefreshing = false
+                        if (response.data != null)
+                        {
+                            stopListeningTracker()
+                            hideAllRoutes()
+
+                            initMapboxRoutes(response.data)
+
+
+                            updateRouteList(response.data)
+
+                            showAllActiveRoute(response.data)
+                            startListeningTracker()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initMapboxRoutes(routes: Array<Route>)
+    {
+        for (route in routes)
+            if (RouteAdminStorage.mapboxRoutes[route.id] == null)
+                RouteAdminStorage.mapboxRoutes[route.id] = MapboxRoute()
+    }
+
 
     private fun showRoute(route: Route)
     {
-        Log.d("showRoute", route.name)
+        Log.d("action", "show route: name = ${route.name}, id = ${route.id}")
+
+        if (RouteAdminStorage.mapboxRoutes[route.id] != null &&
+            isAnnotationInitInMapboxRoute(RouteAdminStorage.mapboxRoutes[route.id]!!))
+            hideRoute(route.id)
+
+
         val busStopIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.location_marker, null)!!)!!
 
         val routeLine = polylineAnnotationManager.create(
@@ -182,7 +223,7 @@ class DispatcherFragment : MapFragment()
     private fun addBusStopClickListener(): OnPointAnnotationClickListener = OnPointAnnotationClickListener { _busStopAnnotation ->
         // listener нажатия на остановку на карте
         for (mapboxRoute in RouteAdminStorage.mapboxRoutes)
-            for (busStop in mapboxRoute.value.busStops)
+            mapboxRoute.value.busStops?.forEach { busStop ->
                 if (_busStopAnnotation == busStop && _busStopAnnotation.getData() != null)
                 {
                     val requestKey = requireContext().getString(R.string.itemSelected)
@@ -190,34 +231,44 @@ class DispatcherFragment : MapFragment()
                     val busStopId = busStop.getData()?.asString.toString()
 
                     val route = findRouteById(routeId)
-                    if (route != null)
-                    {
+                    if (route != null) {
                         val bottomSheet = BusStopsBottomSheet(busStopId, route.busStopsWithTime)
                         bottomSheet.show(childFragmentManager, "BottomSheetMap $busStopId $routeId")
-                        childFragmentManager.setFragmentResultListener(requestKey, viewLifecycleOwner) { key, bundle ->
+                        childFragmentManager.setFragmentResultListener(
+                            requestKey,
+                            viewLifecycleOwner
+                        ) { key, bundle ->
                             // listener нажатия на остановку в Bottom sheet
-                            if (key == requestKey)
-                            {
-                                val position = Json.decodeFromString<GeoPosition>(bundle.getString(requireContext().getString(R.string.busStop_id)).toString())
+                            if (key == requestKey) {
+                                val position = Json.decodeFromString<GeoPosition>(
+                                    bundle.getString(requireContext().getString(R.string.busStop_id))
+                                        .toString()
+                                )
                                 moveCamera(position)
                             }
                         }
                     }
                 }
+            }
         true
     }
 
     private fun findRouteById(id: String): Route?
-        = RouteAdminStorage.routes.find { _route -> _route.id == id }
+        = RouteAdminStorage.routes.value.data?.find { _route -> _route.id == id }
 
 
     private fun hideRoute(id: String)
     {
+        Log.d("action", "hide route: $id")
         RouteAdminStorage.mapboxRoutes[id]?.let { mapboxRoute ->
-            mapboxRoute.isVisible = false
-            pointAnnotationManager.delete(mapboxRoute.busStops.toList())
-            polylineAnnotationManager.delete(mapboxRoute.trackLine)
-            RouteAdminStorage.mapboxRoutes.remove(id, mapboxRoute)
+            if (isAnnotationInitInMapboxRoute(mapboxRoute))
+            {
+                mapboxRoute.isVisible = false
+                pointAnnotationManager.delete(mapboxRoute.busStops!!.toList())
+                polylineAnnotationManager.delete(mapboxRoute.trackLine!!)
+//            RouteAdminStorage.mapboxRoutes.remove(id, mapboxRoute)
+            }
+
         }
     }
 
@@ -238,20 +289,16 @@ class DispatcherFragment : MapFragment()
                         hideRoute(routeId)
                         removeBusLocationChangeListener(routeId)
 
-                        RouteAdminStorage.routes
-                            .filter { it.id != routeId }
-                            .let { RouteAdminStorage.routes = it.toTypedArray() }
 
-                        RouteAdminStorage.routes.forEach {
+                        RouteAdminStorage.routes.value.data?.let { _routes ->
+                            val newRoutes = _routes.filter { it.id != routeId }
+                            RouteAdminStorage.routes.value = Resource.Success(newRoutes.toTypedArray())
 
-                            Log.d("routes:", it.name)
+                            newRoutes.forEach { Log.d("routes:", it.name) }
+                            adapter.dataSet = Array<DispatcherRouteItem> ( newRoutes.size) {
+                                DispatcherRouteItem(newRoutes[it], false)
+                            }
                         }
-
-
-                        val dispatcherRoutes = Array<DispatcherRouteItem> ( RouteAdminStorage.routes.size) {
-                            DispatcherRouteItem(RouteAdminStorage.routes[it], false)
-                        }
-                        adapter.dataSet = dispatcherRoutes
                         adapter.notifyDataSetChanged()
                     }
                     else
@@ -265,9 +312,9 @@ class DispatcherFragment : MapFragment()
 
     private fun editRoute(id: String)
     {
-        Navigation.findNavController(requireActivity(), R.id.nav_host_main)
+        findNavController()
             .navigate(
-                AdminMainFragmentDirections.actionAdminMainFragmentToCreateRouteFragment(
+                DispatcherFragmentDirections.actionMapAdminFragmentToCreateRouteFragment(
                     Json.encodeToString(
                         findRouteById(
                             id
@@ -284,17 +331,17 @@ class DispatcherFragment : MapFragment()
         if (viewModel.isTracking) return
         Log.d("Tracker", "start listening all buses")
 
-        lifecycle.coroutineScope.launchWhenStarted {
+        initBuses()
+
+        lifecycleScope.launchWhenStarted {
             viewModel.startWebSocket()
         }
-        Log.d("buses", viewModel.buses.size.toString())
 
         for ((id, busLocation) in viewModel.buses)
         {
-            lifecycleScope.launch {
-                Log.d("buses", busLocation.toString())
+            lifecycleScope.launchWhenStarted {
                 busLocation.isActual.collect { isActual ->
-                    Log.d("isActualChanged", isActual.toString())
+                    Log.d("isActualChanged", busLocation.isActual.toString())
                     if (isActual)
                     {
                         Log.d("addBusLocationChangeListener", "id = $id")
@@ -317,6 +364,12 @@ class DispatcherFragment : MapFragment()
             }
         }
     }
+    private fun initBuses()
+    {
+        val _buses: MutableMap<String, BusLocation> = mutableMapOf()
+        RouteAdminStorage.routes.value.data?.forEach { _buses[it.id] = BusLocation() }
+        viewModel.buses = _buses.toMap()
+    }
 
     private fun stopListeningTracker()
     {
@@ -324,7 +377,6 @@ class DispatcherFragment : MapFragment()
         viewModel.stopWebSocket()
         for ((id, busLocation) in viewModel.buses)
             removeBusLocationChangeListener(id)
-
     }
 
 
@@ -368,11 +420,7 @@ class DispatcherFragment : MapFragment()
 
     override fun onStart()
     {
-        for (mapboxRoute in RouteAdminStorage.mapboxRoutes)
-            if (mapboxRoute.value.isVisible)
-                findRouteById(mapboxRoute.key)?.let { _route ->
-                    showRoute(_route)
-                }
+//        showAllActiveRoute()
 
         pointAnnotationManager.addClickListener(pointClickListener)
         cameraChangeListener = OnCameraChangeListener { cameraChanged ->
@@ -397,9 +445,43 @@ class DispatcherFragment : MapFragment()
         super.onStart()
     }
 
+    private fun showAllActiveRoute(routes: Array<Route>)
+    {
+        Log.d("action", "showAllActiveRoute")
+        for (route in routes)
+            if (RouteAdminStorage.mapboxRoutes[route.id]!!.isVisible)
+                showRoute(route)
+    }
+
+    private fun hideAllRoutes()
+    {
+        for ((routeId, mapboxRoute) in RouteAdminStorage.mapboxRoutes)
+            if (mapboxRoute.isVisible && isAnnotationInitInMapboxRoute(mapboxRoute))
+            {
+                pointAnnotationManager.delete(mapboxRoute.busStops!!)
+                polylineAnnotationManager.delete(mapboxRoute.trackLine!!)
+            }
+    }
+
+    private fun updateRouteList(routes: Array<Route>)
+    {
+        adapter.dataSet = Array<DispatcherRouteItem> (routes.size) {
+            DispatcherRouteItem(
+                routes[it],
+                false,
+                RouteAdminStorage.mapboxRoutes[routes[it].id]!!.isVisible
+            )
+        }
+        adapter.notifyDataSetChanged()
+    }
+
+
     override fun onStop() {
         pointAnnotationManager.removeClickListener(pointClickListener)
 
         super.onStop()
     }
+
+    private fun isAnnotationInitInMapboxRoute(mapboxRoute: MapboxRoute): Boolean =
+        mapboxRoute.trackLine != null && mapboxRoute.busStops != null
 }

@@ -32,7 +32,7 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
                 val users = response.body<Array<User>>()
 
                 users.forEach { Log.d("data", "role = ${it.userType}, id = ${it.id}") }
-                UsersStorage.userList = MutableStateFlow(users)
+                UsersStorage.userList = users
                 Log.d("Server", "SUCCESS")
                 return true
             }
@@ -49,13 +49,14 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     {
         try {
             val response: HttpResponse = Repository.client.post(EndPoint.createUser) {
-                this.setBody(Json.encodeToJsonElement(user))
+                this.setBody(Json.encodeToString(user))
             }
             Log.d("Server", "Status code: ${response.status.value}")
 
+            Log.d("Server", Json.encodeToString(user))
             if (response.status.value == 200)
             {
-                UsersStorage.userList.value += user
+                UsersStorage.userList += user
                 Log.d("Server", "SUCCESS")
                 return true
             } else
@@ -76,9 +77,9 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
 
             if (response.status.value == 200)
             {
-                UsersStorage.userList.value
+                UsersStorage.userList
                     .filter { it.id != id }
-                    .let { UsersStorage.userList.value = it.toTypedArray() }
+                    .let { UsersStorage.userList = it.toTypedArray() }
                 Log.d("Server", "SUCCESS")
                 return true
             } else

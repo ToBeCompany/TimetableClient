@@ -9,7 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class BusLocation(
+data class BusLocation(
     var position: MutableStateFlow<GeoPosition?>  = MutableStateFlow(null),
     var busLocationJob: Job = Job()
 ) {

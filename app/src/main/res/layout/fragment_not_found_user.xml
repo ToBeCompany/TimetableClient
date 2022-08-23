@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/notFoundReasons_NotFoundUserFragment"
+        android:id="@+id/not_found_reasons"
         android:layout_width="0sp"
         android:layout_height="wrap_content"
         android:textSize="15sp"
@@ -36,15 +36,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/notFound_NotFoundUserFragment"/>
 
-    <Button
-        android:id="@+id/loginOut_NotFoundUserFragment"
-        android:layout_width="0sp"
-        android:layout_height="70sp"
-        android:layout_margin="8sp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/reboot"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:padding="16sp"
+        android:text="@string/reboot"
+        app:layout_constraintBottom_toTopOf="@+id/login_out"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/login_out"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:padding="16sp"
         android:text="@string/login_out"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

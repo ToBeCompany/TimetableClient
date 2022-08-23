@@ -24,6 +24,7 @@
     <color name="light_blue">#73B1E7</color>
     <color name="grey_new">#4A4A4A</color>
     <color name="blue_text">#30437E</color>
+    <color name="red">#D32F2F</color>
 
     <color name="dark_grey">#1E1E1E</color>
     <color name="progress_shadow">#B3323232</color>

@@ -32,12 +32,15 @@ class EditUsersFragment : Fragment(), CreateUser
         arrayOf()
     )
 
-    val typeUserConvertor = mapOf<String, TypeUser?>(
-        "Все" to null,
-        "Работник" to TypeUser.WORKER,
-        "Водитель" to TypeUser.DRIVER,
-        "Админ" to TypeUser.ADMIN
-    )
+    val typeUserConvertor by lazy {
+        mapOf<String, TypeUser?>(
+            getString(R.string._all) to null,
+            getString(R.string.worker) to TypeUser.WORKER,
+            getString(R.string.driver) to TypeUser.DRIVER,
+            getString(R.string.admin) to TypeUser.ADMIN,
+            getString(R.string.dispatcher) to TypeUser.DISPAT
+        )
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentEditUsersBinding.inflate(inflater)
@@ -47,7 +50,7 @@ class EditUsersFragment : Fragment(), CreateUser
         binding.userRecyclerView.adapter = adapter
 
         binding.createUserButton.setOnClickListener {
-            Log.d("event", "show dialog create user")
+            Log.d("action", "show dialog create user")
             val createUserDialog = AddUserDialog()
             createUserDialog.isCancelable = false
             createUserDialog.show(childFragmentManager, AddUserDialog.TAG)
@@ -60,7 +63,7 @@ class EditUsersFragment : Fragment(), CreateUser
                 binding.resetIdText.visibility = View.GONE
             else
                 binding.resetIdText.visibility = View.VISIBLE
-            adapter.sortById(_id.toString(), UsersStorage.userList.value)
+            adapter.sortById(_id.toString(), UsersStorage.userList)
         }
 
         binding.resetIdText.setOnClickListener {
@@ -70,7 +73,7 @@ class EditUsersFragment : Fragment(), CreateUser
         binding.sortByRoleSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long)
             {
-                adapter.sortByRole(typeUserConvertor[parentView?.selectedItem], UsersStorage.userList.value)
+                adapter.sortByRole(typeUserConvertor[parentView?.selectedItem], UsersStorage.userList)
             }
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         }
@@ -86,7 +89,7 @@ class EditUsersFragment : Fragment(), CreateUser
 
     private fun initRecyclerView()
     {
-        if (UsersStorage.userList.value.isEmpty())
+        if (UsersStorage.userList.isEmpty())
         {
             Log.d("request", "get users from server")
             lifecycleScope.launch {
@@ -94,7 +97,7 @@ class EditUsersFragment : Fragment(), CreateUser
                 Log.d("status", "= $status")
                 if (status)
                 {
-                    adapter.dataSet = UsersStorage.userList.value
+                    adapter.dataSet = UsersStorage.userList
                     adapter.notifyDataSetChanged()
                 }
 //                else
@@ -104,12 +107,12 @@ class EditUsersFragment : Fragment(), CreateUser
         else
         {
             Log.d("request", "get users from repository")
-            adapter.dataSet = UsersStorage.userList.value
+            adapter.dataSet = UsersStorage.userList
             adapter.notifyDataSetChanged()
         }
     }
 
-    fun deleteUser(user: User)
+    private fun deleteUser(user: User)
     {
         Log.d("event", "show dialog delete user")
         AlertDialog.Builder(requireActivity())
@@ -122,7 +125,7 @@ class EditUsersFragment : Fragment(), CreateUser
                     val status = viewModel.deleteUser(user.id)
                     Log.d("status", "= $status")
                     if (status)
-                        adapter.sort(UsersStorage.userList.value)
+                        adapter.sort(UsersStorage.userList)
                     else
                         Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_delete_user), Snackbar.LENGTH_LONG).show()
                 }
@@ -139,7 +142,7 @@ class EditUsersFragment : Fragment(), CreateUser
             val status = viewModel.createUser(user)
             Log.d("status", "= $status")
             if (status)
-                adapter.sort(UsersStorage.userList.value)
+                adapter.sort(UsersStorage.userList)
             else
                 Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_create_user), Snackbar.LENGTH_LONG).show()
         }
@@ -161,7 +164,7 @@ class EditUsersFragment : Fragment(), CreateUser
 
     override fun onResume()
     {
-        adapter.sort(UsersStorage.userList.value)
+        adapter.sort(UsersStorage.userList)
         super.onResume()
     }
 

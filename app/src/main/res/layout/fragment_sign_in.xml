@@ -34,7 +34,7 @@
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/colorPrimary"
-        app:hintTextColor="@color/colorPrimary"
+        app:hintTextColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:focusedByDefault="true"
             android:maxLength="50"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -57,7 +57,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
 
-        <ProgressBar
+    <ProgressBar
         android:id="@+id/progressBar"
         android:visibility="gone"
         style="?android:attr/progressBarStyleHorizontal"
@@ -69,5 +69,35 @@
         app:layout_constraintEnd_toEndOf="@+id/codeTextContainer"
         app:layout_constraintStart_toStartOf="@+id/codeTextContainer"
         app:layout_constraintTop_toBottomOf="@+id/codeTextContainer" />
+
+    <TextView
+        android:id="@+id/invalid_password_text"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/invalid_password"
+        android:textColor="@color/red"
+        app:layout_constraintEnd_toEndOf="@+id/codeTextContainer"
+        app:layout_constraintStart_toStartOf="@+id/codeTextContainer"
+        app:layout_constraintTop_toBottomOf="@+id/codeTextContainer" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sign_button"
+        android:layout_width="200sp"
+        android:layout_height="64sp"
+        android:layout_marginBottom="32dp"
+        android:letterSpacing="0.08"
+        android:text="@string/sign_in"
+        android:backgroundTint="@color/white"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="2sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

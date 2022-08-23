@@ -5,6 +5,6 @@ import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
 
 class MapboxRoute(
     var isVisible: Boolean = false,
-    var trackLine: PolylineAnnotation,
-    var busStops: List<PointAnnotation> = listOf(),
+    var trackLine: PolylineAnnotation? = null,
+    var busStops: List<PointAnnotation>? = null,
 )

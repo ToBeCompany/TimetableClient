@@ -1,6 +1,5 @@
 package com.dru128.timetable.admin.edituser
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -57,7 +56,6 @@ class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Arr
 
         fun onBind(position: Int)
         {
-//            Log.d("data", "users size = ${dataSet[position].userType} ${dataSet[position].id}")
 
             binding.userId.text = dataSet[position].id
             binding.userRole.text = when (dataSet[position].userType)
@@ -65,6 +63,7 @@ class UserRecyclerAdapter(var deleteUser: (user: User) -> Unit, var dataSet: Arr
                 TypeUser.WORKER -> context.resources.getString(R.string.worker)
                 TypeUser.DRIVER -> context.resources.getString(R.string.driver)
                 TypeUser.ADMIN -> context.resources.getString(R.string.admin)
+                TypeUser.DISPAT -> context.resources.getString(R.string.dispatcher)
                 else-> context.resources.getString(R.string.error)
             }
 

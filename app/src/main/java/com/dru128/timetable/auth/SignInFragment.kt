@@ -30,14 +30,14 @@ class SignInFragment : Fragment()
         binding = FragmentSignInBinding.inflate(inflater)
 
         Keyboard().show(requireContext(), binding.codeText)
-        binding
-            .codeText
-            .addTextChangedListener { code ->
-                if (!code.isNullOrEmpty())
+        binding.signButton.setOnClickListener {
+            val password = binding.codeText.text.toString()
+                if (password.isNotBlank())
                 {
                     lifecycle.coroutineScope.launchWhenStarted {
+                        binding.invalidPasswordText.visibility = View.GONE
                         binding.progressBar.visibility = View.VISIBLE
-                        val response: User? = viewModel.getUser(code.toString())
+                        val response: User? = viewModel.getUser(password)
                         binding.progressBar.visibility = View.GONE
 
                         Log.d("response", response.toString())
@@ -49,6 +49,10 @@ class SignInFragment : Fragment()
                             Snackbar.make(requireView(), getString(R.string.auth_success), Snackbar.LENGTH_LONG).show()
                             startActivity(Intent(requireContext(), MainActivity::class.java))
                             (requireActivity() as AppCompatActivity).finish()
+                        }
+                        else
+                        {
+                            binding.invalidPasswordText.visibility = View.VISIBLE
                         }
                     }
                 }
