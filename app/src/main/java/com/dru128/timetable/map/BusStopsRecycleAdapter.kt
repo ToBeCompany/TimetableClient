@@ -2,14 +2,12 @@ package com.dru128.timetable.map
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.data.metadata.BusStopWithTime
 import com.dru128.timetable.data.metadata.GeoPosition
 import dru128.timetable.R
 import dru128.timetable.databinding.BusStopItemWorkerBinding
-import kotlin.reflect.KFunction1
 
 
 class BusStopsRecycleAdapter(

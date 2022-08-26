@@ -77,6 +77,13 @@ class DispatcherFragment : MapFragment()
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+//        findNavController()
+//            .navigate(DispatcherFragmentDirections.actionMapAdminFragmentToCreateRouteFragment("")) // for debug
+    }
+
     override fun mapReady()
     {
         addShowPanelButtonListener()
@@ -190,7 +197,7 @@ class DispatcherFragment : MapFragment()
         val busStopIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.location_marker, null)!!)!!
 
         val routeLine = polylineAnnotationManager.create(
-            createRouteLine(route.positions)
+            createRouteLine(geoPosToPoint(route.positions))
         )
 
         val busStopMarkers = List<PointAnnotation>(route.busStopsWithTime.size) { i ->
@@ -198,8 +205,8 @@ class DispatcherFragment : MapFragment()
                 createBusStop(route.busStopsWithTime[i].busStop, busStopIcon)
             )
         }
-        busStopMarkers.forEach { pointAnnotationManager.selectAnnotation(it) }
 
+        busStopMarkers.forEach { pointAnnotationManager.selectAnnotation(it) } /** оно не работает :( */
         lifecycleScope.launchWhenStarted {
             isZoomChange.collectLatest {
                 if (it)
@@ -278,8 +285,8 @@ class DispatcherFragment : MapFragment()
         AlertDialog.Builder(requireActivity())
             .setTitle(requireContext().resources.getString(R.string.delete_route))
 //               .setIcon(R.drawable.hungrycat)
-            .setNegativeButton(requireContext().resources.getString(R.string.cancel)) { dialog, _id -> dialog.dismiss() }
-            .setPositiveButton(requireContext().resources.getString(R.string.confirm)) { dialog, _id ->
+            .setNegativeButton(requireContext().resources.getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton(requireContext().resources.getString(R.string.confirm)) { dialog, _ ->
                 Log.d("request", "delete user by id: $routeId")
                 lifecycleScope.launch {
                     val status = viewModel.deleteRoute(routeId)

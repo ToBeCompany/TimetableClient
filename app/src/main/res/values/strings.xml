@@ -83,6 +83,7 @@
     <string name="sign_in">Войти</string>
     <string name="invalid_password">Неверный пароль</string>
     <string name="reboot">Перезагрузить</string>
+    <string name="time">Время</string>
 
 
     <!--  intent  -->

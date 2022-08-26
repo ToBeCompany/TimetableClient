@@ -23,8 +23,6 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     suspend fun getUsers(): Boolean
     {
         try {
-
-//            for (i in 0..10) UsersStorage.userList.value += User(TypeUser.WORKER, null, (0..91111).random().toString())
             val response: HttpResponse = Repository.client.get(EndPoint.allUsers)
             Log.d("Server", "Status code: ${response.status.value}")
             if (response.status.value == 200)
@@ -49,11 +47,10 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     {
         try {
             val response: HttpResponse = Repository.client.post(EndPoint.createUser) {
-                this.setBody(Json.encodeToString(user))
+                this.setBody(Json.encodeToJsonElement(user))
             }
             Log.d("Server", "Status code: ${response.status.value}")
 
-            Log.d("Server", Json.encodeToString(user))
             if (response.status.value == 200)
             {
                 UsersStorage.userList += user
@@ -71,7 +68,9 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     {
         try {
             val response: HttpResponse = Repository.client.delete(EndPoint.deleteUser) {
-                this.setBody(id)
+                this.setBody(
+                    mapOf("id" to id)
+                )
             }
             Log.d("Server", "Status code: ${response.status.value}")
 

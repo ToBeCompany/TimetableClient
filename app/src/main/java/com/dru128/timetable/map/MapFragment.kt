@@ -31,6 +31,7 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.extension.localization.localizeLabels
 import com.mapbox.maps.extension.style.expressions.dsl.generated.zoom
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.LineJoin
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
@@ -70,11 +71,11 @@ abstract class MapFragment: Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         mapbox = mapView.getMapboxMap()
+        mapbox.setBounds(agglomerationOfBarnaul)
         mapbox.loadStyleUri(Style.MAPBOX_STREETS) {
             it.localizeLabels(getCurrentLocale(requireContext()))
             mapReady()
         }
-        mapbox.setBounds(agglomerationOfBarnaul)
 
 
         pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
@@ -151,13 +152,13 @@ abstract class MapFragment: Fragment()
             .withTextAnchor(TextAnchor.TOP)
             .withTextSize(10.0)
     }
-    fun createRouteLine(positions: List<GeoPosition>): PolylineAnnotationOptions
+    fun createRouteLine(points: List<Point>): PolylineAnnotationOptions
     {
-        val points = List<Point>(positions.size) { i -> Point.fromLngLat(positions[i].longitude, positions[i].latitude) }
         return PolylineAnnotationOptions()
             .withPoints(points)
             .withLineColor( ResourcesCompat.getColor(requireContext().resources, R.color.polyline, null) )
-            .withLineWidth(5.0)
+            .withLineWidth(6.0)
+            .withLineJoin(LineJoin.ROUND)
     }
 
     fun moveCamera(point: GeoPosition?) {
@@ -196,8 +197,12 @@ abstract class MapFragment: Fragment()
     fun geoPosToPoint(geoPosition: GeoPosition): Point =
         Point.fromLngLat(geoPosition.longitude, geoPosition.latitude)
 
+    fun geoPosToPoint(geoPositions: List<GeoPosition>): List<Point> =
+        List<Point>(geoPositions.size) { i -> geoPosToPoint(geoPositions[i]) }
+
     fun pointToGeoPos(point: Point): GeoPosition =
         GeoPosition(latitude = point.latitude(), longitude = point.longitude())
+
 
     private fun getCurrentLocale(context: Context): Locale
     {
@@ -219,12 +224,14 @@ abstract class MapFragment: Fragment()
     private val agglomerationOfBarnaul: CameraBoundsOptions = CameraBoundsOptions.Builder()
         .bounds(
             CoordinateBounds(
-                Point.fromLngLat(83.284087, 53.522732),
-                Point.fromLngLat( 84.1435581550414, 53.118062596069514),
+//                Point.fromLngLat(84.165446, 53.556742),
+//                Point.fromLngLat( 83.333214, 53.145960),
+                Point.fromLngLat(82.113161,52.79682),
+                Point.fromLngLat(85.612297,53.967066),
                 false
             )
         )
-        .minZoom(10.0)
+        .minZoom(8.0)
         .build()
 
     override fun onStop()

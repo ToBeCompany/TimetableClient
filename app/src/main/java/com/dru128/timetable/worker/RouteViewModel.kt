@@ -39,6 +39,14 @@ class RouteViewModel: ViewModel()
             return null
     }
 
+    fun isFavouritesContainsRealRoutes(routes: Array<Route>, favourites: Array<String>): Boolean
+    {
+        for (route in routes)
+            if (favourites.contains(route.id))
+                return true
+        return false
+    }
+
     private suspend fun getRoutesFromServer(): Array<Route>? =
         try {
             Repository.client.get(EndPoint.all_routes).body()

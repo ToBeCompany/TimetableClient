@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -70,7 +71,7 @@ class RouteFragment : Fragment()
             {
                 RouteWorkerStorage.routes = routes
                 initRecyclerViews()
-                Snackbar.make(binding.root, requireContext().resources.getString(R.string.pinch_to_add_to_favorites), 1200).show()
+                Toast.makeText(requireContext(), requireContext().resources.getString(R.string.pinch_to_add_to_favorites), Toast.LENGTH_SHORT).show()
 
             } else {
                 // не получилось получить маршруты
@@ -87,12 +88,8 @@ class RouteFragment : Fragment()
         var favouriteRoutes = arrayOf<Route>()
 
         viewModel.getFavouriteRoutes().let { favourites ->
-            if (favourites.isEmpty())
+            if (favourites.isNotEmpty() && viewModel.isFavouritesContainsRealRoutes(RouteWorkerStorage.routes, favourites))
             {
-                binding.favouriteRouteLayout.visibility = View.GONE
-                routes = RouteWorkerStorage.routes
-            }
-            else {
                 binding.favouriteRouteLayout.visibility = View.VISIBLE
                 RouteWorkerStorage.routes.forEach { _route ->
                     if (favourites.contains(_route.id))
@@ -101,8 +98,11 @@ class RouteFragment : Fragment()
                         routes += _route
                 }
             }
-
-
+            else
+            {
+                binding.favouriteRouteLayout.visibility = View.GONE
+                routes = RouteWorkerStorage.routes
+            }
         }
 
         adapter.dataSet = routes

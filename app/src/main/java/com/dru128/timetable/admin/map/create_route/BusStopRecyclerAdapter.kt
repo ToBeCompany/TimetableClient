@@ -1,9 +1,7 @@
 package com.dru128.timetable.admin.map.create_route
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.dru128.timetable.data.metadata.BusStopWithTime
@@ -44,13 +42,13 @@ class BusStopAdminRecyclerAdapter (
                 }
 
                 nameText.doOnTextChanged { text, start, count, after ->
-                    var busStop = dataSet[position]
+                    val busStop = dataSet[position]
                     busStop.busStop.name = text.toString()
                     busStopChanged(busStop)
                 }
                 timeText.doOnTextChanged { text, start, count, after ->
-                    var busStop = dataSet[position]
-                    busStop.time= text.toString()
+                    val busStop = dataSet[position]
+                    busStop.time = text.toString()
                     busStopChanged(busStop)
                 }
 
