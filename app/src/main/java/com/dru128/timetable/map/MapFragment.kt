@@ -1,7 +1,6 @@
 package com.dru128.timetable.map
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -10,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
@@ -29,7 +27,6 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.localization.localizeLabels
-import com.mapbox.maps.extension.style.expressions.dsl.generated.zoom
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.LineJoin
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
@@ -101,14 +98,13 @@ abstract class MapFragment: Fragment()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    @SuppressLint("MissingPermission")
     fun moveToUserLocation()
     {
         if (isGPSEnabled())
             if (isGPSPermissionGranted())
                 ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
             else
-            { // разрешения выданы
+            { // разрешения выданы и gps включен
 
                 mapView.location.apply {
                     if (!enabled)  updateSettings { enabled = true }
@@ -143,7 +139,6 @@ abstract class MapFragment: Fragment()
         return PointAnnotationOptions()
             .withPoint(geoPosToPoint(busStopData.position))
             .withData(
-//                JsonParser.parseString(busStopData.id)
                     JsonParser.parseReader(StringReader(busStopData.id))
             )
             .withIconImage(busStopIcon)
@@ -224,8 +219,6 @@ abstract class MapFragment: Fragment()
     private val agglomerationOfBarnaul: CameraBoundsOptions = CameraBoundsOptions.Builder()
         .bounds(
             CoordinateBounds(
-//                Point.fromLngLat(84.165446, 53.556742),
-//                Point.fromLngLat( 83.333214, 53.145960),
                 Point.fromLngLat(82.113161,52.79682),
                 Point.fromLngLat(85.612297,53.967066),
                 false

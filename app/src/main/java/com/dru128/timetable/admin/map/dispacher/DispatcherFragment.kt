@@ -29,15 +29,9 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentDispatcherBinding
-import kotlin.collections.List
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.find
-import kotlin.collections.forEach
-import kotlin.collections.indices
-import kotlin.collections.iterator
 import kotlin.collections.set
-import kotlin.collections.toList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -63,7 +57,7 @@ class DispatcherFragment : MapFragment()
         arrayOf(),
     )
 
-    private var cameraChangeListener: OnCameraChangeListener? = null
+    private val cameraChangeListener: OnCameraChangeListener by lazy { addCameraChangeListener() }
     private val pointClickListener: OnPointAnnotationClickListener by lazy { addBusStopClickListener() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
@@ -77,13 +71,6 @@ class DispatcherFragment : MapFragment()
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-//        findNavController()
-//            .navigate(DispatcherFragmentDirections.actionMapAdminFragmentToCreateRouteFragment("")) // for debug
-    }
-
     override fun mapReady()
     {
         addShowPanelButtonListener()
@@ -95,6 +82,23 @@ class DispatcherFragment : MapFragment()
 
         binding.routesRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.routesRecyclerView.adapter = adapter
+
+
+        lifecycleScope.launchWhenStarted {
+            isZoomChange.collectLatest {
+                Log.d("collectLatestZoom", it.toString())
+                if (it)
+                    for ((key, value) in RouteAdminStorage.busMarkers) {
+                        value.textField = findRouteById(key)?.name ?: ""
+                        pointAnnotationManager.update(value)
+                    }
+                else
+                    for ((key, value) in RouteAdminStorage.busMarkers) {
+                        value.textField = ""
+                        pointAnnotationManager.update(value)
+                    }
+            }
+        }
 
         progressManager.finish()
     }
@@ -284,7 +288,7 @@ class DispatcherFragment : MapFragment()
         Log.d("event", "show dialog delete route")
         AlertDialog.Builder(requireActivity())
             .setTitle(requireContext().resources.getString(R.string.delete_route))
-//               .setIcon(R.drawable.hungrycat)
+//               .setIcon(R.drawable.hungrycat) CAT IS VERY HUNGRY!
             .setNegativeButton(requireContext().resources.getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
             .setPositiveButton(requireContext().resources.getString(R.string.confirm)) { dialog, _ ->
                 Log.d("request", "delete user by id: $routeId")
@@ -407,6 +411,7 @@ class DispatcherFragment : MapFragment()
                             .withIconAnchor(IconAnchor.BOTTOM)
                             .withTextAnchor(TextAnchor.TOP)
                             .withTextSize(11.0)
+                            .withTextField(findRouteById(id)?.name ?: "" )
                     )
                     pointAnnotationManager.update(busMarker)
                     RouteAdminStorage.busMarkers[id] = busMarker
@@ -424,33 +429,6 @@ class DispatcherFragment : MapFragment()
         }
     }
 
-
-    override fun onStart()
-    {
-//        showAllActiveRoute()
-
-        pointAnnotationManager.addClickListener(pointClickListener)
-        cameraChangeListener = OnCameraChangeListener { cameraChanged ->
-            isZoomChange.value = mapbox.cameraState.zoom > 13.0
-        }
-        mapbox.addOnCameraChangeListener(cameraChangeListener!!)
-
-        lifecycleScope.launchWhenStarted {
-            isZoomChange.collectLatest {
-                if (it)
-                    for ((key, value) in RouteAdminStorage.busMarkers) {
-                        value.textField = findRouteById(key)?.name
-                        pointAnnotationManager.update(value)
-                    }
-                else
-                    for ((key, value) in RouteAdminStorage.busMarkers) {
-                        value.textField = ""
-                        pointAnnotationManager.update(value)
-                    }
-            }
-        }
-        super.onStart()
-    }
 
     private fun showAllActiveRoute(routes: Array<Route>)
     {
@@ -482,10 +460,21 @@ class DispatcherFragment : MapFragment()
         adapter.notifyDataSetChanged()
     }
 
+    private fun addCameraChangeListener(): OnCameraChangeListener = OnCameraChangeListener { cameraChanged ->
+        isZoomChange.value = mapbox.cameraState.zoom > 13.0
+    }
+
+    override fun onStart()
+    {
+        pointAnnotationManager.addClickListener(pointClickListener)
+        mapbox.addOnCameraChangeListener(cameraChangeListener)
+        super.onStart()
+    }
+
 
     override fun onStop() {
         pointAnnotationManager.removeClickListener(pointClickListener)
-
+        mapbox.removeOnCameraChangeListener(cameraChangeListener)
         super.onStop()
     }
 

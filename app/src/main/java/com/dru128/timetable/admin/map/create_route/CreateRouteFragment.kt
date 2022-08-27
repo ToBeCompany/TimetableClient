@@ -26,12 +26,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonParser
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
-import com.mapbox.maps.extension.style.layers.properties.generated.LineJoin
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
-import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
@@ -40,7 +38,6 @@ import dru128.timetable.R
 import dru128.timetable.databinding.FragmentCreateRouteBinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -136,6 +133,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
         lifecycleScope.launchWhenStarted {
             isZoomChange.collectLatest {
+                Log.d("zoom", it.toString())
                 if (it)
                 {
                     for (curBusStop in busStopMarkers)
@@ -164,9 +162,6 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
             }
         }
 
-        pointAnnotationManager.addClickListener(addRouteDotClickListener())
-        mapbox.addOnMapClickListener(mapClickListener)
-        mapbox.addOnCameraChangeListener(cameraChangeListener)
         progressManager.finish()
     }
 
@@ -380,6 +375,13 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
                 )
             )
         )
+    }
+
+    override fun onStart() {
+        pointAnnotationManager.addClickListener(addRouteDotClickListener())
+        mapbox.addOnMapClickListener(mapClickListener)
+        mapbox.addOnCameraChangeListener(cameraChangeListener)
+        super.onStart()
     }
 
     override fun onStop() {
