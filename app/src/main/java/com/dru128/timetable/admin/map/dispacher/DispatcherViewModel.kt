@@ -9,6 +9,7 @@ import com.dru128.timetable.Repository
 import com.dru128.timetable.admin.map.RouteAdminStorage
 import com.dru128.timetable.data.JsonDataManager
 import com.dru128.timetable.data.metadata.Route
+import com.dru128.timetable.tools.Resource
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocket
@@ -23,6 +24,7 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -30,37 +32,46 @@ import kotlinx.serialization.json.Json
 
 class DispatcherViewModel : ViewModel()
 {
-    var buses: MutableMap<String, BusLocation> = mutableMapOf()
+    var buses: Map<String, BusLocation> = mapOf()
+
+    var isVisibleRoutePanel = MutableStateFlow<Boolean>(true)
 
     var webSocketSession: DefaultClientWebSocketSession? = null
-    var isVisibleRoutePanel = MutableStateFlow<Boolean>(true)
     var isTracking: Boolean = false
 
     private var dataManager = JsonDataManager(App.globalContext)
 
-    suspend fun getRoutes(): Array<Route>?
+    suspend fun getRoutes()
     {
+        RouteAdminStorage.routes.value = Resource.Loading()
         val serverVersion = getDBVersionFromServer()
         val cacheVersion = dataManager.getDBVersion()
 
-        if (serverVersion != null)
+
+        RouteAdminStorage.routes.value = if (serverVersion != null)
             if (cacheVersion != null && cacheVersion == serverVersion)
             {
+                val fromCache = dataManager.loadRoutes()
                 Log.d("ROUTE_DATA", "get from cache")
-                return dataManager.loadRoutes() // маршруты с сервера не изменились
+                if (fromCache.isNullOrEmpty())
+                    Resource.Error("Не удалось получить маршруты с кэша") // маршруты с сервера не удалось получить
+                else
+                    Resource.Success(fromCache) // маршруты с сервера не изменились
             }
             else
             {
+                val fromServer = getRoutesFromServer()
                 Log.d("ROUTE_DATA", "get from server")
-                getRoutesFromServer()?.let { fromServer ->
-                    dataManager.saveRoutes(fromServer, serverVersion)
-
-                    return  fromServer // маршруты получены с сервера и сохранены в кэш
+                if (fromServer.isNullOrEmpty())
+                    Resource.Error("Не удалось получить маршруты с сервера") // маршруты с сервера не удалось получить
+                else
+                {
+                    dataManager.saveRoutes(fromServer, serverVersion) // маршруты получены с сервера и сохранены в кэш
+                    Resource.Success(fromServer)
                 }
-                return null // маршруты с сервера не удалось получить
             }
         else
-            return null
+            Resource.Error("Не удалось получить версию БД")
     }
 
     private suspend fun getDBVersionFromServer(): Int? =
@@ -78,14 +89,14 @@ class DispatcherViewModel : ViewModel()
         try {
             val response: HttpResponse = Repository.client.get(EndPoint.all_routes)
             Log.d("Server", "Status code: ${response.status.value}")
-            if (response.status.value == 200)
+            return if (response.status.value == 200)
             {
                 val routes = response.body<Array<Route>>()
                 Log.d("Server", "SUCCESS")
-                return routes
+                routes
             }
             else
-                return null
+                null
         }
         catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
@@ -143,12 +154,12 @@ class DispatcherViewModel : ViewModel()
             }
             Log.d("Server", "Status code: ${response.status.value}")
 
-            if (response.status.value == 200)
+            return if (response.status.value == 200)
             {
                 Log.d("Server", "SUCCESS")
-                return true
+                true
             } else
-                return false
+                false
         } catch (error: Exception) {
             Log.d("Server", "ERROR: ${error.message}")
             return false

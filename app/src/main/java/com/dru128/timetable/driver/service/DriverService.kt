@@ -32,6 +32,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -47,10 +49,11 @@ class DriverService : Service()
     private var route: RouteNamesResponse? = null
     private var isTrackerOn = false
 
-    private val busLocation = MutableSharedFlow<GeoPosition>()
+    private val busLocation = MutableStateFlow<GeoPosition?>(null)
     
     private var listener = LocationListener {
         val position = GeoPosition(latitude = it.latitude, longitude = it.longitude)
+        Log.d("LocationListener", position.toString())
         serviceScope.launch {
             busLocation.emit(position)
         }
@@ -66,9 +69,7 @@ class DriverService : Service()
     {
         // сеть доступна для использования
         override fun onAvailable(network: Network) {
-            route?.let { _route ->
-                startSearch(_route.id)
-            }
+            route?.let { _route -> startSearch(_route.id) }
             Log.d("network", "is on")
             super.onAvailable(network)
         }
@@ -138,12 +139,15 @@ class DriverService : Service()
         isTrackerOn = true
         Log.d("LocationListener", "start listening")
         val locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        Log.d("action", "start socket0")
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
             5000, 10f,
             listener
         )
+        Log.d("action", "start socket1")
         serviceScope.launch {
+            Log.d("action", "start socket2")
             startWebSocket(trackerId)
         }
 
@@ -161,12 +165,14 @@ class DriverService : Service()
         serviceScope.launch {
             webSocketSession?.close(CloseReason(CloseReason.Codes.NORMAL, "driver turn off transponder "))
             serviceScope.cancel()
+            serviceScope = CoroutineScope(Job())
         }
     }
 
 
     private suspend fun startWebSocket(trackerId: String)
     {
+        Log.d("startWebSocket", "route id = $trackerId")
         Repository.websocketClient().webSocket(
             method = HttpMethod.Get,
             host = EndPoint.host,
@@ -174,16 +180,15 @@ class DriverService : Service()
         )
         {
             webSocketSession = this@webSocket
-            Log.d("startWebSocket", "url = ${this.call.request.url}   route id = $trackerId")
 
-            busLocation.collect { geoPosition ->
-                Log.d("UPD_BUS_LOC", "id= $trackerId | ${geoPosition.latitude} ${geoPosition.longitude}")
-
-                send(
-                    Frame.Text(
-                        Json.encodeToString(geoPosition)
+            busLocation.collectLatest { geoPosition ->
+                if (geoPosition != null)
+                    Log.d("UPD_BUS_LOC", "id= $trackerId | ${geoPosition.latitude} ${geoPosition.longitude}")
+                    send(
+                        Frame.Text(
+                            Json.encodeToString(geoPosition)
+                        )
                     )
-                )
             }
         }
     }

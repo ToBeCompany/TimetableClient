@@ -1,8 +1,7 @@
 package com.dru128.timetable.worker.map
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dru128.timetable.EndPoint
 import com.dru128.timetable.Repository
@@ -22,7 +21,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
-class MapWorkerViewModel(application : Application): AndroidViewModel(application)
+class MapWorkerViewModel: ViewModel()
 {
     var webSocketSession: DefaultClientWebSocketSession? = null
     var isTracking = false

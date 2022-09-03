@@ -26,7 +26,7 @@
             android:layout_margin="8sp"
             android:padding="4sp"
             android:textColor="@color/dark_gray"
-            android:textSize="18sp"
+            android:textSize="17sp"
             app:layout_constraintEnd_toStartOf="@+id/user_role"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/user_delete"
@@ -39,7 +39,7 @@
             android:layout_margin="8sp"
             android:padding="4sp"
             android:textColor="@color/dark_gray"
-            android:textSize="18sp"
+            android:textSize="17sp"
             app:layout_constraintEnd_toStartOf="@+id/user_delete"
             app:layout_constraintTop_toTopOf="@+id/user_delete"
             tools:text="Работник" />

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -18,7 +17,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dru128.timetable.data.metadata.BusStop
 import com.dru128.timetable.data.metadata.BusStopWithTime
-import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
 import com.dru128.timetable.map.MapFragment
 import com.dru128.timetable.tools.DrawableConvertor
@@ -32,7 +30,6 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
-import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
@@ -41,7 +38,6 @@ import dru128.timetable.R
 import dru128.timetable.databinding.FragmentCreateRouteBinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -53,7 +49,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
     private val deleteMarkerIcon by lazy { DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.delete_marker, null))!! }
     private val busStopMarkerIcon by lazy { DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.location_marker, null))!! }
 
-    private val routeDotClickListener: OnPointAnnotationClickListener by lazy { addRouteDotClickListener() }
+    private val pointAnnotationClickListener: OnPointAnnotationClickListener by lazy { addRouteDotClickListener() }
     private val mapClickListener: OnMapClickListener by lazy { addMapClickListener() }
     private val cameraChangeListener: OnCameraChangeListener by lazy { addCameraChangeListener() }
 
@@ -62,12 +58,13 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         { busStop -> busStopChanged(busStop) },
         arrayOf(),
     )
+    private lateinit var progressManager: ProgressManager
 
     private lateinit var binding: FragmentCreateRouteBinding
     private val viewModel: CreateRouteViewModel by viewModels()
 
     private var busStopMarkers = mutableListOf<PointAnnotation>()
-    private var routeDots = mutableListOf<PointAnnotation>()
+    private var routeDots = listOf<PointAnnotation>()
     private var deleteDotMarker: PointAnnotation? = null
     private var routePolyline: PolylineAnnotation? = null
 
@@ -76,99 +73,87 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         binding = FragmentCreateRouteBinding.inflate(inflater)
-        val progressManager = ProgressManager(binding.root, requireActivity())
+        progressManager = ProgressManager(binding.parent, requireActivity())
         progressManager.start()
 
         mapView = binding.map
         super.onCreateView(inflater, container, savedInstanceState)
-        showCrosshair()
-        progressManager.finish()
-
-
 
         return binding.root
     }
 
-
     override fun mapReady()
     {
+        showCrosshair()
+        collectRoutePoints()
+        collectBusStops()
         binding.addRouteLine.setOnClickListener {
-            val position = mapbox.cameraState.center
-            createDotRoute(position)
+            removeSelectingFromDots()
+            viewModel.addRouteDot(mapbox.cameraState.center)
         }
+
 
         binding.addBusStop.setOnClickListener {
             val dialog = CreateBusStopDialog()
             dialog.show(childFragmentManager, CreateBusStopDialog.TAG)
         }
 
-        binding.routeName.addTextChangedListener { viewModel.route.name = it.toString() }
+        binding.routeName.addTextChangedListener { viewModel.routeName = it.toString() }
 
-        binding.createRouteButton.setOnClickListener {
-            val route = viewModel.route
-            lifecycleScope.launch {
-                if (route.id.isBlank())
-                {
-                    route.id = IDManager.generateID()
-                    val status = viewModel.createRoute(route)
-                    Log.d("status", "= $status")
-                    if (status)
-                    {
-                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
-                    }
-                    else {
-                        route.id = ""
-                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_create_route), Snackbar.LENGTH_LONG).show()
-                    }
-                }
-                else
-                {
-                    val status = viewModel.editRoute(route)
-                    Log.d("status", "= $status")
-                    if (status)
-                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
-                    else
-                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_edit_route), Snackbar.LENGTH_LONG).show()
-                }
-            }
-        }
+        addCreateRouteButtonListener()
 
-        Log.d("isInitRoute", viewModel.isInitRoute.toString())
 
-        if (viewModel.isInitRoute)
-            drawRoute(viewModel.route)
-        else
+
+        val args: CreateRouteFragmentArgs by navArgs()
+        if (args.jsonRoute.isNotEmpty())
         {
-            val args: CreateRouteFragmentArgs by navArgs()
-            if (args.jsonRoute.isNotEmpty())
-            {
-                Log.d("getRoute", "from navigation args")
-                viewModel.route = Json.decodeFromString<Route>(args.jsonRoute)
-                drawRoute(viewModel.route)
+            Log.d("getRoute", "from navigation args")
+            Json.decodeFromString<Route>(args.jsonRoute).let { _route ->
+                viewModel.routeId = _route.id
+                viewModel.routeName = _route.name
+
+                viewModel.setRouteDots(geoPosToPoint(_route.positions))
+                viewModel.setBusStops(_route.busStopsWithTime)
+                binding.routeName.setText(_route.name)
+
+                for (curBusStop in _route.busStopsWithTime)
+                    busStopMarkers.add(
+                        pointAnnotationManager.create(
+                            createBusStop(
+                                curBusStop.busStop, busStopMarkerIcon
+                            )
+                        )
+                    )
             }
-            viewModel.isInitRoute = true
         }
+
 
         binding.routesRecyclerView.adapter = adapter
         binding.routesRecyclerView.layoutManager = LinearLayoutManager(context)
 
         lifecycleScope.launchWhenStarted {
             isZoomChange.collectLatest {
-                if (it) {
-                    for (i in busStopMarkers.indices)
-                        busStopMarkers[i].textField =
-                            viewModel.route.busStopsWithTime[i].busStop.name
+                Log.d("zoom", it.toString())
+                if (it)
+                {
+                    for (curBusStop in busStopMarkers)
+                        curBusStop.textField =
+                            viewModel.busStops.value
+                                .find { it.busStop.id ==  curBusStop.getData()?.asString }
+                                ?.busStop?.name.toString()
+
 
                     for (i in routeDots.indices)
                         routeDots[i].iconImageBitmap = dotIcon
                 }
-                else {
+                else
+                {
                     for (pointAnnotation in busStopMarkers)
                         pointAnnotation.textField = ""
 
 
-                    for (i in routeDots.indices)
-                        routeDots[i].iconImageBitmap = null
+                    for (routeDot in routeDots)
+                        routeDot.iconImageBitmap = null
 
                     removeSelectingFromDots()
                 }
@@ -177,54 +162,82 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
             }
         }
 
-        pointAnnotationManager.addClickListener(routeDotClickListener)
-        mapbox.addOnMapClickListener(mapClickListener)
-        mapbox.addOnCameraChangeListener(cameraChangeListener)
+        progressManager.finish()
     }
 
-
-    private fun deleteBusStop(id: String)
+    private fun collectRoutePoints()
     {
-        val position = viewModel.route.busStopsWithTime.indexOf( findBusStopById(id) )
-
-
-        viewModel.route.busStopsWithTime
-            .filter { it.busStop.id != id }
-            .let {
-                viewModel.route.busStopsWithTime = it
-                adapter.dataSet = it.toTypedArray()
+        lifecycleScope.launchWhenStarted {
+            viewModel.routePoints.collectLatest {
+                drawRoutePolyline(it)
             }
-        adapter.apply {
-//            notifyDataSetChanged()
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position,  viewModel.route.busStopsWithTime.size)
         }
+    }
 
-        pointAnnotationManager.delete(busStopMarkers[position])
-        busStopMarkers.removeAt(position)
-        Log.d("deleteBusStop", "id = $id")
+    private fun collectBusStops()
+    {
+        lifecycleScope.launchWhenStarted {
+            viewModel.busStops.collectLatest {
+                adapter.dataSet = it.toTypedArray()
+                adapter.notifyDataSetChanged()
+            }
+        }
+    }
+
+    private fun addCreateRouteButtonListener()
+    {
+        binding.createRouteButton.setOnClickListener {
+            lifecycleScope.launchWhenStarted {
+                if (viewModel.routeId.isBlank())
+                {
+                    val status = viewModel.createRoute()
+                    Log.d("status", "= $status")
+                    if (status)
+                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
+                    else
+                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_create_route), Snackbar.LENGTH_LONG).show()
+                }
+                else
+                {
+                    val status = viewModel.editRoute()
+                    Log.d("status", "= $status")
+                    if (status)
+                        Navigation.findNavController(requireActivity(), R.id.nav_host_main).popBackStack()
+                    else
+                        Snackbar.make(requireView(), requireContext().resources.getString(R.string.error_edit_route), Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun deleteBusStop(busStopId: String)
+    {
+        Log.d("action", "delete busStop | id = $busStopId")
+        viewModel.deleteBusStop(busStopId)
+
+        for (busStopMarker in busStopMarkers)
+            busStopMarker.getData()?.let {
+                if (it.asString == busStopId)
+                {
+                    pointAnnotationManager.delete(busStopMarker)
+                    busStopMarkers.remove(busStopMarker)
+                }
+            }
     }
 
     private fun busStopChanged(newBusStop: BusStopWithTime)
     {
-        Log.d("event", "busStopChanged")
-        for (i in 0 until viewModel.route.busStopsWithTime.size)
-            if (viewModel.route.busStopsWithTime[i].busStop.id == newBusStop.busStop.id)
-            {
-                Log.d("event", "find busStop")
+        Log.d("action", "busStopChanged")
+        viewModel.changeBusStop(newBusStop)
 
-                viewModel.route.busStopsWithTime[i].time = newBusStop.time
-                viewModel.route.busStopsWithTime[i].busStop.name = newBusStop.busStop.name
-
-                busStopMarkers[i].textField = newBusStop.busStop.name
-                pointAnnotationManager.update(busStopMarkers[i])
-
+        for (busStopMarker in busStopMarkers)
+            busStopMarker.getData()?.let {
+                if (it.asString == newBusStop.busStop.id)
+                {
+                    busStopMarker.textField = newBusStop.busStop.name
+                    pointAnnotationManager.update(busStopMarker)
+                }
             }
-        viewModel.route.busStopsWithTime.forEach {
-            Log.d("bsSutp", it.busStop.name)
-
-        }
-
     }
 
 
@@ -240,9 +253,9 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
     private fun addRouteDotClickListener(): OnPointAnnotationClickListener = OnPointAnnotationClickListener { pointAnnotation ->
 
-        forDots@ for (routeDot in routeDots)
+        Log.d("click", "on point annotation")
+        foreachDots@ for (routeDot in routeDots)
         {
-
             if (pointAnnotation == routeDot) // опредилили точка на которую нажали
             {
                 removeSelectingFromDots()
@@ -254,15 +267,13 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
                     pointAnnotationManager.update(routeDot)
                     showDeleteDotMarker(routeDot.point)
                 }
-                break@forDots
+                break@foreachDots
             }
-            else if (pointAnnotation == deleteDotMarker)
-            {
-                Log.d("click", "on delete marker")
-                deleteDotMarker?.point?.let { deleteDotRoute(it) }
-                break@forDots
-
-            }
+        }
+        if (pointAnnotation == deleteDotMarker)
+        {
+            Log.d("click", "on delete marker")
+            deleteDotMarker?.point?.let { deleteDotRoute(it) }
         }
         true
     }
@@ -270,47 +281,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
     private fun deleteDotRoute(point: Point)
     {
         removeSelectingFromDots()
-
-        routeDots.find {
-            it.point.latitude() == point.latitude() && it.point.longitude() == point.longitude()
-        }?.let {
-            pointAnnotationManager.delete(it)
-            routeDots.removeAt(routeDots.indexOf(it))
-        }
-        viewModel.points.let { points ->
-            points.remove(point)
-            drawRoutePolyline(points)
-            viewModel.route.positions = List(points.size) { i ->
-                GeoPosition(
-                    latitude = points[i].latitude(),
-                    longitude = points[i].longitude()
-                )
-            }
-        }
-
-    }
-
-    private fun createDotRoute(point: Point)
-    {
-        removeSelectingFromDots()
-        viewModel.points.let { points ->
-            points.add(point)
-            drawRoutePolyline(points)
-            viewModel.route.positions = List(points.size) { i ->
-                GeoPosition(
-                    latitude = points[i].latitude(),
-                    longitude = points[i].longitude()
-                )
-            }
-        }
-        routeDots.add(
-            pointAnnotationManager.create(
-                PointAnnotationOptions()
-                    .withIconImage(dotIcon)
-                    .withPoint(point)
-                    .withData( JsonParser.parseString(false.toString()) ) // isSelected
-            )
-        )
+        viewModel.deleteRouteDot(point)
     }
 
     private fun drawRoutePolyline(points: List<Point>)
@@ -319,11 +290,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         {
             if (points.size > 1)
             {
-                val polylineAnnotationOptions = PolylineAnnotationOptions()
-                    .withPoints(points)
-                    .withLineColor( ResourcesCompat.getColor(requireContext().resources, R.color.polyline, null) )
-                    .withLineWidth(5.0)
-                routePolyline = polylineAnnotationManager.create(polylineAnnotationOptions)
+                routePolyline = polylineAnnotationManager.create(createRouteLine(points))
             }
         }
         else
@@ -339,6 +306,27 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
                 routePolyline = null
             }
         }
+
+        drawRouteDots(points)
+    }
+
+    private fun drawRouteDots(points: List<Point>)
+    {
+        hideRouteDots()
+
+        routeDots = List<PointAnnotation>(points.size) { i ->
+            pointAnnotationManager.create(
+                PointAnnotationOptions()
+                    .withIconImage(dotIcon)
+                    .withPoint(points[i])
+                    .withData( JsonParser.parseString(false.toString()) ) // isSelected
+            )
+        }
+    }
+
+    private fun hideRouteDots()
+    {
+        pointAnnotationManager.delete(routeDots)
     }
 
     private fun removeSelectingFromDots()
@@ -356,47 +344,13 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
     private fun showDeleteDotMarker(position: Point)
     {
+        Log.d("action", "showDeleteDotMarker")
         deleteDotMarker = pointAnnotationManager.create(
             PointAnnotationOptions()
                 .withIconImage(deleteMarkerIcon)
                 .withGeometry(position)
                 .withIconAnchor(IconAnchor.BOTTOM)
         )
-        Log.d("event", "showDeleteDotMarker")
-    }
-
-    private fun drawRoute(route: Route)
-    {
-        Log.d("event", "drawRoute")
-        binding.routeName.setText(route.name)
-
-        viewModel.points = mutableListOf()
-        for (position in route.positions)
-        {
-            val point = geoPosToPoint(position)
-            viewModel.points.add(point)
-            routeDots.add(
-                pointAnnotationManager.create(
-                    PointAnnotationOptions()
-                        .withIconImage(dotIcon)
-                        .withPoint(point)
-                        .withData( JsonParser.parseString(false.toString()) ) // isSelected
-                )
-            )
-        }
-
-        drawRoutePolyline(viewModel.points)
-
-        for (busStop in route.busStopsWithTime)
-            busStopMarkers.add(
-                pointAnnotationManager.create(
-                    createBusStop(
-                        busStop.busStop, busStopMarkerIcon
-                    )
-                )
-            )
-
-        adapter.dataSet = route.busStopsWithTime.toTypedArray()
     }
 
     override fun createNewBusStop(name: String, time: String)
@@ -412,13 +366,7 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         Log.d("createBusStop", busStop.toString())
 
 
-        viewModel.route.busStopsWithTime += busStop
-        viewModel.route.busStopsWithTime.let { busStops ->
-            adapter.dataSet = busStops.toTypedArray()
-//            adapter.notifyDataSetChanged()
-            adapter.notifyItemInserted(busStops.lastIndex)
-            adapter.notifyItemRangeChanged(busStops.lastIndex, busStops.size)
-        }
+        viewModel.addBusStop(busStop)
 
         busStopMarkers.add(
             pointAnnotationManager.create(
@@ -429,15 +377,22 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         )
     }
 
+    override fun onStart() {
+        pointAnnotationManager.addClickListener(addRouteDotClickListener())
+        mapbox.addOnMapClickListener(mapClickListener)
+        mapbox.addOnCameraChangeListener(cameraChangeListener)
+        super.onStart()
+    }
+
     override fun onStop() {
-        pointAnnotationManager.removeClickListener(routeDotClickListener)
+        pointAnnotationManager.removeClickListener(pointAnnotationClickListener)
         mapbox.removeOnMapClickListener(mapClickListener)
         mapbox.removeOnCameraChangeListener(cameraChangeListener)
         super.onStop()
     }
 
     private fun findBusStopById(id: String): BusStopWithTime?
-            = viewModel.route.busStopsWithTime.find { it.busStop.id == id }
+         = viewModel.busStops.value.find { it.busStop.id == id }
 
 
     private fun showCrosshair() {
@@ -446,5 +401,4 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         crosshair.setBackgroundColor(Color.BLUE)
         mapView.addView(crosshair)
     }
-
 }

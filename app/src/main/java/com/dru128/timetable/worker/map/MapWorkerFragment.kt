@@ -1,7 +1,6 @@
 package com.dru128.timetable.worker.map
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -9,30 +8,23 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.dru128.timetable.map.BusStopsBottomSheet
 import com.dru128.timetable.MainActivity
-import com.dru128.timetable.map.MapFragment
-import com.dru128.timetable.map.RouteAndBusStopId
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.dru128.timetable.data.metadata.Route
+import com.dru128.timetable.map.BusStopsBottomSheet
+import com.dru128.timetable.map.MapFragment
 import com.dru128.timetable.tools.DrawableConvertor
 import com.dru128.timetable.tools.ProgressManager
 import com.google.android.material.snackbar.Snackbar
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraBoundsOptions
-import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
@@ -41,7 +33,6 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentMapWorkerBinding
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -51,7 +42,6 @@ class MapWorkerFragment: MapFragment()
 {
     private lateinit var binding: FragmentMapWorkerBinding
     private lateinit var progressManager: ProgressManager
-
 
     private var busMarker: PointAnnotation? = null
     var busStopMarkers = listOf<PointAnnotation>()
@@ -143,7 +133,7 @@ class MapWorkerFragment: MapFragment()
         if (positions.isEmpty())
             Snackbar.make(binding.root, requireContext().resources.getString(R.string.error_route_line_null), Snackbar.LENGTH_LONG).show()
         else
-            polylineAnnotationManager.create(createRouteLine(positions)) // построение линии маршруты
+            polylineAnnotationManager.create(createRouteLine(geoPosToPoint(positions))) // построение линии маршруты
 
         busStopMarkers = List<PointAnnotation>(route.busStopsWithTime.size) { i ->
             pointAnnotationManager.create(
@@ -183,7 +173,7 @@ class MapWorkerFragment: MapFragment()
 
         val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
 
-        lifecycle.coroutineScope.launchWhenStarted {
+        lifecycleScope.launchWhenStarted {
             viewModel.startWebSocket(trackerId).collect { busPosition ->
                 Log.d("Tracker", "new pos $busPosition")
                 if (busMarker == null)

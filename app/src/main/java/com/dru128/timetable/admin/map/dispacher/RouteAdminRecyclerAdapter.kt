@@ -1,5 +1,6 @@
 package com.dru128.timetable.admin.map.dispacher
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.util.Log
@@ -44,22 +45,18 @@ class RouteAdminRecyclerAdapter(
 
     inner class ViewHolder(var binding: RouteAdminItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
-        var context = binding.root.context
+
+
+        var context: Context = binding.root.context
 
         fun onBind(position: Int)
         {
-            binding.nameRoute.text = dataSet[position].route.name
 
-            val mapboxRoute = RouteAdminStorage.mapboxRoutes[ dataSet[position].route.id ]
-            if (mapboxRoute == null)
-                isShowRoute(false, position)
-            else
-                isShowRoute(mapboxRoute.isVisible, position)
+            initItem(dataSet[position].isVisible)
 
-
-            binding.visibleRoute.setOnCheckedChangeListener { v, isChecked ->
-                Log.d("setOnCheckedChangeListener", isChecked.toString())
-                isShowRoute(isChecked, position)
+            binding.visibleRoute.setOnClickListener {
+                Log.d("action", "checkbox click from adapter | id = ${dataSet[position].route.id}")
+                isShowRoute(binding.visibleRoute.isChecked, position)
             }
             binding.deleteRoute.setOnClickListener {
                 deleteRoute(dataSet[position].route.id)
@@ -69,33 +66,52 @@ class RouteAdminRecyclerAdapter(
             }
 
 
+        }
+
+        private fun initItem(isShow: Boolean)
+        {
+            binding.nameRoute.text = dataSet[position].route.name
+
             binding.isOnline.visibility =
                 if (dataSet[position].isOnline) View.VISIBLE
                 else View.INVISIBLE
+
+            if (isShow) shownMode()
+            else hiddenMode()
         }
 
         private fun isShowRoute(isShow: Boolean, i: Int)
         {
-            Log.d("isShowRoute", isShow.toString())
             if (isShow)
             {
+                Log.d("action", "show route from adapter")
                 showRoute(dataSet[i].route)
-                binding.root.transitionAlpha = 1f
-//                binding.root.setCardBackgroundColor( Color.WHITE)
-                binding.visibleRoute.apply {
-                    setBackgroundResource(R.drawable.visibility)
-                    if (!isChecked) isChecked = true
-                }
+                shownMode()
             }
             else
             {
+                Log.d("action", "hide route from adapter")
                 hideRoute(dataSet[i].route.id)
-                binding.root.transitionAlpha = 0.7f
-//                binding.root.setCardBackgroundColor( Color.GRAY)
-                binding.visibleRoute.apply {
-                    setBackgroundResource(R.drawable.visibility_off)
-                    if (isChecked) isChecked = false
-                }
+                hiddenMode()
+            }
+        }
+
+        private fun hiddenMode()
+        {
+            binding.root.transitionAlpha = 0.7f
+            binding.visibleRoute.apply {
+                setBackgroundResource(R.drawable.visibility_off)
+                if (isChecked) isChecked = false
+            }
+        }
+
+
+        private fun shownMode()
+        {
+            binding.root.transitionAlpha = 1f
+            binding.visibleRoute.apply {
+                setBackgroundResource(R.drawable.visibility)
+                if (!isChecked) isChecked = true
             }
         }
 

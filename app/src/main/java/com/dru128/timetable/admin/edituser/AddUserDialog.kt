@@ -23,11 +23,14 @@ class AddUserDialog: DialogFragment()
     private var addUser: CreateUser? = null
 
     private lateinit var binding: AddUserDialogBinding
-    val typeUserConvertor = mapOf<String, TypeUser>(
-        "Работник" to TypeUser.WORKER,
-        "Водитель" to TypeUser.DRIVER,
-        "Администратор" to TypeUser.ADMIN
-    )
+    private val typeUserConvertor by lazy {
+        mapOf<String, TypeUser>(
+            getString(R.string.worker) to TypeUser.WORKER,
+            getString(R.string.driver) to TypeUser.DRIVER,
+            getString(R.string.admin) to TypeUser.ADMIN,
+            getString(R.string.dispatcher) to TypeUser.DISPAT
+        )
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
         initSpinner()

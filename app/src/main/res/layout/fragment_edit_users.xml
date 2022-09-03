@@ -83,15 +83,21 @@
         app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/user_item" />
 
-    <android.widget.ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/create_user_button"
-        android:layout_width="64sp"
-        android:layout_height="64sp"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/plus_in_circle"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/plus"
+        app:iconPadding="0dp"
+        app:iconSize="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.Button.Rounded" />
 </androidx.constraintlayout.widget.ConstraintLayout>

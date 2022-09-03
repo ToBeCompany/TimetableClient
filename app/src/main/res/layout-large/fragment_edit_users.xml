@@ -73,24 +73,31 @@
         android:id="@+id/user_recycler_view"
         android:layout_width="0sp"
         android:layout_height="0sp"
-        android:layout_marginStart="200dp"
+        android:layout_marginStart="128dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="200dp"
+        android:layout_marginEnd="128dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sort_parent"
         tools:listitem="@layout/user_item" />
 
-    <android.widget.ImageButton
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/create_user_button"
-        android:layout_width="64sp"
-        android:layout_height="64sp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/plus_in_circle"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/plus"
+        app:iconPadding="0dp"
+        app:iconSize="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.Button.Rounded" />
 </androidx.constraintlayout.widget.ConstraintLayout>

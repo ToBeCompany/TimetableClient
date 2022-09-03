@@ -23,8 +23,6 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     suspend fun getUsers(): Boolean
     {
         try {
-
-//            for (i in 0..10) UsersStorage.userList.value += User(TypeUser.WORKER, null, (0..91111).random().toString())
             val response: HttpResponse = Repository.client.get(EndPoint.allUsers)
             Log.d("Server", "Status code: ${response.status.value}")
             if (response.status.value == 200)
@@ -32,7 +30,7 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
                 val users = response.body<Array<User>>()
 
                 users.forEach { Log.d("data", "role = ${it.userType}, id = ${it.id}") }
-                UsersStorage.userList = MutableStateFlow(users)
+                UsersStorage.userList = users
                 Log.d("Server", "SUCCESS")
                 return true
             }
@@ -55,7 +53,7 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
 
             if (response.status.value == 200)
             {
-                UsersStorage.userList.value += user
+                UsersStorage.userList += user
                 Log.d("Server", "SUCCESS")
                 return true
             } else
@@ -70,15 +68,17 @@ class EditUsersViewModel(application : Application): AndroidViewModel(applicatio
     {
         try {
             val response: HttpResponse = Repository.client.delete(EndPoint.deleteUser) {
-                this.setBody(id)
+                this.setBody(
+                    mapOf("id" to id)
+                )
             }
             Log.d("Server", "Status code: ${response.status.value}")
 
             if (response.status.value == 200)
             {
-                UsersStorage.userList.value
+                UsersStorage.userList
                     .filter { it.id != id }
-                    .let { UsersStorage.userList.value = it.toTypedArray() }
+                    .let { UsersStorage.userList = it.toTypedArray() }
                 Log.d("Server", "SUCCESS")
                 return true
             } else

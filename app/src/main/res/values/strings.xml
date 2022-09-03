@@ -30,7 +30,7 @@
     <string name="error_create_route">Ошибка! Не удалось создать маршрут</string>
     <string name="error_edit_route">Ошибка! Не удалось изменить маршрут</string>
     <string name="error_get_users">Ошибка! Не удалось получить список пользователей</string>
-    <string name="error_get_routes">Ошибка! Не удалось получить список маршрутов</string>
+    <string name="error_get_routes">Ошибка! Не удалось получить маршруты</string>
     <string name="error_route_line_null">Ошибка! Нет данных линии маршрута</string>
     <string name="fill_all_fields">Заполните все поля!</string>
     <string name="pinch_to_add_to_favorites">Зажмите, чтобы добавить в избранное</string>
@@ -78,7 +78,12 @@
     <string name="bus_stop_data">Данные остановки</string>
     <string name="user_data">Данные пользователя</string>
     <string name="all">все</string>
+    <string name="_all">Все</string>
     <string name="favourite">избранное</string>
+    <string name="sign_in">Войти</string>
+    <string name="invalid_password">Неверный пароль</string>
+    <string name="reboot">Перезагрузить</string>
+    <string name="time">Время</string>
 
 
     <!--  intent  -->
