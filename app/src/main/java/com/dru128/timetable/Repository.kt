@@ -5,6 +5,7 @@ import io.ktor.client.engine.android.Android
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.ContentType
 import io.ktor.http.URLBuilder
@@ -20,6 +21,7 @@ import kotlinx.serialization.json.Json
 object Repository
 {
     var client = HttpClient(Android) {
+        install(Logging)
         install(ContentNegotiation) {
             json(
                 Json {
