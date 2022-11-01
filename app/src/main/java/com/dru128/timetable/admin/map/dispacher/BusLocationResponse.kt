@@ -8,5 +8,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BusLocationResponse(
     var id: String = "",
-    var position: GeoPosition = GeoPosition()
+    var position: GeoPosition? = GeoPosition()
 )

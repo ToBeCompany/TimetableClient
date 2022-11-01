@@ -42,9 +42,11 @@ class MapWorkerViewModel: ViewModel()
                 Log.d("WEB_SOCKET", "update position111")
                 if (frame is Frame.Text)
                 {
-                    Log.d("WEB_SOCKET", "update position222")
-                    val position = Json.decodeFromString<GeoPosition>(frame.readText())
-                    emit(position)
+                    Log.d("WEB_SOCKET", frame.readText())
+                    val position = Json.decodeFromString<GeoPosition?>(frame.readText())
+                    position?.let {
+                        emit(it)
+                    }
                     Log.d("WEB_SOCKET", "update position: $position")
                 }
             }
