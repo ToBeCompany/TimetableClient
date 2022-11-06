@@ -11,7 +11,8 @@ object EndPoint
     val host = if (BuildConfig.BUILD_TYPE == "release")
         "timetable.apzrotor.ru:8080"
     else
-        "timetable.apzrotor.ru:8080"
+        "fierce-woodland-54822.herokuapp.com"
+//        "timetable.apzrotor.ru:8080"
 
     // вебсокет пассажира
     const val webSocket_passenger = "/passenger/"

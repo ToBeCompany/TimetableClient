@@ -1,6 +1,7 @@
 package com.dru128.timetable.worker.map
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
@@ -116,7 +118,7 @@ class MapWorkerFragment: MapFragment()
 
         // соединение прервано
         override fun onLost(network: Network) {
-            stopListeningTracker()
+//            stopListeningTracker()
             Log.d("network", "is off")
             super.onLost(network)
         }
@@ -168,30 +170,31 @@ class MapWorkerFragment: MapFragment()
 
     private fun startListeningTracker(trackerId: String)
     {
+        if (!checkInternetConection(requireContext())) return
         if (viewModel.isTracking) return
         Log.d("Tracker", "startListening, id = $trackerId")
 
         val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
 
         lifecycleScope.launchWhenStarted {
-            viewModel.startWebSocket(trackerId).collect { busPosition ->
-                Log.d("Tracker", "new pos $busPosition")
-                if (busMarker == null)
-                {
-                    Log.d("Tracker", "bus marker is null")
-                    busMarker = pointAnnotationManager.create(
+            try {
+
+                viewModel.startWebSocket(trackerId).collect { busPosition ->
+                    Log.d("Tracker", "new pos $busPosition")
+                    binding.findBusButton.setBackgroundResource(R.drawable.bus_in_gps_icon)
+                    if (busMarker == null) {
+                        Log.d("Tracker", "bus marker is null")
+                        busMarker = pointAnnotationManager.create(
                             PointAnnotationOptions()
                                 .withIconImage(busIcon)
                                 .withPoint(geoPosToPoint(busPosition))
                         )
+                    } else {
+                        busMarker!!.point = geoPosToPoint(busPosition)
+                        pointAnnotationManager.update(busMarker!!)
+                    }
                 }
-                else
-                {
-                    busMarker!!.point = geoPosToPoint(busPosition)
-                    pointAnnotationManager.update(busMarker!!)
-
-                }
-            }
+            } catch (err: Error) { Log.d("ERROR", err.message.toString()) }
         }
     }
 
@@ -216,6 +219,24 @@ class MapWorkerFragment: MapFragment()
 
             }
         true
+    }
+
+    private fun checkInternetConection(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
     }
 
     private fun stopListeningTracker() {

@@ -1,13 +1,12 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:gravity="center"
-        android:drawable="@drawable/circle_blue2"
+        android:drawable="@drawable/circle_grey"
         android:width="56sp"
         android:height="56sp"/>
     <item
         android:gravity="center"
-        android:drawable="@drawable/outline_gps_fixed"
-        android:width="24sp"
-        android:height="24sp"/>
-
+        android:drawable="@drawable/bus_icon_white"
+        android:height="24sp"
+        android:width="24sp"/>
 </layer-list>

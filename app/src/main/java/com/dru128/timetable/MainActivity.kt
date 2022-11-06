@@ -3,7 +3,6 @@ package com.dru128.timetable
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -12,10 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import com.dru128.timetable.auth.SignInFragmentDirections
 import com.dru128.timetable.auth.UserPreference
 import com.dru128.timetable.data.metadata.TypeUser
-import com.dru128.timetable.data.metadata.User
 import com.dru128.timetable.tools.ProgressManager
 import dru128.timetable.R
 import dru128.timetable.databinding.ActivityMainBinding
@@ -84,8 +81,8 @@ class MainActivity : AppCompatActivity()
                     }
                 } else
                 {
-                    navController.graph = inflater.inflate(R.navigation.nav_auth)
-                    navController.navigate(SignInFragmentDirections.actionSignInFragmentToNotFoundUserFragment())
+                    this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    navController.setGraph(R.navigation.nav_error)
                 }
             }
             progressManager.finish()

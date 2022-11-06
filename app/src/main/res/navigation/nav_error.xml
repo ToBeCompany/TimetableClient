@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_error"
+    app:startDestination="@id/notFoundUserFragment2">
+
+    <fragment
+        android:id="@+id/notFoundUserFragment2"
+        android:name="com.dru128.timetable.auth.NotFoundUserFragment"
+        android:label="fragment_not_found_user"
+        tools:layout="@layout/fragment_not_found_user" />
+</navigation>

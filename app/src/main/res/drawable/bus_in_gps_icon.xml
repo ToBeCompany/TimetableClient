@@ -1,7 +1,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:gravity="center"
-        android:drawable="@drawable/circle_light_grey"
+        android:drawable="@drawable/circle_blue2"
         android:width="56sp"
         android:height="56sp"/>
     <item
@@ -9,5 +9,4 @@
         android:drawable="@drawable/bus_icon_white"
         android:height="24sp"
         android:width="24sp"/>
-
 </layer-list>

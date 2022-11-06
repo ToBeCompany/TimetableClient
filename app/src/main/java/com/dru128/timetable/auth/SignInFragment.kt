@@ -7,13 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
+import androidx.navigation.fragment.navArgs
 import com.dru128.timetable.MainActivity
 import com.dru128.timetable.data.metadata.User
 import com.dru128.timetable.tools.Keyboard
+import com.dru128.timetable.worker.map.MapWorkerFragmentArgs
 import com.google.android.material.snackbar.Snackbar
 import dru128.timetable.R
 import dru128.timetable.databinding.FragmentSignInBinding

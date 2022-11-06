@@ -28,14 +28,19 @@ class NotFoundUserFragment : Fragment()
             .setOnClickListener {
                 val userPreference = UserPreference(requireContext())
                 userPreference.loginOut()
-                it.findNavController().popBackStack()
+                restartApp()
             }
         root.findViewById<Button>(R.id.reboot)
             .setOnClickListener {
-                startActivity(Intent(requireContext(), MainActivity::class.java))
-                (requireActivity() as AppCompatActivity).finish()
+                restartApp()
             }
         return root
+    }
+
+    private fun restartApp()
+    {
+        startActivity(Intent(requireContext(), MainActivity::class.java))
+        (requireActivity() as AppCompatActivity).finish()
     }
 
 

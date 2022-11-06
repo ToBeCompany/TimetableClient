@@ -21,7 +21,7 @@
     <string name="permission_not_granted">Разрешения не выданы</string>
     <string name="tracker_launched">Трекер включен</string>
     <string name="tracker_shutdown">Трекер выключен</string>
-    <string name="bus_not_connected">Маршрут не отслеживается</string>
+    <string name="bus_not_connected">Данные не получены</string>
     <string name="choose_route">Выберите маршрут</string>
     <string name="id_is_coped">ID скопирован в буфер обмена</string>
     <string name="error_delete_user">Ошибка! Не удалось удалить пользователя</string>

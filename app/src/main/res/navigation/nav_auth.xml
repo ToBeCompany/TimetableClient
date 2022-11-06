@@ -9,13 +9,13 @@
         android:name="com.dru128.timetable.auth.SignInFragment"
         android:label="@string/signin_fragment_toolbar"
         tools:layout="@layout/fragment_sign_in" >
-        <action
-            android:id="@+id/action_signInFragment_to_notFoundUserFragment"
-            app:destination="@id/notFoundUserFragment" />
+<!--        <action-->
+<!--            android:id="@+id/action_signInFragment_to_notFoundUserFragment"-->
+<!--            app:destination="@id/notFoundUserFragment" />-->
     </fragment>
-    <fragment
-        android:id="@+id/notFoundUserFragment"
-        android:name="com.dru128.timetable.auth.NotFoundUserFragment"
-        android:label="@string/not_found_user_fragment_toolbar"
-        tools:layout="@layout/fragment_not_found_user" />
+<!--    <fragment-->
+<!--        android:id="@+id/notFoundUserFragment"-->
+<!--        android:name="com.dru128.timetable.auth.NotFoundUserFragment"-->
+<!--        android:label="@string/not_found_user_fragment_toolbar"-->
+<!--        tools:layout="@layout/fragment_not_found_user" />-->
 </navigation>
