@@ -43,10 +43,6 @@ object Repository
 
     fun websocketClient(): HttpClient
     {
-//        System.setProperty("io.ktor.random.secure.random.provider","DRBG")
-//        Security.setProperty("securerandom.drbg.config", "HMAC_DRBG,SHA-512,256,pr_and_reseed")
-
-
         System.setProperty("io.ktor.util.random.secure.random.provider","DRBG")
         Security.setProperty("securerandom.drgb.config", "HMAC_DRBG,SHA-512,256,pr_and_reseed")
 

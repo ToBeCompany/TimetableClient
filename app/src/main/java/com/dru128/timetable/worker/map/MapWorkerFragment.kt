@@ -2,6 +2,7 @@ package com.dru128.timetable.worker.map
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -13,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
@@ -44,6 +44,16 @@ class MapWorkerFragment: MapFragment()
 {
     private lateinit var binding: FragmentMapWorkerBinding
     private lateinit var progressManager: ProgressManager
+
+    private val busIcon : Bitmap by lazy {
+        DrawableConvertor().drawableToBitmap(
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.bus_marker,
+                null
+            )!!
+        )!!
+    }
 
     private var busMarker: PointAnnotation? = null
     var busStopMarkers = listOf<PointAnnotation>()
@@ -104,6 +114,26 @@ class MapWorkerFragment: MapFragment()
             val request = NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
             connectivityManager?.registerNetworkCallback(request, networkCallback)
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.geoPosition.collect { busPosition ->
+                if (busPosition != null) {
+                    Log.d("Tracker", "new pos $busPosition")
+                    binding.findBusButton.setBackgroundResource(R.drawable.bus_in_gps_icon)
+                    if (busMarker == null) {
+                        Log.d("Tracker", "bus marker is null")
+                        busMarker = pointAnnotationManager.create(
+                            PointAnnotationOptions()
+                                .withIconImage(busIcon)
+                                .withPoint(geoPosToPoint(busPosition))
+                        )
+                    } else {
+                        busMarker!!.point = geoPosToPoint(busPosition)
+                        pointAnnotationManager.update(busMarker!!)
+                    }
+                }
+            }
         }
     }
 
@@ -174,28 +204,7 @@ class MapWorkerFragment: MapFragment()
         if (viewModel.isTracking) return
         Log.d("Tracker", "startListening, id = $trackerId")
 
-        val busIcon = DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.bus_marker, null)!!)!!
-
-        lifecycleScope.launchWhenStarted {
-            try {
-
-                viewModel.startWebSocket(trackerId).collect { busPosition ->
-                    Log.d("Tracker", "new pos $busPosition")
-                    binding.findBusButton.setBackgroundResource(R.drawable.bus_in_gps_icon)
-                    if (busMarker == null) {
-                        Log.d("Tracker", "bus marker is null")
-                        busMarker = pointAnnotationManager.create(
-                            PointAnnotationOptions()
-                                .withIconImage(busIcon)
-                                .withPoint(geoPosToPoint(busPosition))
-                        )
-                    } else {
-                        busMarker!!.point = geoPosToPoint(busPosition)
-                        pointAnnotationManager.update(busMarker!!)
-                    }
-                }
-            } catch (err: Error) { Log.d("ERROR", err.message.toString()) }
-        }
+        viewModel.startWebSocket(trackerId)
     }
 
     private fun addBusStopClickListener(): OnPointAnnotationClickListener = OnPointAnnotationClickListener { _busStopAnnotation ->
