@@ -18,8 +18,8 @@ android {
         applicationId "com.dru128.timetable"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 7
-        versionName "1.4"
+        versionCode 9
+        versionName "1.6"
         multiDexEnabled = true // снимает лимит методов
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

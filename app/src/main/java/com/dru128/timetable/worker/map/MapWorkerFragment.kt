@@ -246,8 +246,12 @@ class MapWorkerFragment: MapFragment()
     }
 
     override fun onStop() {
-        pointAnnotationManager.removeClickListener(pointClickListener)
         stopListeningTracker()
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        pointAnnotationManager.removeClickListener(pointClickListener)
+        super.onDestroy()
     }
 }
