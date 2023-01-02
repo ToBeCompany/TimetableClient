@@ -92,71 +92,69 @@ class CreateRouteViewModel : ViewModel()
 
     suspend fun createRoute(): Boolean
     {
-        return true
-//        val route = Route(
-//            id = /*(1..238651).random().toString(),*/IDManager.generateID(),
-//            name = routeName,
-//            positions = pointToGeoPos(_routePoints.value),
-//            busStopsWithTime = _busStops.value
-//        )
-//
-//        val response: HttpResponse
-//        try {
-//            response = Repository.client.post(EndPoint.createRoute) {
-//                this.setBody(Json.encodeToJsonElement(route))
-//            }
-//        } catch (error: Exception) {
-//            Log.d("Server", "ERROR: ${error.message}")
-//            return false
-//        }
-//        Log.d("Server", "Status code: ${response.status.value}")
-//
-//        return if (response.status.value == 200)
-//        {
-//            RouteAdminStorage.routes.value.data?.let { routes ->
-//                val newRoutes = routes.plus(route)
-//                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
-//            }
-//            Log.d("Server", "SUCCESS")
-//            true
-//        } else
-//            false
+        val route = Route(
+            id = /*(1..238651).random().toString(),*/IDManager.generateID(),
+            name = routeName,
+            positions = pointToGeoPos(_routePoints.value),
+            busStopsWithTime = _busStops.value
+        )
+
+        val response: HttpResponse
+        try {
+            response = Repository.client.post(EndPoint.createRoute) {
+                this.setBody(Json.encodeToJsonElement(route))
+            }
+        } catch (error: Exception) {
+            Log.d("Server", "ERROR: ${error.message}")
+            return false
+        }
+        Log.d("Server", "Status code: ${response.status.value}")
+
+        return if (response.status.value == 200)
+        {
+            RouteAdminStorage.routes.value.data?.let { routes ->
+                val newRoutes = routes.plus(route)
+                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
+            }
+            Log.d("Server", "SUCCESS")
+            true
+        } else
+            false
     }
     suspend fun editRoute(): Boolean
     {
-        return true
-//        val route = Route(
-//            id = routeId,
-//            name = routeName,
-//            positions = pointToGeoPos(_routePoints.value),
-//            busStopsWithTime = _busStops.value
-//        )
-//
-//        val response: HttpResponse
-//        try {
-//            response = Repository.client.post(EndPoint.editRoute) {
-//                this.setBody(Json.encodeToJsonElement(route))
-//            }
-//        } catch (error: Exception) {
-//            Log.d("Server", "ERROR: ${error.message}")
-//            return false
-//        }
-//        Log.d("Server", "Status code: ${response.status.value}")
-//
-//        return if (response.status.value == 200)
-//        {
-//            RouteAdminStorage.routes.value.data?.let { _routes ->
-//                val newRoutes = Array<Route> ( _routes.size) { i ->
-//                    if (_routes[i].id == route.id) route
-//                    else _routes[i]
-//                }
-//                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
-//
-//            }
-//            Log.d("Server", "SUCCESS")
-//            true
-//        } else
-//            false
+        val route = Route(
+            id = routeId,
+            name = routeName,
+            positions = pointToGeoPos(_routePoints.value),
+            busStopsWithTime = _busStops.value
+        )
+
+        val response: HttpResponse
+        try {
+            response = Repository.client.post(EndPoint.editRoute) {
+                this.setBody(Json.encodeToJsonElement(route))
+            }
+        } catch (error: Exception) {
+            Log.d("Server", "ERROR: ${error.message}")
+            return false
+        }
+        Log.d("Server", "Status code: ${response.status.value}")
+
+        return if (response.status.value == 200)
+        {
+            RouteAdminStorage.routes.value.data?.let { _routes ->
+                val newRoutes = Array<Route> ( _routes.size) { i ->
+                    if (_routes[i].id == route.id) route
+                    else _routes[i]
+                }
+                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
+
+            }
+            Log.d("Server", "SUCCESS")
+            true
+        } else
+            false
     }
 
     fun calcDistance(point1: Point, point2: Point): Float // расстояние между точками

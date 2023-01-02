@@ -15,7 +15,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import com.dru128.timetable.App
 import com.dru128.timetable.data.metadata.BusStop
 import com.dru128.timetable.data.metadata.GeoPosition
 import com.google.android.material.snackbar.Snackbar

@@ -22,6 +22,7 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import java.io.EOFException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -116,18 +117,24 @@ class DispatcherViewModel : ViewModel()
         {
             webSocketSession = this@webSocket
             Log.d("WEB_SOCKET", "web socket admin start")
-
-            for (frame in incoming)
-            {
-                if (frame is Frame.Text)
+            try {
+                for (frame in incoming)
                 {
-                    Log.d("WEB_SOCKET", "new data")
-//                    val busLocation = Json.decodeFromString<BusLocationResponse>(frame.readText())
-//                    Log.d("WEB_SOCKET", "update position: $busLocation")
-//                    if (busLocation.position != null)
-//                        buses[busLocation.id]?.position?.emit(busLocation.position)
+                    if (frame is Frame.Text)
+                    {
+                        Log.d("WEB_SOCKET", "new data")
+                        val busLocation = Json.decodeFromString<BusLocationResponse>(frame.readText())
+                        Log.d("WEB_SOCKET", "update position: $busLocation")
+                        if (busLocation.position != null)
+                            buses[busLocation.id]?.position?.emit(busLocation.position)
+                    }
                 }
             }
+            catch (e: EOFException) {
+                webSocketSession = null
+                Log.d("WEB_SOCKET", "error ${e.message}")
+            }
+
         }
 
     }
