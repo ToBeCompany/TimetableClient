@@ -84,6 +84,7 @@
     <string name="invalid_password">Неверный пароль</string>
     <string name="reboot">Перезагрузить</string>
     <string name="time">Время</string>
+    <string name="bus_stop">Остановка</string>
 
 
     <!--  intent  -->
@@ -96,6 +97,9 @@
     <string name="which_tracker_id">which_tracker_id</string>
     <string name="route">route</string>
     <string name="itemSelected">itemSelected</string>
+    <string name="tag_id">tag_id</string>
+    <string name="tag_name">tag_name</string>
+    <string name="tag_time">tag_time</string>
 
     <!--  Notification  -->
     <string name="click_to_open_app">Нажмите чтобы открыть приложение</string>

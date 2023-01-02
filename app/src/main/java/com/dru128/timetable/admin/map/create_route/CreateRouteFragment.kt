@@ -42,7 +42,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
-class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
+class CreateRouteFragment : MapFragment(), EditBusStopData
 {
     private val dotIcon by lazy { DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.route_dot, null))!! }
     private val dotSelectedIcon by lazy { DrawableConvertor().drawableToBitmap(ResourcesCompat.getDrawable(resources, R.drawable.route_dot_selected, null))!! }
@@ -55,7 +55,11 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
     private var adapter: BusStopAdminRecyclerAdapter = BusStopAdminRecyclerAdapter(
         { id -> deleteBusStop(id) },
-        { busStop -> busStopChanged(busStop) },
+        { bundle ->
+            val dialog = EditBusStopDataDialog()
+            dialog.arguments = bundle
+            dialog.show(childFragmentManager, EditBusStopDataDialog.TAG)
+        },
         arrayOf(),
     )
     private lateinit var progressManager: ProgressManager
@@ -94,8 +98,8 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
 
 
         binding.addBusStop.setOnClickListener {
-            val dialog = CreateBusStopDialog()
-            dialog.show(childFragmentManager, CreateBusStopDialog.TAG)
+            val dialog = EditBusStopDataDialog()
+            dialog.show(childFragmentManager, EditBusStopDataDialog.TAG)
         }
 
         binding.routeName.addTextChangedListener { viewModel.routeName = it.toString() }
@@ -215,31 +219,17 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         Log.d("action", "delete busStop | id = $busStopId")
         viewModel.deleteBusStop(busStopId)
 
-        for (busStopMarker in busStopMarkers)
-            busStopMarker.getData()?.let {
-                if (it.asString == busStopId)
-                {
-                    pointAnnotationManager.delete(busStopMarker)
-                    busStopMarkers.remove(busStopMarker)
-                }
+        forBusStops@ for (busStopMarker in busStopMarkers)
+        {
+            if (busStopMarker.getData()?.asString == busStopId)
+            {
+                Log.d("action", "SUCCESS deleted busStop with id = $busStopId")
+                busStopMarkers.remove(busStopMarker)
+                pointAnnotationManager.delete(busStopMarker)
+                break@forBusStops
             }
+        }
     }
-
-    private fun busStopChanged(newBusStop: BusStopWithTime)
-    {
-        Log.d("action", "busStopChanged")
-        viewModel.changeBusStop(newBusStop)
-
-        for (busStopMarker in busStopMarkers)
-            busStopMarker.getData()?.let {
-                if (it.asString == newBusStop.busStop.id)
-                {
-                    busStopMarker.textField = newBusStop.busStop.name
-                    pointAnnotationManager.update(busStopMarker)
-                }
-            }
-    }
-
 
     private fun addMapClickListener(): OnMapClickListener = OnMapClickListener { _routeDotAnnotation ->
         Log.d("click", "on map")
@@ -353,28 +343,51 @@ class CreateRouteFragment : MapFragment(), CreateBusStopFromDialog
         )
     }
 
-    override fun createNewBusStop(name: String, time: String)
+    override fun saveBusStopData(_id: String?, name: String, time: String)
     {
-        val busStop = BusStopWithTime(
-            busStop = BusStop(
-                id = IDManager.generateID(),
-                name = name,
-                position = pointToGeoPos(mapbox.cameraState.center)
-            ),
-            time = time
-        )
-        Log.d("createBusStop", busStop.toString())
+        if (_id == null)
+        {
+
+            val busStop = BusStopWithTime(
+                busStop = BusStop(
+                    id = IDManager.generateID(),
+                    name = name,
+                    position = pointToGeoPos(mapbox.cameraState.center)
+                ),
+                time = time
+            )
 
 
-        viewModel.addBusStop(busStop)
+            viewModel.addBusStop(busStop)
 
-        busStopMarkers.add(
-            pointAnnotationManager.create(
-                createBusStop(
-                    busStop.busStop, busStopMarkerIcon
+            busStopMarkers.add(
+                pointAnnotationManager.create(
+                    createBusStop(
+                        busStop.busStop, busStopMarkerIcon
+                    )
                 )
             )
-        )
+            Log.d("createBusStop", busStop.toString())
+        }
+        else
+        {
+            viewModel.changeBusStop(_id, name, time)
+            adapter.dataSet = viewModel.busStops.value.toTypedArray()
+            adapter.notifyDataSetChanged()
+
+            foreachBusStops@ for (busStopMarker in busStopMarkers)
+            {
+                if (busStopMarker.getData()?.asString == _id)
+                {
+                    busStopMarker.textField = name
+                    pointAnnotationManager.update(busStopMarker)
+                    break@foreachBusStops
+                }
+
+
+            }
+        }
+
     }
 
     override fun onStart() {

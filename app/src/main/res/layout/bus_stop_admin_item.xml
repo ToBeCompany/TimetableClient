@@ -16,7 +16,7 @@
         android:orientation="horizontal">
 
 
-        <EditText
+        <TextView
             android:id="@+id/name_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
+        <TextView
             android:id="@+id/time_text"
             android:layout_width="80sp"
             android:layout_height="wrap_content"

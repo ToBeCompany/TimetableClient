@@ -50,41 +50,41 @@ class MainActivity : AppCompatActivity()
         val inflater = navController.navInflater
 
         lifecycleScope.launch {
-            if (user == null) {
-                this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                navController.graph = inflater.inflate(R.navigation.nav_auth)
-                // отправить на экран аунтификации
-            }
-            else
-            {
-                supportActionBar?.hide()
-                if (viewModel.getUser(user.id) != null)
-                {
-                    supportActionBar?.show()
-                    when (user.userType) {
-                        TypeUser.DRIVER -> {
-                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                            navController.graph = inflater.inflate(R.navigation.nav_driver)
-                        }
-                        TypeUser.WORKER -> {
-                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                            navController.graph = inflater.inflate(R.navigation.nav_worker)
-                        }
-                        TypeUser.ADMIN -> {
-                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                            navController.graph = inflater.inflate(R.navigation.nav_admin)
-                        }
-                        TypeUser.DISPAT -> {
+//            if (user == null) {
+//                this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//                navController.graph = inflater.inflate(R.navigation.nav_auth)
+//                // отправить на экран аунтификации
+//            }
+//            else
+//            {
+//                supportActionBar?.hide()
+//                if (viewModel.getUser(user.id) != null)
+//                {
+//                    supportActionBar?.show()
+//                    when (user.userType) {
+//                        TypeUser.DRIVER -> {
+//                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//                            navController.graph = inflater.inflate(R.navigation.nav_driver)
+//                        }
+//                        TypeUser.WORKER -> {
+//                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//                            navController.graph = inflater.inflate(R.navigation.nav_worker)
+//                        }
+//                        TypeUser.ADMIN -> {
+//                            this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+//                            navController.graph = inflater.inflate(R.navigation.nav_admin)
+//                        }
+//                        TypeUser.DISPAT -> {
                             this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             navController.graph = inflater.inflate(R.navigation.nav_dispatcher)
-                        }
-                    }
-                } else
-                {
-                    this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    navController.setGraph(R.navigation.nav_error)
-                }
-            }
+//                        }
+//                    }
+//                } else
+//                {
+//                    this@MainActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//                    navController.setGraph(R.navigation.nav_error)
+//                }
+//            }
             progressManager.finish()
             NavigationUI.setupActionBarWithNavController(this@MainActivity, navController)
         }
