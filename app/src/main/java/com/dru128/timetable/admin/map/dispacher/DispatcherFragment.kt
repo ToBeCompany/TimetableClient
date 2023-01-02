@@ -350,12 +350,14 @@ class DispatcherFragment : MapFragment()
 
         for ((id, busLocation) in viewModel.buses)
         {
+            Log.d("forBusLoc", id)
+
             lifecycleScope.launchWhenStarted {
                 busLocation.isActual.collect { isActual ->
-                    Log.d("isActualChanged", busLocation.isActual.toString())
+                    Log.d("isActualChanged", busLocation.isActual.value.toString())
                     if (isActual)
                     {
-                        Log.d("addBusLocationChangeListener", "id = $id")
+                        Log.d("addBusLocationLis", "id = $id")
                         adapter.routePositionById(id)?.let {
                             adapter.dataSet[it].isOnline = true
                             adapter.notifyItemChanged(it)
@@ -364,7 +366,7 @@ class DispatcherFragment : MapFragment()
                     }
                     else
                     {
-                        Log.d("removeBusLocationChangeListener", "id = $id")
+                        Log.d("removeBusLocationLis", "id = $id")
                         adapter.routePositionById(id)?.let {
                             adapter.dataSet[it].isOnline = false
                             adapter.notifyItemChanged(it)
@@ -425,7 +427,7 @@ class DispatcherFragment : MapFragment()
         viewModel.buses[id]?.busLocationJob?.cancel()
         RouteAdminStorage.busMarkers[id]?.let { busMarker ->
             pointAnnotationManager.delete(busMarker)
-            RouteAdminStorage.busMarkers.remove(id, busMarker)
+            RouteAdminStorage.busMarkers.remove(id)
         }
     }
 

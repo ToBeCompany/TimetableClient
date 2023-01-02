@@ -121,10 +121,11 @@ class DispatcherViewModel : ViewModel()
             {
                 if (frame is Frame.Text)
                 {
-                    val busLocation = Json.decodeFromString<BusLocationResponse>(frame.readText())
-                    Log.d("WEB_SOCKET", "update position: $busLocation")
-                    if (busLocation.position != null)
-                        buses[busLocation.id]?.position?.emit(busLocation.position)
+                    Log.d("WEB_SOCKET", "new data")
+//                    val busLocation = Json.decodeFromString<BusLocationResponse>(frame.readText())
+//                    Log.d("WEB_SOCKET", "update position: $busLocation")
+//                    if (busLocation.position != null)
+//                        buses[busLocation.id]?.position?.emit(busLocation.position)
                 }
             }
         }

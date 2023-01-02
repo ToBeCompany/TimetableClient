@@ -42,13 +42,15 @@ class CreateRouteViewModel : ViewModel()
         _busStops.value += _BusStop
     }
 
-    fun changeBusStop(newBusStop: BusStopWithTime)
+    fun changeBusStop(id: String, name: String, time: String)
     {
+        Log.d("action", "changeBusStop")
+
         for (curBusStop in _busStops.value)
-            if (curBusStop.busStop.id == newBusStop.busStop.id)
+            if (curBusStop.busStop.id == id)
             {
-                curBusStop.time = newBusStop.time
-                curBusStop.busStop.name = newBusStop.busStop.name
+                curBusStop.time = time
+                curBusStop.busStop.name = name
             }
     }
 
@@ -59,6 +61,8 @@ class CreateRouteViewModel : ViewModel()
         for (curBusStop in _busStops.value)
             if (curBusStop.busStop.id != id)
                 newBusStops.add(curBusStop)
+            else
+                Log.d("deletedBusStop", "id = " + curBusStop.busStop.id)
 
         _busStops.value = newBusStops
     }
@@ -68,9 +72,9 @@ class CreateRouteViewModel : ViewModel()
         if (_routePoints.value.isNotEmpty() &&
             calcDistance(point, _routePoints.value.first()) <
             calcDistance(point, _routePoints.value.last()))
-            _routePoints.value = listOf(point) + _routePoints.value
+                _routePoints.value = listOf(point) + _routePoints.value
         else
-        _routePoints.value = _routePoints.value + point
+            _routePoints.value = _routePoints.value + point
     }
     fun setRouteDots(points: List<Point>)
     {
@@ -88,69 +92,71 @@ class CreateRouteViewModel : ViewModel()
 
     suspend fun createRoute(): Boolean
     {
-        val route = Route(
-            id = /*(1..238651).random().toString(),*/IDManager.generateID(),
-            name = routeName,
-            positions = pointToGeoPos(_routePoints.value),
-            busStopsWithTime = _busStops.value
-        )
-
-        val response: HttpResponse
-        try {
-            response = Repository.client.post(EndPoint.createRoute) {
-                this.setBody(Json.encodeToJsonElement(route))
-            }
-        } catch (error: Exception) {
-            Log.d("Server", "ERROR: ${error.message}")
-            return false
-        }
-        Log.d("Server", "Status code: ${response.status.value}")
-
-        return if (response.status.value == 200)
-        {
-            RouteAdminStorage.routes.value.data?.let { routes ->
-                val newRoutes = routes.plus(route)
-                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
-            }
-            Log.d("Server", "SUCCESS")
-            true
-        } else
-            false
+        return true
+//        val route = Route(
+//            id = /*(1..238651).random().toString(),*/IDManager.generateID(),
+//            name = routeName,
+//            positions = pointToGeoPos(_routePoints.value),
+//            busStopsWithTime = _busStops.value
+//        )
+//
+//        val response: HttpResponse
+//        try {
+//            response = Repository.client.post(EndPoint.createRoute) {
+//                this.setBody(Json.encodeToJsonElement(route))
+//            }
+//        } catch (error: Exception) {
+//            Log.d("Server", "ERROR: ${error.message}")
+//            return false
+//        }
+//        Log.d("Server", "Status code: ${response.status.value}")
+//
+//        return if (response.status.value == 200)
+//        {
+//            RouteAdminStorage.routes.value.data?.let { routes ->
+//                val newRoutes = routes.plus(route)
+//                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
+//            }
+//            Log.d("Server", "SUCCESS")
+//            true
+//        } else
+//            false
     }
     suspend fun editRoute(): Boolean
     {
-        val route = Route(
-            id = routeId,
-            name = routeName,
-            positions = pointToGeoPos(_routePoints.value),
-            busStopsWithTime = _busStops.value
-        )
-
-        val response: HttpResponse
-        try {
-            response = Repository.client.post(EndPoint.editRoute) {
-                this.setBody(Json.encodeToJsonElement(route))
-            }
-        } catch (error: Exception) {
-            Log.d("Server", "ERROR: ${error.message}")
-            return false
-        }
-        Log.d("Server", "Status code: ${response.status.value}")
-
-        return if (response.status.value == 200)
-        {
-            RouteAdminStorage.routes.value.data?.let { _routes ->
-                val newRoutes = Array<Route> ( _routes.size) { i ->
-                    if (_routes[i].id == route.id) route
-                    else _routes[i]
-                }
-                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
-
-            }
-            Log.d("Server", "SUCCESS")
-            true
-        } else
-            false
+        return true
+//        val route = Route(
+//            id = routeId,
+//            name = routeName,
+//            positions = pointToGeoPos(_routePoints.value),
+//            busStopsWithTime = _busStops.value
+//        )
+//
+//        val response: HttpResponse
+//        try {
+//            response = Repository.client.post(EndPoint.editRoute) {
+//                this.setBody(Json.encodeToJsonElement(route))
+//            }
+//        } catch (error: Exception) {
+//            Log.d("Server", "ERROR: ${error.message}")
+//            return false
+//        }
+//        Log.d("Server", "Status code: ${response.status.value}")
+//
+//        return if (response.status.value == 200)
+//        {
+//            RouteAdminStorage.routes.value.data?.let { _routes ->
+//                val newRoutes = Array<Route> ( _routes.size) { i ->
+//                    if (_routes[i].id == route.id) route
+//                    else _routes[i]
+//                }
+//                RouteAdminStorage.routes.value = Resource.Success(newRoutes)
+//
+//            }
+//            Log.d("Server", "SUCCESS")
+//            true
+//        } else
+//            false
     }
 
     fun calcDistance(point1: Point, point2: Point): Float // расстояние между точками
